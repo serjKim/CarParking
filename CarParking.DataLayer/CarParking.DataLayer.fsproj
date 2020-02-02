@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="DataContext.fs" />
+    <Compile Include="Dto.fs" />
+    <Compile Include="Queries.fs" />
+    <Compile Include="Commands.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
+  </ItemGroup>
+
+</Project>

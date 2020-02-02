@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Workflow.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
+    <ProjectReference Include="..\CarParking.DataLayer\CarParking.DataLayer.fsproj" />
+    <ProjectReference Include="..\CarParking.Utils\CarParking.Utils.fsproj" />
+  </ItemGroup>
+
+</Project>

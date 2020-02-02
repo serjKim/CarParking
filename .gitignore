@@ -1,0 +1,8 @@
+.paket
+paket-files
+bin
+obj
+.vs
+node_modules
+*.fsproj.user
+*.csproj.user
