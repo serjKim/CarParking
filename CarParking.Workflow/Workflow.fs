@@ -32,15 +32,27 @@ module internal Workflow =
 
 module Parking =
 
-    let createNewParking dctx () =
+    let createNewParking (dctx, token) =
         workflow {
-            return! insertParking dctx Started DateTime.UtcNow
+            let status = Started
+            let arrivalDate = DateTime.UtcNow
+            let! newId = insertParking (dctx, token) status arrivalDate
+
+            return {
+                Id = newId
+                Status = status
+                ArrivalDate = arrivalDate }
         }
 
-    let getParking dctx rawParkingId =
+    let getAllParkings (dctx, token) =
         workflow {
-            let! parkingId = ParkingId.Parse rawParkingId
-            let! parking = queryParkingById dctx parkingId
+            return! queryAllPacking (dctx, token)
+        }
+
+    let getParking (dctx, token) rawParkingId =
+        workflow {
+            let! parkingId = ParkingId.parse rawParkingId
+            let! parking = queryParkingById (dctx, token) parkingId
             match parking with
             | Some prk ->
                 return Ok prk
@@ -48,19 +60,19 @@ module Parking =
                 return Error "Parking not existing"
         }
 
-    let updateParking dctx rawParkingId rawStatus =
+    let updateParking (dctx, token) rawParkingId rawStatus =
         workflow {
-            let! status = ParkingStatus.Parse rawStatus
+            let! status = ParkingStatus.parse rawStatus
 
             match status with
             | Started ->
                 return Error "Only Complete status is supported"
             | Complete ->
-                let! parking = getParking dctx rawParkingId
+                let! parking = getParking (dctx, token) rawParkingId
 
                 match tryCompleteParking parking DateTime.UtcNow with
                 | Ok cprk ->
-                    do! updateParking dctx cprk
+                    do! updateParking (dctx, token) cprk
 
                     return Ok cprk
                 | Error err ->

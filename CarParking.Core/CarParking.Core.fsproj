@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Script.fsx" />
     <Compile Include="Domain.fs" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />

@@ -10,8 +10,8 @@ module Responses =
           Status: string
           ArrivalDate: DateTime }
         static member FromParking(x: Parking) = 
-            { Id = x.Id.LongValue
-              Status = x.Status.ToString()
+            { Id = ParkingId.toLong x.Id
+              Status = ParkingStatus.toString x.Status
               ArrivalDate = x.ArrivalDate }
 
 

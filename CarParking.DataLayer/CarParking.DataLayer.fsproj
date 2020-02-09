@@ -1,18 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
+    <Compile Include="Mapping.fs" />
     <Compile Include="DataContext.fs" />
-    <Compile Include="Dto.fs" />
     <Compile Include="Queries.fs" />
     <Compile Include="Commands.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
+    <ProjectReference Include="..\CarParking.DataLayer.CmdDefs\CarParking.DataLayer.CmdDefs.csproj" />
+    <ProjectReference Include="..\CarParking.DataLayer.Dto\CarParking.DataLayer.Dto.fsproj" />
   </ItemGroup>
-
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

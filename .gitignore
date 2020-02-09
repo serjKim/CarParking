@@ -6,3 +6,5 @@ obj
 node_modules
 *.fsproj.user
 *.csproj.user
+.ionide
+.vscode

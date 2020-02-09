@@ -5,3 +5,5 @@ module DataContext =
     
     type ISQLServerDataContext =
         abstract member Connection : IDbConnection with get
+
+    let inline getConn (dctx: ISQLServerDataContext) = dctx.Connection

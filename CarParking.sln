@@ -18,6 +18,10 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "CarParking.Utils", "CarPark
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "CarParking.WebApi", "CarParking.WebApi\CarParking.WebApi.fsproj", "{1918B54B-9CEE-4777-9B66-4D1450F0181A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarParking.DataLayer.CmdDefs", "CarParking.DataLayer.CmdDefs\CarParking.DataLayer.CmdDefs.csproj", "{0A80E289-D0E3-4890-AFF9-6E72876561D4}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CarParking.DataLayer.Dto", "CarParking.DataLayer.Dto\CarParking.DataLayer.Dto.fsproj", "{6E0FB7A8-6F9C-4BC5-B3C5-13084F6D0E37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +48,14 @@ Global
 		{1918B54B-9CEE-4777-9B66-4D1450F0181A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1918B54B-9CEE-4777-9B66-4D1450F0181A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1918B54B-9CEE-4777-9B66-4D1450F0181A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A80E289-D0E3-4890-AFF9-6E72876561D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A80E289-D0E3-4890-AFF9-6E72876561D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A80E289-D0E3-4890-AFF9-6E72876561D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A80E289-D0E3-4890-AFF9-6E72876561D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E0FB7A8-6F9C-4BC5-B3C5-13084F6D0E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E0FB7A8-6F9C-4BC5-B3C5-13084F6D0E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E0FB7A8-6F9C-4BC5-B3C5-13084F6D0E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E0FB7A8-6F9C-4BC5-B3C5-13084F6D0E37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

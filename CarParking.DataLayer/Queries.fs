@@ -1,28 +1,30 @@
 ﻿namespace CarParking.DataLayer
 
+open Mapping
 open DataContext
-open Dto
 open CarParking.Core
-open CarParking.Core.Parking
-open System.Threading.Tasks
+open Dto
+open Dapper
+open CarParking.DataLayer.CmdDefs
+open FSharp.Control.Tasks.V2.ContextInsensitive
 
 module Queries =
 
-    let queryParkingById (dctx: ISQLServerDataContext)
-                         (parkingId: ParkingId) =
-        let result =
-            match Dto.mem.Get(parkingId.LongValue) with
-            | Some dto -> 
-                let parkingId = ParkingId.FromLong dto.Id
-                match ParkingStatus.Parse dto.Status with
-                | Ok status -> 
-                    Some { Id = parkingId
-                           Status = status 
-                           ArrivalDate = dto.ArrivalDate}
-                | Error _ -> 
-                    None
-            | None ->
-                None
+    let queryParkingById (dctx, token) parkingId =
+        let cmd = ParkingCmdDefs.ParkingById(ParkingId.toLong parkingId, token)
+        let conn = getConn dctx
+        task {
+            let! dto = conn.QueryFirstOrDefaultAsync<ParkingDto>(cmd)
+            return toParking dto
+        }
 
-        result |> Task.FromResult
-    
+    let queryAllPacking (dctx, token) =
+        let cmd = ParkingCmdDefs.AllParking(token)
+        let conn = getConn dctx
+        task {
+            let! dtos = conn.QueryAsync<ParkingDto>(cmd)
+            return dtos 
+                |> Seq.map toParking
+                |> Seq.choose id (*TODO: log if None*)
+                |> Seq.toList
+        }
