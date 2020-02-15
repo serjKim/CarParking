@@ -4,26 +4,38 @@ open System
 
 type ParkingStatus =
     | Started
-    | Complete
+    | Completed
 
-type ParkingId = ParkingId of int64
-type ChargeId = ChargeId of int64
+type ParkingId = ParkingId of Guid
+type PaymentId = PaymentId of Guid
 
-type Charge = 
-    { Id: ChargeId
+type Payment = 
+    { Id: PaymentId
       CreateDate: DateTime }
-
-type Parking =
-    { Id: ParkingId
-      Status: ParkingStatus 
-      ArrivalDate: DateTime }
 
 type Tariff =
     | Free
     | First
 
-type CompleteError =
-    | FreeExpired of string
+type StartedFreeParking = 
+    { Id: ParkingId
+      ArrivalDate: DateTime }
+
+type CompletedFreeParking =    
+    { Id: ParkingId
+      ArrivalDate: DateTime
+      CompleteDate: DateTime }
+
+type CompletedFirstParking = 
+    { Id: ParkingId
+      ArrivalDate: DateTime
+      CompleteDate: DateTime
+      Payment: Payment }
+
+type Parking =
+    | StartedFreeParking of StartedFreeParking
+    | CompletedFreeParking of CompletedFreeParking
+    | CompletedFirstParking of CompletedFirstParking
 
 [<RequireQualifiedAccess>]
 module ParkingStatus =
@@ -31,29 +43,44 @@ module ParkingStatus =
         let parseStatus status = 
             String.Equals 
                 (status.ToString(), str, 
-                StringComparison.InvariantCultureIgnoreCase)
+                StringComparison.Ordinal)
 
         if parseStatus Started then Ok Started
-        elif parseStatus Complete then Ok Complete
+        elif parseStatus Completed then Ok Completed
         else Error (sprintf "Couldn't parse %s status" str)
-
-    let toString (status: ParkingStatus) = status.ToString()
 
 [<RequireQualifiedAccess>]
 module ParkingId =
     let parse (str: string) = 
-        match Int64.TryParse str with
+        match Guid.TryParse str with
         | true, result -> Ok (ParkingId result)
         | false, _ -> Error (sprintf "Couldn't parse %s parkingId" str)
 
-    let toLong = function
+    let toGuid = function
         | ParkingId x -> x
+
+[<RequireQualifiedAccess>]
+module PaymentId =
+    let toGuid = function
+        | PaymentId x -> x
+
+[<RequireQualifiedAccess>]
+module Tariff =
+    let parse str =
+        let parseTariff tariff = 
+            String.Equals 
+                (tariff.ToString(), str, 
+                StringComparison.Ordinal)
+
+        if parseTariff Free then Ok Free
+        elif parseTariff First then Ok First
+        else Error (sprintf "Couldn't parse %s tariff" str)
 
 module Parking =
 
     let freeInterval = new TimeSpan (0, 10, 0)
 
-    let (|FirstTariff|_|) (prk,date: DateTime) =
+    let (|FirstTariff|_|) (prk: StartedFreeParking, date: DateTime) =
         let diff = prk.ArrivalDate - date
         if Math.Abs(diff.TotalMinutes) > freeInterval.TotalMinutes then
             Some First
@@ -65,8 +92,22 @@ module Parking =
         | FirstTariff t -> t
         | _ -> Free
 
-    let tryCompleteParking prk completeDate =
-        let tariff = calculateTariff prk completeDate
-        match tariff with
-        | Free -> Ok { prk with Status = Complete }
-        | First -> Error (FreeExpired "Free tariff was expired. You have to pay the First tariff")
+    let transitionToFree prk completeDate =
+        match calculateTariff prk completeDate with
+        | Free ->
+            Ok { Id = prk.Id
+                 ArrivalDate = prk.ArrivalDate 
+                 CompleteDate = completeDate }
+        | First ->
+            Error "Free was expired"
+
+    let transitionToFirst prk completeDate paymentId =
+        match calculateTariff prk completeDate with
+        | Free ->
+            Error "Already free"
+        | First ->
+            { Id = prk.Id
+              ArrivalDate = prk.ArrivalDate 
+              CompleteDate = completeDate
+              Payment = { Id = paymentId
+                          CreateDate = completeDate}} |> Ok

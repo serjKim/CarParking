@@ -13,6 +13,7 @@
     <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
     <ProjectReference Include="..\CarParking.DataLayer.CmdDefs\CarParking.DataLayer.CmdDefs.csproj" />
     <ProjectReference Include="..\CarParking.DataLayer.Dto\CarParking.DataLayer.Dto.fsproj" />
+    <ProjectReference Include="..\CarParking.Utils\CarParking.Utils.fsproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

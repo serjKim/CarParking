@@ -20,7 +20,9 @@ module Program =
             GET >=> routeCi "/parkings" >=> getAllParkingsHandler
             GET >=> routeCif "/parkings/%s" getParkingHandler
             POST >=> routeCi "/parkings" >=> createParkingHandler
-            PATCH >=> routeCif "/parkings/%s" updateParkingHandler ]
+            PATCH >=> routeCif "/parkings/%s" updateParkingHandler
+            
+            POST >=> routeCif "/parkings/%s/payments" createPaymentHandler ]
 
     let configuration = 
         ConfigurationBuilder()

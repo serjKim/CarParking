@@ -55,11 +55,23 @@ module RouteHandlers =
             task {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
                 | Ok req -> 
-                    match! updateParking (dctx, token) rawParkingId req.Status with
+                    match! patchParking (dctx, token) rawParkingId req.Status with
                     | Ok _ ->
                         return! Successful.NO_CONTENT next ctx
                     | Error err ->
                         return! RequestErrors.BAD_REQUEST err next ctx
                 | Error err ->
                     return! RequestErrors.BAD_REQUEST err next ctx
+            }
+
+    let createPaymentHandler rawParkingId =
+        fun (next : HttpFunc) (ctx : HttpContext) ->
+            let dctx = ctx.GetService<ISQLServerDataContext>()
+            let token = ctx.RequestAborted
+            task {
+                match! createPayment (dctx, token) rawParkingId with
+                | Ok uprk ->
+                    return! ok (ParkingResponse.FromParking uprk) next ctx
+                | Error err ->
+                    return! RequestErrors.BAD_REQUEST err next ctx 
             }

@@ -4,7 +4,27 @@ open System
 open CarParking.Core
 open CarParking.Core.Parking
 
-let x = { Id = ParkingId 1L; ArrivalDate = DateTime.UtcNow.AddMinutes(-20.); Status = Started }
+let s =
+    { Id = ParkingId (Guid.NewGuid())
+      ArrivalDate = DateTime.UtcNow.AddMinutes(-20.) }
 let d = DateTime.UtcNow
-calculateTariff x d
-let r = tryCompleteParking x d
+
+calculateTariff s d
+
+s.ToString()
+
+// Complete
+match transitionToFree s d with
+| Ok prk ->
+    printfn "Save %A to DB" prk
+| Error x ->
+    printfn "%A" x
+
+let pId = PaymentId (Guid.NewGuid())
+
+// Pay
+match transitionToFirst s d pId with
+| Ok prk ->
+    printfn "%A" prk
+| Error x ->
+    printfn "%A" x

@@ -34,14 +34,11 @@ module Parking =
 
     let createNewParking (dctx, token) =
         workflow {
-            let status = Started
-            let arrivalDate = DateTime.UtcNow
-            let! newId = insertParking (dctx, token) status arrivalDate
-
-            return {
-                Id = newId
-                Status = status
-                ArrivalDate = arrivalDate }
+            let parking = 
+                { Id = ParkingId (Guid.NewGuid())
+                  ArrivalDate = DateTime.UtcNow }
+            do! insertFreeParking (dctx, token) parking
+            return StartedFreeParking parking
         }
 
     let getAllParkings (dctx, token) =
@@ -60,23 +57,40 @@ module Parking =
                 return Error "Parking not existing"
         }
 
-    let updateParking (dctx, token) rawParkingId rawStatus =
+    let patchParking (dctx, token) rawParkingId rawStatus =
         workflow {
-            let! status = ParkingStatus.parse rawStatus
-
-            match status with
+            match! ParkingStatus.parse rawStatus with
             | Started ->
                 return Error "Only Complete status is supported"
-            | Complete ->
-                let! parking = getParking (dctx, token) rawParkingId
+            | Completed ->
+                match! getParking (dctx, token) rawParkingId with
+                | StartedFreeParking prk ->
 
-                match tryCompleteParking parking DateTime.UtcNow with
-                | Ok cprk ->
-                    do! updateParking (dctx, token) cprk
-
-                    return Ok cprk
-                | Error err ->
-                    match err with
-                    | FreeExpired message -> return Error message
+                    match transitionToFree prk DateTime.UtcNow with
+                    | Ok freePrk ->
+                        do! updateFreeParking (dctx, token) freePrk
+                        return CompletedFreeParking freePrk |> Ok
+                    | Error err ->
+                        return Error err
+                | CompletedFreeParking _ 
+                | CompletedFirstParking _ ->
+                    return Error "Parking was already complete"
         }
 
+    let createPayment (dctx, token) rawParkingId =
+        workflow {
+            let createDate = DateTime.UtcNow
+
+            match! getParking (dctx, token) rawParkingId with
+            | StartedFreeParking prk ->
+                let paymentId = PaymentId (Guid.NewGuid())
+                match transitionToFirst prk createDate paymentId with
+                | Ok firstPrk ->
+                    do! updateFirstParking (dctx, token) firstPrk
+                    return CompletedFirstParking firstPrk |> Ok
+                | Error err ->
+                    return Error err
+            | CompletedFreeParking _ 
+            | CompletedFirstParking _ ->
+                return Error "Parking was already complete"
+        }
