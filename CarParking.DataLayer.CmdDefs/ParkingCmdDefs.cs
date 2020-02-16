@@ -45,7 +45,7 @@
             return (command, Mapping, splitOn);
         }
 
-        public static CommandDefinition InsertStartedFreeParking(StartedFreeParkingDto dto, CancellationToken token = default)
+        public static CommandDefinition InsertStartedFree(StartedFreeParkingDto dto, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 insert into dbo.Parking 
@@ -60,7 +60,7 @@
             return new CommandDefinition(sqlQuery, dto, cancellationToken: token);
         }
 
-        public static CommandDefinition UpdateFreeParking(FreeParkingDto parkingDto, CancellationToken token = default)
+        public static CommandDefinition TransitionToCompletedFree(FreeParkingDto parkingDto, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 update dbo.Parking
@@ -72,7 +72,7 @@
             return new CommandDefinition(sqlQuery, parkingDto, cancellationToken: token);
         }
 
-        public static CommandDefinition UpdateFirstParking(FirstParkingDto parkingDto, IDbTransaction tran, CancellationToken token = default)
+        public static CommandDefinition TransitionToCompletedFirst(FirstParkingDto parkingDto, IDbTransaction tran, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 update dbo.Parking

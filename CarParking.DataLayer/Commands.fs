@@ -1,33 +1,33 @@
 ﻿namespace CarParking.DataLayer
 
 open System
+open Mapping
+open DataContext
+open CarParking.DataLayer.CmdDefs
+open FSharp.Control.Tasks.V2
+open Dapper
 
 module Commands =
-    open Mapping
-    open DataContext
-    open CarParking.DataLayer.CmdDefs
-    open FSharp.Control.Tasks.V2
-    open Dapper
 
-    let insertFreeParking (dctx, token) parking =
+    let insertStartedFree (dctx, token) parking =
         let conn = getConn dctx
         let dto = toStartedFreeParkingDto parking
-        let cmd = ParkingCmdDefs.InsertStartedFreeParking(dto, token)
+        let cmd = ParkingCmdDefs.InsertStartedFree(dto, token)
         task {
             let! rows = conn.ExecuteAsync(cmd)
             return (rows > 0)
         }
 
-    let updateFreeParking (dctx, token) freePrk =
+    let transitionToCompletedFree (dctx, token) freePrk =
         let conn = getConn dctx
         let dto = toFreeParkingDto freePrk
-        let cmd = ParkingCmdDefs.UpdateFreeParking(dto, token)
+        let cmd = ParkingCmdDefs.TransitionToCompletedFree(dto, token)
         task {
             let! rows = conn.ExecuteAsync(cmd)
             return (rows > 0)            
         }
 
-    let updateFirstParking (dctx, token) parking =
+    let transitionToCompletedFirst (dctx, token) parking =
         let conn = getConn dctx
         let dto = toFirstParkingDto parking
         task {
@@ -38,7 +38,7 @@ module Commands =
                     let paymentCmd = PaymentCmdDefs.InsertPayment(dto.Payment, tran, token)
                     let! _ = conn.ExecuteAsync(paymentCmd)
 
-                    let updateCmd = ParkingCmdDefs.UpdateFirstParking(dto, tran, token)
+                    let updateCmd = ParkingCmdDefs.TransitionToCompletedFirst(dto, tran, token)
                     let! rows = conn.ExecuteAsync(updateCmd)
 
                     tran.Commit()

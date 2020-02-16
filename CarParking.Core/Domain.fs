@@ -92,7 +92,7 @@ module Parking =
         | FirstTariff t -> t
         | _ -> Free
 
-    let transitionToFree prk completeDate =
+    let transitionToCompletedFree prk completeDate =
         match calculateTariff prk completeDate with
         | Free ->
             Ok { Id = prk.Id
@@ -101,13 +101,14 @@ module Parking =
         | First ->
             Error "Free was expired"
 
-    let transitionToFirst prk completeDate paymentId =
+    let transitionToCompletedFirst prk (completeDate, paymentId) =
         match calculateTariff prk completeDate with
         | Free ->
-            Error "Already free"
+            Error "Payment is not applicable for Free tariff"
         | First ->
             { Id = prk.Id
               ArrivalDate = prk.ArrivalDate 
               CompleteDate = completeDate
-              Payment = { Id = paymentId
-                          CreateDate = completeDate}} |> Ok
+              Payment =
+                { Id = paymentId
+                  CreateDate = completeDate}} |> Ok

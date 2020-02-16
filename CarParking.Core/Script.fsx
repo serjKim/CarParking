@@ -11,10 +11,8 @@ let d = DateTime.UtcNow
 
 calculateTariff s d
 
-s.ToString()
-
 // Complete
-match transitionToFree s d with
+match transitionToCompletedFree s d with
 | Ok prk ->
     printfn "Save %A to DB" prk
 | Error x ->
@@ -23,7 +21,7 @@ match transitionToFree s d with
 let pId = PaymentId (Guid.NewGuid())
 
 // Pay
-match transitionToFirst s d pId with
+match transitionToCompletedFirst s (d, pId) with
 | Ok prk ->
     printfn "%A" prk
 | Error x ->

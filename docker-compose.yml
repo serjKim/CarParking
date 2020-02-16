@@ -1,0 +1,11 @@
+version: '3.3'
+services:
+    database:
+        build: ./database
+        environment:
+            - ACCEPT_EULA=Y
+            - SA_PASSWORD=(!)123password
+        ports:
+            - '1433:1433'
+        container_name: car_parking
+

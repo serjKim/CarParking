@@ -29,7 +29,7 @@ module Responses =
                   Payment      = Unchecked.defaultof<PaymentResponse> }
             | CompletedFreeParking prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "StartedFirstParking"
+                  Type         = "CompletedFreeParking"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
                   Payment      = Unchecked.defaultof<PaymentResponse> }

@@ -7,7 +7,7 @@ open CarParking.Utils
 open CarParking.Core
 open CarParking.Core.Parking
 open CarParking.DataLayer.Queries
-open CarParking.DataLayer.Commands
+open CarParking.DataLayer
 
 [<AutoOpen>]
 module internal Workflow =
@@ -37,7 +37,7 @@ module Parking =
             let parking = 
                 { Id = ParkingId (Guid.NewGuid())
                   ArrivalDate = DateTime.UtcNow }
-            do! insertFreeParking (dctx, token) parking
+            do! Commands.insertStartedFree (dctx, token) parking
             return StartedFreeParking parking
         }
 
@@ -66,15 +66,15 @@ module Parking =
                 match! getParking (dctx, token) rawParkingId with
                 | StartedFreeParking prk ->
 
-                    match transitionToFree prk DateTime.UtcNow with
+                    match transitionToCompletedFree prk DateTime.UtcNow with
                     | Ok freePrk ->
-                        do! updateFreeParking (dctx, token) freePrk
+                        do! Commands.transitionToCompletedFree (dctx, token) freePrk
                         return CompletedFreeParking freePrk |> Ok
                     | Error err ->
                         return Error err
                 | CompletedFreeParking _ 
                 | CompletedFirstParking _ ->
-                    return Error "Parking was already complete"
+                    return Error "Parking was already completed"
         }
 
     let createPayment (dctx, token) rawParkingId =
@@ -84,13 +84,13 @@ module Parking =
             match! getParking (dctx, token) rawParkingId with
             | StartedFreeParking prk ->
                 let paymentId = PaymentId (Guid.NewGuid())
-                match transitionToFirst prk createDate paymentId with
+                match transitionToCompletedFirst prk (createDate, paymentId) with
                 | Ok firstPrk ->
-                    do! updateFirstParking (dctx, token) firstPrk
+                    do! Commands.transitionToCompletedFirst (dctx, token) firstPrk
                     return CompletedFirstParking firstPrk |> Ok
                 | Error err ->
                     return Error err
             | CompletedFreeParking _ 
             | CompletedFirstParking _ ->
-                return Error "Parking was already complete"
+                return Error "Parking was already completed"
         }

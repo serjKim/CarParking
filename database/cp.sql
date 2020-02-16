@@ -1,4 +1,9 @@
-﻿CREATE TABLE [dbo].[Payment] (
+﻿CREATE DATABASE CarParking
+GO
+USE CarParking
+GO
+
+CREATE TABLE [dbo].[Payment] (
     [PaymentID]  UNIQUEIDENTIFIER NOT NULL,
     [CreateDate] DATETIME2 (7)    NOT NULL
     PRIMARY KEY CLUSTERED ([PaymentID])
@@ -42,33 +47,11 @@ CREATE TABLE [dbo].[Parking] (
 GO
 CREATE NONCLUSTERED INDEX [IX_Parking_StatusID]
     ON [dbo].[Parking]([StatusID]);
---insert into dbo.ParkingStatus (ParkingStatusID, Name) values (newid(), 'Started'), (newid(), 'Completed')
---insert into dbo.Tariff([TariffID],[Name]) values (newid(), 'Free'), (newid(), 'First')
 
--- delete from dbo.Parking
--- delete from dbo.ParkingStatus
--- delete from dbo.Payment
--- delete from dbo.Tariff
 
-select * from dbo.ParkingStatus
-select * from dbo.Parking where ParkingID =3
-select * from dbo.Tariff
-select * from dbo.Payment
-
---create SEQUENCE dbo.ParkingSeq  
---    START WITH 8  
---    INCREMENT BY 1 ; 
-
---CREATE TABLE [MyTable]
---(
---    [ID] [bigint] PRIMARY KEY NOT NULL DEFAULT (NEXT VALUE FOR dbo.ParkingSeq),
---    [Title] [nvarchar](64) NOT NULL
---);
-
-insert into dbo.Parking 
-    (ParkingID, StatusID, ArrivalDate, TariffID)
-values
-    (newid(),
-    (select ParkingStatusID from dbo.ParkingStatus where [Name] = 'Started'),
-    getdate(),
-    (select TariffID from dbo.Tariff where [Name] = 'Free'))
+GO
+insert into dbo.ParkingStatus (ParkingStatusID, Name) 
+values (newid(), 'Started'), (newid(), 'Completed')
+GO
+insert into dbo.Tariff([TariffID],[Name]) 
+values (newid(), 'Free'), (newid(), 'First')

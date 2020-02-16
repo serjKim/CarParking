@@ -1,11 +1,9 @@
 ﻿namespace CarParking.DataLayer
 
-open CarParking.Utils
-open System
-
 module internal Mapping =
     open CarParking.Core
     open CarParking.DataLayer.Dto
+    open CarParking.Utils
 
     let toPayment (dto: PaymentDto) =
         if (isNull (box dto)) then
