@@ -27,30 +27,21 @@ module internal Mapping =
             let tariff = Tariff.parse dto.Tariff
             
             match (status, completeDate, payment, tariff) with
-            | Ok st, None, None, Ok Free ->
-                match st with
-                | Started ->
-                    StartedFreeParking {
-                        Id = ParkingId dto.Id
-                        ArrivalDate = dto.ArrivalDate } |> Some
-                | Completed -> None
-            | Ok st, Some cdate, None, Ok Free ->
-                match st with
-                | Started -> None
-                | Completed ->
-                    CompletedFreeParking {
-                        Id = ParkingId dto.Id
-                        ArrivalDate = dto.ArrivalDate
-                        CompleteDate = cdate } |> Some
-            | Ok st, Some cdate, Some p, Ok First ->
-                match st with
-                | Started -> None
-                | Completed ->
-                    CompletedFirstParking {
-                        Id = ParkingId dto.Id
-                        ArrivalDate = dto.ArrivalDate
-                        CompleteDate = cdate
-                        Payment = p } |> Some
+            | Ok Started, None, None, Ok Free ->
+                StartedFreeParking {
+                    Id = ParkingId dto.Id
+                    ArrivalDate = dto.ArrivalDate }|> Some
+            | Ok Completed, Some cdate, None, Ok Free ->
+                CompletedFreeParking {
+                    Id = ParkingId dto.Id
+                    ArrivalDate = dto.ArrivalDate
+                    CompleteDate = cdate } |> Some
+            | Ok Completed, Some cdate, Some p, Ok First ->
+                CompletedFirstParking {
+                    Id = ParkingId dto.Id
+                    ArrivalDate = dto.ArrivalDate
+                    CompleteDate = cdate
+                    Payment = p } |> Some
             | _,_,_,_ -> None
 
     let toStartedFreeParkingDto (prk: StartedFreeParking) =
