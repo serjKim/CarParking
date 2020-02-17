@@ -30,7 +30,7 @@ module internal Mapping =
             | Ok Started, None, None, Ok Free ->
                 StartedFreeParking {
                     Id = ParkingId dto.Id
-                    ArrivalDate = dto.ArrivalDate }|> Some
+                    ArrivalDate = dto.ArrivalDate } |> Some
             | Ok Completed, Some cdate, None, Ok Free ->
                 CompletedFreeParking {
                     Id = ParkingId dto.Id
