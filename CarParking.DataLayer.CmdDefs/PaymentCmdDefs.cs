@@ -10,11 +10,11 @@
         public static CommandDefinition InsertPayment(PaymentDto paymentDto, IDbTransaction tran, CancellationToken token = default)
         {
             var sqlQuery = $@"
-                insert into dbo.Payment
-                    (PaymentID,
+                insert into dbo.Payment(
+                    PaymentID,
                     CreateDate)
-                values
-                    (@{nameof(PaymentDto.PaymentId)},
+                values(
+                    @{nameof(PaymentDto.PaymentId)},
                     @{nameof(PaymentDto.CreateDate)})
             ";
 

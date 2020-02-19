@@ -2,7 +2,8 @@
 
 open Microsoft.AspNetCore.Http
 open Giraffe
-open FSharp.Control.Tasks.V2
+open FSharp.Control.Tasks.V2.ContextInsensitive
+open CarParking.Error
 open CarParking.Workflow.Parking
 open CarParking.DataLayer.DataContext
 open Responses
@@ -12,66 +13,55 @@ module RouteHandlers =
 
     let ok obj = Successful.ok (json obj)
 
-    let f h =
+    let toResponse okResult = function
+        | Ok x -> okResult x
+        | Error err ->
+            match err with
+            | EntityNotFound d -> RequestErrors.NOT_FOUND d
+            | BadInput d -> RequestErrors.BAD_REQUEST d
+            | TransitionError d -> RequestErrors.UNPROCESSABLE_ENTITY d
+
+    let deps handler =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let dctx = ctx.GetService<ISQLServerDataContext>()
             let token = ctx.RequestAborted
-            h next ctx dctx token
+            handler next ctx (dctx, token)
 
     let getParkingHandler rawParkingId =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
-            let dctx = ctx.GetService<ISQLServerDataContext>()
-            let token = ctx.RequestAborted
+        fun next ctx dctx ->
             task {
-                match! getParking (dctx, token) rawParkingId with
-                | Ok x ->
-                    return! ok (ParkingResponse.FromParking x) next ctx
-                | Error err -> 
-                    return! RequestErrors.BAD_REQUEST err next ctx
+                let! parking = getParking dctx rawParkingId
+                return! toResponse ok parking next ctx
             }
 
     let getAllParkingsHandler =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
-            let dctx = ctx.GetService<ISQLServerDataContext>()
-            let token = ctx.RequestAborted
+        fun next ctx dctx ->
             task {
-                let! list = getAllParkings (dctx, token)
+                let! list = getAllParkings dctx
                 return! ok (list |> List.map ParkingResponse.FromParking) next ctx
             }
 
     let createParkingHandler =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
-            let dctx = ctx.GetService<ISQLServerDataContext>()
-            let token = ctx.RequestAborted
+        fun next ctx dctx ->
             task {
-                let! newParking = createNewParking (dctx, token)
+                let! newParking = createNewParking dctx
                 return! ok (ParkingResponse.FromParking newParking) next ctx
             }
     
-    let updateParkingHandler rawParkingId =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
-            let dctx = ctx.GetService<ISQLServerDataContext>()
-            let token = ctx.RequestAborted
+    let patchParkingHandler rawParkingId =
+        fun next (ctx : HttpContext) dctx ->
             task {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
                 | Ok req -> 
-                    match! patchParking (dctx, token) rawParkingId req.Status with
-                    | Ok _ ->
-                        return! Successful.NO_CONTENT next ctx
-                    | Error err ->
-                        return! RequestErrors.BAD_REQUEST err next ctx
+                    let! res = patchParking dctx rawParkingId req.Status
+                    return! toResponse (fun _ -> Successful.NO_CONTENT) res next ctx
                 | Error err ->
                     return! RequestErrors.BAD_REQUEST err next ctx
             }
 
     let createPaymentHandler rawParkingId =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
-            let dctx = ctx.GetService<ISQLServerDataContext>()
-            let token = ctx.RequestAborted
+        fun next ctx dctx ->
             task {
-                match! createPayment (dctx, token) rawParkingId with
-                | Ok uprk ->
-                    return! ok (ParkingResponse.FromParking uprk) next ctx
-                | Error err ->
-                    return! RequestErrors.BAD_REQUEST err next ctx 
+                let! res = createPayment dctx rawParkingId
+                return! toResponse ok res next ctx
             }

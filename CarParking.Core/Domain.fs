@@ -1,5 +1,6 @@
 ﻿namespace CarParking.Core
 
+open CarParking.Error
 open System
 
 type ParkingStatus =
@@ -47,14 +48,14 @@ module ParkingStatus =
 
         if parseStatus Started then Ok Started
         elif parseStatus Completed then Ok Completed
-        else Error (sprintf "Couldn't parse %s status" str)
+        else Error <| BadInput (sprintf "Couldn't parse %s status" str)
 
 [<RequireQualifiedAccess>]
 module ParkingId =
     let parse (str: string) = 
         match Guid.TryParse str with
         | true, result -> Ok (ParkingId result)
-        | false, _ -> Error (sprintf "Couldn't parse %s parkingId" str)
+        | false, _ -> Error <| BadInput (sprintf "Couldn't parse %s parkingId" str)
 
     let toGuid = function
         | ParkingId x -> x
@@ -74,7 +75,7 @@ module Tariff =
 
         if parseTariff Free then Ok Free
         elif parseTariff First then Ok First
-        else Error (sprintf "Couldn't parse %s tariff" str)
+        else Error <| BadInput (sprintf "Couldn't parse %s tariff" str)
 
 module Parking =
 
@@ -99,16 +100,16 @@ module Parking =
                  ArrivalDate = prk.ArrivalDate 
                  CompleteDate = completeDate }
         | First ->
-            Error "Free was expired"
+            Error <| TransitionError "Free was expired"
 
     let transitionToCompletedFirst prk (completeDate, paymentId) =
         match calculateTariff prk completeDate with
         | Free ->
-            Error "Payment is not applicable for Free tariff"
+            Error <| TransitionError "Payment is not applicable for Free tariff"
         | First ->
             { Id = prk.Id
               ArrivalDate = prk.ArrivalDate 
               CompleteDate = completeDate
               Payment =
                 { Id = paymentId
-                  CreateDate = completeDate}} |> Ok
+                  CreateDate = completeDate }} |> Ok

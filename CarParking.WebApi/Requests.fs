@@ -1,7 +1,6 @@
 ﻿namespace CarParking.WebApi
 
 module Requests = 
-
-    [<CLIMutable>]
+    [<CLIMutable; NoEquality; NoComparison>]
     type ParkingPatchRequest =
         { Status: string }

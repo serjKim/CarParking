@@ -2,8 +2,9 @@
 
 open System
 open System.Threading.Tasks
-open FSharp.Control.Tasks.V2
+open FSharp.Control.Tasks.V2.ContextInsensitive
 open CarParking.Utils
+open CarParking.Error
 open CarParking.Core
 open CarParking.Core.Parking
 open CarParking.DataLayer.Queries
@@ -54,14 +55,14 @@ module Parking =
             | Some prk ->
                 return Ok prk
             | None ->
-                return Error "Parking not existing"
+                return Error <| EntityNotFound "Parking not existing"
         }
 
     let patchParking (dctx, token) rawParkingId rawStatus =
         workflow {
             match! ParkingStatus.parse rawStatus with
             | Started ->
-                return Error "Only Complete status is supported"
+                return Error <| BadInput "Only Complete status is supported"
             | Completed ->
                 match! getParking (dctx, token) rawParkingId with
                 | StartedFreeParking prk ->
@@ -74,7 +75,7 @@ module Parking =
                         return Error err
                 | CompletedFreeParking _ 
                 | CompletedFirstParking _ ->
-                    return Error "Parking was already completed"
+                    return Error <| TransitionError "Parking was already completed"
         }
 
     let createPayment (dctx, token) rawParkingId =
@@ -92,5 +93,5 @@ module Parking =
                     return Error err
             | CompletedFreeParking _ 
             | CompletedFirstParking _ ->
-                return Error "Parking was already completed"
+                return Error <| TransitionError "Parking was already completed"
         }

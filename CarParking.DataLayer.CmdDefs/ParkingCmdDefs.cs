@@ -88,16 +88,16 @@
 
         private static string GetSqlQuery() => $@"
             select 
-	            p.ParkingID [{nameof(ParkingDto.Id)}],
-	            p.ArrivalDate [{nameof(ParkingDto.ArrivalDate)}],
-	            ps.Name [{nameof(ParkingDto.Status)}],
+                p.ParkingID [{nameof(ParkingDto.Id)}],
+                p.ArrivalDate [{nameof(ParkingDto.ArrivalDate)}],
+                ps.Name [{nameof(ParkingDto.Status)}],
                 p.CompleteDate [{nameof(ParkingDto.CompleteDate)}],
                 t.Name [{nameof(ParkingDto.Tariff)}],
                 pt.PaymentID [{nameof(PaymentDto.PaymentId)}],
                 pt.CreateDate [{nameof(PaymentDto.CreateDate)}]
             from dbo.Parking p 
-	        inner join dbo.ParkingStatus ps
-		        on ps.ParkingStatusID = p.StatusID
+            inner join dbo.ParkingStatus ps
+                on ps.ParkingStatusID = p.StatusID
             left join dbo.Payment pt
                 on pt.PaymentID = p.PaymentID
             left join dbo.Tariff t

@@ -17,12 +17,12 @@ module Program =
         choose [
             GET >=> routeCi "/ping" >=> text "pong"
 
-            GET >=> routeCi "/parkings" >=> getAllParkingsHandler
-            GET >=> routeCif "/parkings/%s" getParkingHandler
-            POST >=> routeCi "/parkings" >=> createParkingHandler
-            PATCH >=> routeCif "/parkings/%s" updateParkingHandler
+            GET >=> routeCi "/parkings" >=> (deps getAllParkingsHandler)
+            GET >=> routeCif "/parkings/%s" (getParkingHandler >> deps)
+            POST >=> routeCi "/parkings" >=> (deps createParkingHandler)
+            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler >> deps)
             
-            POST >=> routeCif "/parkings/%s/payments" createPaymentHandler ]
+            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> deps) ]
 
     let configuration = 
         ConfigurationBuilder()
