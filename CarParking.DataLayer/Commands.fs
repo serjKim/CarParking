@@ -28,27 +28,24 @@ module Commands =
         }
 
     let transitionToCompletedFirst (cpdc, token) parking =
-        let conn = getConn cpdc
         let dto = toFirstParkingDto parking
         task {
+            use conn = getConn cpdc
+            conn.Open()
+            use tran = conn.BeginTransaction()
             try
-                conn.Open()
-                use tran = conn.BeginTransaction()
-                try
-                    let paymentCmd = PaymentCmdDefs.InsertPayment(dto.Payment, tran, token)
-                    let! _ = conn.ExecuteAsync(paymentCmd)
+                let paymentCmd = PaymentCmdDefs.InsertPayment(dto.Payment, tran, token)
+                let! _ = conn.ExecuteAsync(paymentCmd)
 
-                    let updateCmd = ParkingCmdDefs.TransitionToCompletedFirst(dto, tran, token)
-                    let! rows = conn.ExecuteAsync(updateCmd)
+                let updateCmd = ParkingCmdDefs.TransitionToCompletedFirst(dto, tran, token)
+                let! rows = conn.ExecuteAsync(updateCmd)
 
-                    tran.Commit()
+                tran.Commit()
 
-                    return (rows > 0)
-                with 
-                | _ as ex -> 
-                    tran.Rollback()
-                    raise(new Exception(ex.Message, ex))
-                    return false
-            finally
-                conn.Close()
+                return (rows > 0)
+            with 
+            | _ as ex -> 
+                tran.Rollback()
+                raise(new Exception(ex.Message, ex))
+                return false
         }
