@@ -9,8 +9,8 @@ open Dapper
 
 module Commands =
 
-    let insertStartedFree (dctx, token) parking =
-        let conn = getConn dctx
+    let insertStartedFree (cpdc, token) parking =
+        let conn = getConn cpdc
         let dto = toStartedFreeParkingDto parking
         let cmd = ParkingCmdDefs.InsertStartedFree(dto, token)
         task {
@@ -18,8 +18,8 @@ module Commands =
             return (rows > 0)
         }
 
-    let transitionToCompletedFree (dctx, token) freePrk =
-        let conn = getConn dctx
+    let transitionToCompletedFree (cpdc, token) freePrk =
+        let conn = getConn cpdc
         let dto = toFreeParkingDto freePrk
         let cmd = ParkingCmdDefs.TransitionToCompletedFree(dto, token)
         task {
@@ -27,8 +27,8 @@ module Commands =
             return (rows > 0)            
         }
 
-    let transitionToCompletedFirst (dctx, token) parking =
-        let conn = getConn dctx
+    let transitionToCompletedFirst (cpdc, token) parking =
+        let conn = getConn cpdc
         let dto = toFirstParkingDto parking
         task {
             try

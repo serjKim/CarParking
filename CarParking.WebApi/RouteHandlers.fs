@@ -10,7 +10,6 @@ open Responses
 open Requests
 
 module RouteHandlers =
-
     let ok obj = Successful.ok (json obj)
 
     let toResponse okResult = function
@@ -21,17 +20,17 @@ module RouteHandlers =
             | BadInput d -> RequestErrors.BAD_REQUEST d
             | TransitionError d -> RequestErrors.UNPROCESSABLE_ENTITY d
 
-    let deps handler =
+    let injectDctx handler =
         fun (next : HttpFunc) (ctx : HttpContext) ->
-            let dctx = ctx.GetService<ISQLServerDataContext>()
+            let cpdc = ctx.GetService<ICPDataContext>()
             let token = ctx.RequestAborted
-            handler next ctx (dctx, token)
+            handler next ctx (cpdc, token)
 
     let getParkingHandler rawParkingId =
         fun next ctx dctx ->
             task {
                 let! parking = getParking dctx rawParkingId
-                return! toResponse ok parking next ctx
+                return! toResponse (ParkingResponse.FromParking >> ok) parking next ctx
             }
 
     let getAllParkingsHandler =
@@ -62,6 +61,6 @@ module RouteHandlers =
     let createPaymentHandler rawParkingId =
         fun next ctx dctx ->
             task {
-                let! res = createPayment dctx rawParkingId
-                return! toResponse ok res next ctx
+                let! payment = createPayment dctx rawParkingId
+                return! toResponse (PaymentResponse.FromPayment >> ok) payment next ctx
             }

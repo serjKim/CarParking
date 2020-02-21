@@ -3,7 +3,9 @@
 module DataContext =
     open System.Data
     
-    type ISQLServerDataContext =
+    type ICPDataContext =
         abstract member Connection : IDbConnection with get
 
-    let inline getConn (dctx: ISQLServerDataContext) = dctx.Connection
+    let inline getConn (dctx: ICPDataContext) = dctx.Connection
+
+    type DataContext = ICPDataContext * System.Threading.CancellationToken

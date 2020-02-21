@@ -13,16 +13,19 @@ open System.Data.SqlClient
 open System.Data
 
 module Program =
+    let inline private ( <>> ) f g = g f
+    let inline private ( ^ ) f x = f x
+
     let webApp =
         choose [
             GET >=> routeCi "/ping" >=> text "pong"
 
-            GET >=> routeCi "/parkings" >=> (deps getAllParkingsHandler)
-            GET >=> routeCif "/parkings/%s" (getParkingHandler >> deps)
-            POST >=> routeCi "/parkings" >=> (deps createParkingHandler)
-            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler >> deps)
+            GET >=> routeCi "/parkings" >=> (getAllParkingsHandler <>> injectDctx)
+            GET >=> routeCif "/parkings/%s" (getParkingHandler >> injectDctx)
+            POST >=> routeCi "/parkings" >=> (createParkingHandler <>> injectDctx)
+            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler >> injectDctx)
             
-            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> deps) ]
+            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> injectDctx) ]
 
     let configuration = 
         ConfigurationBuilder()
@@ -32,7 +35,7 @@ module Program =
 
     let createDbConnection (connStr: string) =
         let conn = new SqlConnection(connStr) :> IDbConnection
-        { new ISQLServerDataContext with 
+        { new ICPDataContext with 
             member __.Connection = conn }
 
     let configureApp (app : IApplicationBuilder) =
@@ -42,7 +45,7 @@ module Program =
         let connStr = host.Configuration.GetConnectionString("CarParking")
         services
             .AddGiraffe()
-            .AddTransient<ISQLServerDataContext>(fun _ -> createDbConnection connStr) |> ignore
+            .AddTransient<ICPDataContext>(fun _ -> createDbConnection connStr) |> ignore
 
     [<EntryPoint>]
     let main args =
