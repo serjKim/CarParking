@@ -50,8 +50,9 @@ CREATE NONCLUSTERED INDEX [IX_Parking_StatusID]
 
 
 GO
-insert into dbo.ParkingStatus (ParkingStatusID, Name) 
-values (newid(), 'Started'), (newid(), 'Completed')
+insert into dbo.ParkingStatus (ParkingStatusID, Name)
+values ('7F73FB8E-1D39-4D9D-84A6-69AFBFC81367', 'Started'), ('9DBD2A20-975D-47EF-9948-2CF6ECFC1583', 'Completed')
 GO
-insert into dbo.Tariff([TariffID],[Name]) 
-values (newid(), 'Free'), (newid(), 'First')
+insert into dbo.Tariff([TariffID],[Name])
+values ('8FB74D7A-4BBC-46CF-BBAB-9F159C8508A8', 'Free'), ('7FE0F00B-035B-49CE-A34A-BCE59CD31921', 'First')
+GO
