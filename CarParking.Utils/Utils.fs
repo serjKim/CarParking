@@ -18,7 +18,7 @@ type OptionExtensions() =
     static member inline ToNullable(this: Option<_>) = 
         this
         |> Option.map (fun v -> Nullable(v))
-        |>  Option.defaultValue (Nullable())
+        |> Option.defaultValue (Nullable())
 
     [<Extension>]
     static member inline MapOrDefault(this: Option<'T>, mapping) = 
