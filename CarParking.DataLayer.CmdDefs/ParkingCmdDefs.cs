@@ -57,10 +57,14 @@
                     (select TariffID from dbo.Tariff where [Name] = 'Free'))
             ";
 
-            return new CommandDefinition(sqlQuery, dto, cancellationToken: token);
+            var parameters = new DynamicParameters();
+            parameters.Add(nameof(StartedFreeParkingDto.Id), dto.Id);
+            parameters.Add(nameof(StartedFreeParkingDto.ArrivalDate), dto.ArrivalDate, DbType.DateTime2);
+
+            return new CommandDefinition(sqlQuery, parameters, cancellationToken: token);
         }
 
-        public static CommandDefinition TransitionToCompletedFree(FreeParkingDto parkingDto, CancellationToken token = default)
+        public static CommandDefinition TransitionToCompletedFree(FreeParkingDto dto, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 update dbo.Parking
@@ -69,10 +73,14 @@
                 where ParkingID = @{nameof(FreeParkingDto.Id)}
             ";
 
-            return new CommandDefinition(sqlQuery, parkingDto, cancellationToken: token);
+            var parameters = new DynamicParameters();
+            parameters.Add(nameof(FreeParkingDto.Id), dto.Id);
+            parameters.Add(nameof(FreeParkingDto.CompleteDate), dto.CompleteDate, DbType.DateTime2);
+
+            return new CommandDefinition(sqlQuery, parameters, cancellationToken: token);
         }
 
-        public static CommandDefinition TransitionToCompletedFirst(FirstParkingDto parkingDto, IDbTransaction tran, CancellationToken token = default)
+        public static CommandDefinition TransitionToCompletedFirst(FirstParkingDto dto, IDbTransaction tran, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 update dbo.Parking
@@ -83,7 +91,12 @@
                 where ParkingID = @{nameof(FirstParkingDto.Id)}
             ";
 
-            return new CommandDefinition(sqlQuery, parkingDto, transaction: tran, cancellationToken: token);
+            var parameters = new DynamicParameters();
+            parameters.Add(nameof(FirstParkingDto.Id), dto.Id);
+            parameters.Add(nameof(FirstParkingDto.CompleteDate), dto.CompleteDate, DbType.DateTime2);
+            parameters.Add(nameof(FirstParkingDto.PaymentId), dto.PaymentId);
+
+            return new CommandDefinition(sqlQuery, dto, transaction: tran, cancellationToken: token);
         }
 
         private static string GetSqlQuery() => $@"

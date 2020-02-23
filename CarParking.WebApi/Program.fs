@@ -11,6 +11,8 @@ open CarParking.DataLayer.DataContext
 open RouteHandlers
 open System.Data.SqlClient
 open System.Data
+open Newtonsoft.Json
+open Giraffe.Serialization
 
 module Program =
     let inline private ( <>> ) f g = g f
@@ -21,9 +23,9 @@ module Program =
             GET >=> routeCi "/ping" >=> text "pong"
 
             GET >=> routeCi "/parkings" >=> (getAllParkingsHandler <>> injectDctx)
-            GET >=> routeCif "/parkings/%s" (getParkingHandler >> injectDctx)
+            GET >=> routeCif "/parkings/%s" (getParkingHandler      >> injectDctx)
             POST >=> routeCi "/parkings" >=> (createParkingHandler <>> injectDctx)
-            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler >> injectDctx)
+            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler  >> injectDctx)
             
             POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> injectDctx) ]
 
@@ -43,8 +45,10 @@ module Program =
 
     let configureServices (host: WebHostBuilderContext) (services : IServiceCollection) =
         let connStr = host.Configuration.GetConnectionString("CarParking")
+        let jsonSettings = JsonSerializerSettings(DateTimeZoneHandling = DateTimeZoneHandling.Utc)
         services
             .AddGiraffe()
+            .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings))
             .AddTransient<ICPDataContext>(fun _ -> createDbConnection connStr) |> ignore
 
     [<EntryPoint>]

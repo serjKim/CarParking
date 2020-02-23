@@ -37,7 +37,7 @@ CREATE TABLE [dbo].[Parking] (
     [ArrivalDate]  DATETIME2 (7)    NOT NULL,
     [StatusID]     UNIQUEIDENTIFIER NOT NULL,
     [TariffID]     UNIQUEIDENTIFIER NOT NULL,
-    [CompleteDate] DATETIME         NULL,
+    [CompleteDate] DATETIME2 (7)    NULL,
     [PaymentID]    UNIQUEIDENTIFIER NULL,
     PRIMARY KEY CLUSTERED ([ParkingID]),
     CONSTRAINT [FK_Parking_ToParkingStatus] FOREIGN KEY ([StatusID]) REFERENCES [dbo].[ParkingStatus] ([ParkingStatusID]),
