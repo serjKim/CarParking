@@ -14,13 +14,19 @@ open FsCheck.Xunit
 open System.Threading.Tasks
 open FsToolkit.ErrorHandling
 open Dapper
+open Microsoft.Extensions.Configuration
 
 (*
     This is just a PoC. Refactor the code
 *)
 
-[<Literal>]
-let testConnString = "Data Source=localhost,1434;Initial Catalog=CarParking;Persist Security Info=True;User ID=sa;Password=(!)123password;"
+let configuration = 
+    ConfigurationBuilder()
+        .SetBasePath(Environment.CurrentDirectory)
+        .AddJsonFile("appsettings.json", false, false)
+        .Build()  
+
+let testConnString = configuration.GetConnectionString("CarParkingTests")
 
 let createCPDataContext (connStr: string) =
     let conn = new SqlConnection(connStr) :> IDbConnection

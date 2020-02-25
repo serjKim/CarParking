@@ -8,6 +8,9 @@ nuget FsCheck.Xunit 3.0.0-alpha4 alpha
 nuget FSharp.Core 4.7
 nuget FsToolkit.ErrorHandling.TaskResult
 nuget Giraffe 4.0.1
+nuget Microsoft.Extensions.Configuration
+nuget Microsoft.Extensions.Configuration.FileExtensions
+nuget Microsoft.Extensions.Configuration.Json
 nuget StyleCop.Analyzers 1.1.118
 nuget System.Data.SqlClient
 nuget System.Net.Http
