@@ -1,0 +1,8 @@
+FSharp.Core
+xunit
+xunit.runner.visualstudio
+TaskBuilder.fs
+System.Data.SqlClient
+FsCheck
+FsCheck.Xunit
+Dapper

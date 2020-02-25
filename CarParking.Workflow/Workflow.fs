@@ -11,11 +11,11 @@ open FsToolkit.ErrorHandling
 
 module Parking =
 
-    let createNewParking dctx =
+    let createNewParking dctx arrivalDate =
         task {
             let parking = 
                 { Id = ParkingId (Guid.NewGuid())
-                  ArrivalDate = DateTime.UtcNow }
+                  ArrivalDate = arrivalDate }
             let! _ = Commands.insertStartedFree dctx parking
             return StartedFreeParking parking
         }
@@ -39,7 +39,7 @@ module Parking =
                 return! Error <| EntityNotFound "Parking not existing"
         }
 
-    let patchParking dctx rawParkingId rawStatus =
+    let patchParking dctx rawParkingId rawStatus completeDate =
         taskResult {
             match! ParkingStatus.parse rawStatus with
             | Started ->
@@ -48,7 +48,7 @@ module Parking =
                 match! getParking dctx rawParkingId with
                 | StartedFreeParking prk ->
 
-                    match transitionToCompletedFree prk DateTime.UtcNow with
+                    match transitionToCompletedFree prk completeDate with
                     | Ok freePrk ->
                         do! Commands.transitionToCompletedFree dctx freePrk
                         return! CompletedFreeParking freePrk |> Ok

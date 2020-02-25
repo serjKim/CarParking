@@ -3,9 +3,15 @@ source https://api.nuget.org/v3/index.json
 storage: none
 framework: netcoreapp3.1, netstandard2.0, netstandard2.1
 nuget Dapper
+nuget FsCheck 3.0.0-alpha4 alpha
+nuget FsCheck.Xunit 3.0.0-alpha4 alpha
 nuget FSharp.Core 4.7
 nuget FsToolkit.ErrorHandling.TaskResult
 nuget Giraffe 4.0.1
 nuget StyleCop.Analyzers 1.1.118
 nuget System.Data.SqlClient
+nuget System.Net.Http
 nuget TaskBuilder.fs 2.1
+nuget xunit 2.4.1
+nuget xunit.core 2.4.1
+nuget xunit.runner.visualstudio 2.4.1

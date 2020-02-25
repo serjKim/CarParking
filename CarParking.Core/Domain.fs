@@ -60,6 +60,9 @@ module ParkingId =
     let toGuid = function
         | ParkingId x -> x
 
+    let toString = function
+        | ParkingId x -> x.ToString()
+
 [<RequireQualifiedAccess>]
 module PaymentId =
     let toGuid = function

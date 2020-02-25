@@ -35,7 +35,7 @@ module Program =
             .AddJsonFile("appsettings.json", false, true)
             .Build()  
 
-    let createDbConnection (connStr: string) =
+    let createCPDataContext (connStr: string) =
         let conn = new SqlConnection(connStr) :> IDbConnection
         { new ICPDataContext with 
             member __.Connection = conn }
@@ -49,7 +49,7 @@ module Program =
         services
             .AddGiraffe()
             .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings))
-            .AddTransient<ICPDataContext>(fun _ -> createDbConnection connStr) |> ignore
+            .AddTransient<ICPDataContext>(fun _ -> createCPDataContext connStr) |> ignore
 
     [<EntryPoint>]
     let main args =

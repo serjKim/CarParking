@@ -1,4 +1,5 @@
-﻿#load "Domain.fs"
+﻿#load "..\\CarParking.Error\Error.fs"
+#load "Domain.fs"
 
 open System
 open CarParking.Core

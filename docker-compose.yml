@@ -5,3 +5,8 @@ services:
         ports:
             - '1433:1433'
         container_name: car_parking
+    database_tests:
+        build: ./database
+        ports:
+            - '1434:1433'
+        container_name: car_parking_tests

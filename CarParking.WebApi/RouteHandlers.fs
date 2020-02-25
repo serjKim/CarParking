@@ -8,6 +8,7 @@ open CarParking.Workflow.Parking
 open CarParking.DataLayer.DataContext
 open Responses
 open Requests
+open System
 
 module RouteHandlers =
     let ok obj = Successful.ok (json obj)
@@ -43,7 +44,7 @@ module RouteHandlers =
     let createParkingHandler =
         fun next ctx dctx ->
             task {
-                let! newParking = createNewParking dctx
+                let! newParking = createNewParking dctx DateTime.UtcNow
                 return! ok (ParkingResponse.FromParking newParking) next ctx
             }
     
@@ -52,7 +53,7 @@ module RouteHandlers =
             task {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
                 | Ok req -> 
-                    let! res = patchParking dctx rawParkingId req.Status
+                    let! res = patchParking dctx rawParkingId req.Status DateTime.UtcNow
                     return! toResponse (fun _ -> Successful.NO_CONTENT) res next ctx
                 | Error err ->
                     return! RequestErrors.BAD_REQUEST err next ctx
