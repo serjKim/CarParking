@@ -1,4 +1,4 @@
-module ParkingTests
+﻿module ParkingTests
 
 open Xunit
 open FSharp.Control.Tasks.V2.ContextInsensitive
@@ -49,7 +49,7 @@ let ``Should create a StartedFreeParking and get`` (arrivalDate: DateTime) =
         let dctx = createDctx ()
 
         // clean db
-        do! cleanDb (dctx)
+        do! cleanDb dctx
         
         // create a started parking
         match! createNewParking dctx arrivalDate with
@@ -79,7 +79,7 @@ let ``Should create a bunch of StartedFreeParking and get them`` () =
     
     task {
         // clean db
-        do! cleanDb (createDctx ())
+        do! createDctx () |> cleanDb 
 
         // create a bunch
         let! createdParkings =
@@ -110,29 +110,44 @@ let ``Should create a bunch of StartedFreeParking and get them`` () =
         Assert.True((sortedLoadedParkings = sortedCreatedParkings))
     }
 
-type ExceededMinutes =
-    static member UInt32() =
-        Arb.Default.UInt32 () |> Arb.filter (fun x -> x <= 10u)
+(*
+    Knowing that a StartedFreeParking can be complete if Free tariff is not exceeded. In other words, 
+    we can describe the following condition:
+    
+    CompleteDate ≤ ArrivalDate + Δ
+    
+        where 0 ≤ Δ ≤ FreeLimit
 
-[<Property(MaxTest = 1000, Arbitrary = [| typeof<ExceededMinutes> |])>]
-let ``Should complete a StartedFreeParking if Free tariff is not exceeded`` (date: DateTime) (exceededMinutes: uint32) =
+    That's the property we need to test. Lets implement an Arbitrary instance that would generate data, satisfing our condition.
+*)
+
+type FreeParkingDates = Dates of DateTime * DateTime * uint32
+
+type ArbitaryFreeParkingDates =
+    static member FreeParkingDates() =
+        Arb.generate<DateTime * uint32 * uint32> 
+        |> Gen.filter (fun (_, delta, freeLimit) -> delta <= freeLimit)
+        |> Gen.map (fun (date, delta, freeLimit) ->
+            let arrivalDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0)
+            let completeDate  = arrivalDate.AddMinutes (float delta)
+            Dates (arrivalDate, completeDate, freeLimit))
+        |> Arb.fromGen
+        
+[<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
+let ``Should patch a StartedFreeParking status, transferring to Complete if Free tariff is not exceeded`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
 
         // clean db
-        do! cleanDb (dctx)
-    
-        let arrivalDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0)
+        do! cleanDb dctx
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
         | StartedFreeParking parking ->
             
             let rawParkingId = parking.Id |> ParkingId.toString
-           
-            let completeDate = arrivalDate.AddMinutes (float exceededMinutes)
 
-            match! patchParking dctx rawParkingId (Completed.ToString()) completeDate with
+            match! patchParking dctx (TimeSpan(0, int freeLimit, 0)) rawParkingId (Completed.ToString()) completeDate with
             | CompletedFreeParking prk ->
                 Assert.True(prk.Id = parking.Id && prk.ArrivalDate = parking.ArrivalDate && prk.CompleteDate = completeDate)
 

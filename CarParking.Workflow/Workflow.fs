@@ -39,7 +39,7 @@ module Parking =
                 return! Error <| EntityNotFound "Parking not existing"
         }
 
-    let patchParking dctx rawParkingId rawStatus completeDate =
+    let patchParking dctx freeLimit rawParkingId rawStatus completeDate =
         taskResult {
             match! ParkingStatus.parse rawStatus with
             | Started ->
@@ -48,7 +48,7 @@ module Parking =
                 match! getParking dctx rawParkingId with
                 | StartedFreeParking prk ->
 
-                    match transitionToCompletedFree prk completeDate with
+                    match transitionToCompletedFree freeLimit prk completeDate with
                     | Ok freePrk ->
                         do! Commands.transitionToCompletedFree dctx freePrk
                         return! CompletedFreeParking freePrk |> Ok
@@ -59,14 +59,14 @@ module Parking =
                     return! Error <| TransitionError "Parking was already completed"
         }
 
-    let createPayment dctx rawParkingId =
+    let createPayment dctx freeLimit rawParkingId =
         taskResult {
             let createDate = DateTime.UtcNow
 
             match! getParking dctx rawParkingId with
             | StartedFreeParking prk ->
                 let paymentId = PaymentId (Guid.NewGuid())
-                match transitionToCompletedFirst prk (createDate, paymentId) with
+                match transitionToCompletedFirst freeLimit prk paymentId createDate with
                 | Ok firstPrk ->
                     do! Commands.transitionToCompletedFirst dctx firstPrk
                     return! firstPrk.Payment |> Ok

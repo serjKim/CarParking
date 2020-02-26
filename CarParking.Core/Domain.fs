@@ -82,22 +82,20 @@ module Tariff =
 
 module Parking =
 
-    let freeInterval = new TimeSpan (0, 10, 0)
-
-    let (|FirstTariff|_|) (prk: StartedFreeParking, date: DateTime) =
+    let (|FirstTariff|_|) (freeLimit: TimeSpan) (prk: StartedFreeParking, date: DateTime) =
         let diff = prk.ArrivalDate - date
-        if Math.Abs(diff.TotalMinutes) > freeInterval.TotalMinutes then
+        if Math.Abs(diff.TotalMinutes) > freeLimit.TotalMinutes then
             Some First
         else
             None
 
-    let calculateTariff prk date =
+    let calculateTariff freeLimit prk date =
         match prk,date with
-        | FirstTariff t -> t
+        | FirstTariff freeLimit t -> t
         | _ -> Free
 
-    let transitionToCompletedFree prk completeDate =
-        match calculateTariff prk completeDate with
+    let transitionToCompletedFree freeLimit prk completeDate =
+        match calculateTariff freeLimit prk completeDate with
         | Free ->
             Ok { Id = prk.Id
                  ArrivalDate = prk.ArrivalDate 
@@ -105,8 +103,8 @@ module Parking =
         | First ->
             Error <| TransitionError "Free was expired"
 
-    let transitionToCompletedFirst prk (completeDate, paymentId) =
-        match calculateTariff prk completeDate with
+    let transitionToCompletedFirst freeLimit prk paymentId completeDate =
+        match calculateTariff freeLimit prk completeDate with
         | Free ->
             Error <| TransitionError "Payment is not applicable for Free tariff"
         | First ->

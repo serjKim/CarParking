@@ -53,7 +53,7 @@ module RouteHandlers =
             task {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
                 | Ok req -> 
-                    let! res = patchParking dctx rawParkingId req.Status DateTime.UtcNow
+                    let! res = patchParking dctx (new TimeSpan(0, 10, 0)) rawParkingId req.Status DateTime.UtcNow
                     return! toResponse (fun _ -> Successful.NO_CONTENT) res next ctx
                 | Error err ->
                     return! RequestErrors.BAD_REQUEST err next ctx
@@ -62,6 +62,6 @@ module RouteHandlers =
     let createPaymentHandler rawParkingId =
         fun next ctx dctx ->
             task {
-                let! payment = createPayment dctx rawParkingId
+                let! payment = createPayment dctx (new TimeSpan(0, 10, 0)) rawParkingId
                 return! toResponse (PaymentResponse.FromPayment >> ok) payment next ctx
             }
