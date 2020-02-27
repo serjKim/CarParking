@@ -6,6 +6,7 @@ open CarParking.Workflow.Parking
 open System.Data.SqlClient
 open CarParking.DataLayer.DataContext
 open CarParking.Core
+open CarParking.Error
 open System.Data
 open System.Threading
 open System
@@ -38,8 +39,8 @@ let createDctx () = (createCPDataContext testConnString, CancellationToken.None)
 let cleanDb (cpdc, _) =
     let conn = getConn cpdc
     task {
-        let! _ = conn.ExecuteAsync("delete from Payment")
         let! _ = conn.ExecuteAsync("delete from Parking")
+        let! _ = conn.ExecuteAsync("delete from Payment")
         return ()
     }
 
@@ -121,20 +122,23 @@ let ``Should create a bunch of StartedFreeParking and get them`` () =
     That's the property we need to test. Lets implement an Arbitrary instance that would generate data, satisfing our condition.
 *)
 
-type FreeParkingDates = Dates of DateTime * DateTime * uint32
+type FreeParkingDates = Dates of DateTime * DateTime * TimeSpan
+
+let generateFreeDatesArb condition =
+    Arb.generate<DateTime * uint32 * uint32> 
+    |> Gen.filter condition
+    |> Gen.map (fun (date, delta, freeLimit) ->
+        let arrivalDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0)
+        let completeDate  = arrivalDate.AddMinutes (float delta)
+        Dates (arrivalDate, completeDate, TimeSpan(0, int freeLimit, 0)))
+    |> Arb.fromGen
 
 type ArbitaryFreeParkingDates =
     static member FreeParkingDates() =
-        Arb.generate<DateTime * uint32 * uint32> 
-        |> Gen.filter (fun (_, delta, freeLimit) -> delta <= freeLimit)
-        |> Gen.map (fun (date, delta, freeLimit) ->
-            let arrivalDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0)
-            let completeDate  = arrivalDate.AddMinutes (float delta)
-            Dates (arrivalDate, completeDate, freeLimit))
-        |> Arb.fromGen
+        generateFreeDatesArb (fun (_, delta, freeLimit) -> delta <= freeLimit)
         
 [<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
-let ``Should patch a StartedFreeParking status, transferring to Complete if Free tariff is not exceeded`` (Dates (arrivalDate, completeDate, freeLimit)) =
+let ``Should patch a StartedFreeParking, transferring to Complete if Free tariff is not expired`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
 
@@ -147,7 +151,7 @@ let ``Should patch a StartedFreeParking status, transferring to Complete if Free
             
             let rawParkingId = parking.Id |> ParkingId.toString
 
-            match! patchParking dctx (TimeSpan(0, int freeLimit, 0)) rawParkingId (Completed.ToString()) completeDate with
+            match! patchParking dctx freeLimit rawParkingId (Completed.ToString()) completeDate with
             | CompletedFreeParking prk ->
                 Assert.True(prk.Id = parking.Id && prk.ArrivalDate = parking.ArrivalDate && prk.CompleteDate = completeDate)
 
@@ -164,4 +168,59 @@ let ``Should patch a StartedFreeParking status, transferring to Complete if Free
         
         | _  ->
             return false
+    } |> Task.map Result.isOk
+
+type ArbitaryExpiredParkingDates =
+    static member FreeParkingDates() =
+        generateFreeDatesArb (fun (_, delta, freeLimit) -> delta > freeLimit)
+
+[<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free tariff is expired``(Dates (arrivalDate, completeDate, freeLimit)) =
+    task {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+        
+            let rawParkingId = parking.Id |> ParkingId.toString
+
+            match! patchParking dctx freeLimit rawParkingId (Completed.ToString()) completeDate with
+            | Ok _ ->
+                return false
+            | Error err ->
+                match err with
+                | TransitionError message ->
+                    return (message = "Free was expired")
+                | _ ->
+                    return false
+    
+        | _  ->
+            return false
+    }
+
+[<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+let ``Should create a payment and complete a StartedFreeParking if Free tariff is expired``(Dates (arrivalDate, completeDate, freeLimit)) =
+    taskResult {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+        
+            let rawParkingId = parking.Id |> ParkingId.toString
+
+            let! payment = createPayment dctx freeLimit rawParkingId completeDate
+
+            return payment.CreateDate = completeDate
+    
+        | _  ->
+            return false
+
     } |> Task.map Result.isOk

@@ -59,14 +59,12 @@ module Parking =
                     return! Error <| TransitionError "Parking was already completed"
         }
 
-    let createPayment dctx freeLimit rawParkingId =
+    let createPayment dctx freeLimit rawParkingId completeDate =
         taskResult {
-            let createDate = DateTime.UtcNow
-
             match! getParking dctx rawParkingId with
             | StartedFreeParking prk ->
                 let paymentId = PaymentId (Guid.NewGuid())
-                match transitionToCompletedFirst freeLimit prk paymentId createDate with
+                match transitionToCompletedFirst freeLimit prk paymentId completeDate with
                 | Ok firstPrk ->
                     do! Commands.transitionToCompletedFirst dctx firstPrk
                     return! firstPrk.Payment |> Ok

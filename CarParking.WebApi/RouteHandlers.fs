@@ -62,6 +62,6 @@ module RouteHandlers =
     let createPaymentHandler rawParkingId =
         fun next ctx dctx ->
             task {
-                let! payment = createPayment dctx (new TimeSpan(0, 10, 0)) rawParkingId
+                let! payment = createPayment dctx (new TimeSpan(0, 10, 0)) rawParkingId DateTime.UtcNow
                 return! toResponse (PaymentResponse.FromPayment >> ok) payment next ctx
             }

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
     <ProjectReference Include="..\CarParking.DataLayer\CarParking.DataLayer.fsproj" />
+    <ProjectReference Include="..\CarParking.Error\CarParking.Error.fsproj" />
     <ProjectReference Include="..\CarParking.Workflow\CarParking.Workflow.fsproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
