@@ -45,7 +45,7 @@ let cleanDb (cpdc, _) =
     }
 
 [<Property(MaxTest = 1000)>]
-let ``Should create a StartedFreeParking and get`` (arrivalDate: DateTime) =
+let ``Should create a StartedFreeParking`` (arrivalDate: DateTime) =
     taskResult {
         let dctx = createDctx ()
 
@@ -71,7 +71,7 @@ let ``Should create a StartedFreeParking and get`` (arrivalDate: DateTime) =
     } |> Task.map Result.isOk
 
 [<Fact>]
-let ``Should create a bunch of StartedFreeParking and get them`` () =
+let ``Should create a bunch of StartedFreeParking`` () =
     let arrivalDates =
         Arb.Default.DateTime()
         |> Arb.mapFilter (fun x -> DateTime.SpecifyKind(x, DateTimeKind.Utc)) (fun _ -> true)
@@ -109,6 +109,42 @@ let ``Should create a bunch of StartedFreeParking and get them`` () =
         let sortedCreatedParkings = createdParkings |> List.ofArray |> List.sort
 
         Assert.True((sortedLoadedParkings = sortedCreatedParkings))
+    }
+
+[<Property(MaxTest = 1000)>]
+let ``Should return EntityNotFound if parking is not exising`` (id: Guid) =
+    task {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+        
+        let rawId = id.ToString()
+
+        match! getParking dctx rawId with
+        | Ok _ ->
+            return false
+        | Error err ->
+            match err with
+            | EntityNotFound message ->
+                return true
+            | _ ->
+                return false
+    }
+
+[<Fact>]
+let ``Should return an empty array if there isn't parkings`` () =
+    task {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        match! getAllParkings dctx with
+        | [] ->
+            return true
+        | _ ->
+            return false
     }
 
 (*
@@ -175,7 +211,7 @@ type ArbitaryExpiredParkingDates =
         generateFreeDatesArb (fun (_, delta, freeLimit) -> delta > freeLimit)
 
 [<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
-let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free tariff is expired``(Dates (arrivalDate, completeDate, freeLimit)) =
+let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free tariff is expired`` (Dates (arrivalDate, completeDate, freeLimit)) =
     task {
         let dctx = createDctx ()
 
@@ -202,8 +238,103 @@ let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free ta
             return false
     }
 
-[<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
-let ``Should create a payment and complete a StartedFreeParking if Free tariff is expired``(Dates (arrivalDate, completeDate, freeLimit)) =
+[<Property(MaxTest = 5000)>]
+let ``Patch returns BadInput if status is invalid`` (statusRaw: string)
+                                                    (arrivalDate: DateTime)
+                                                    (completeDate: DateTime)
+                                                    (freeLimit: TimeSpan) =
+    task {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+            
+            let rawParkingId = parking.Id |> ParkingId.toString
+
+            match! patchParking dctx freeLimit rawParkingId statusRaw completeDate with
+            | Ok _ ->
+                return false
+            | Error err ->
+                match err with
+                | BadInput _ ->
+                    return true
+                | _ ->
+                    return false
+        | _  ->
+            return false
+    }
+
+[<Property(MaxTest = 5000)>]
+let ``Patch supports changing from Started to Completed`` (arrivalDate: DateTime)
+                                                          (completeDate: DateTime)
+                                                          (freeLimit: TimeSpan) =
+    task {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+            
+            let rawParkingId = parking.Id |> ParkingId.toString
+
+            // try patch to Started status
+            match! patchParking dctx freeLimit rawParkingId (Started.ToString()) completeDate with
+            | Ok _ ->
+                return false
+            | Error err ->
+                match err with
+                | BadInput _ ->
+                    return true
+                | _ ->
+                    return false
+        | _  ->
+            return false
+    }
+[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
+let ``Shouldn't patch an already completed parking`` (Dates (arrivalDate, completeDate, freeLimit)) =
+    taskResult {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+        
+            let rawParkingId = parking.Id |> ParkingId.toString
+            let rawStatus = Completed.ToString()
+
+            match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
+            | CompletedFreeParking prk ->
+                
+                // try patch again
+                match! patchParking dctx freeLimit (prk.Id |> ParkingId.toString) rawStatus completeDate with
+                | Ok _ -> 
+                    return false
+                | Error err ->
+                    match err with
+                    | TransitionError _ ->
+                        return true
+                    | _ ->
+                        return false
+
+            | _ ->
+                return false
+    
+        | _  ->
+            return false
+    } |> Task.map Result.isOk
+
+[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+let ``Should create a payment and complete a StartedFreeParking if Free tariff is expired`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
 
@@ -219,6 +350,70 @@ let ``Should create a payment and complete a StartedFreeParking if Free tariff i
             let! payment = createPayment dctx freeLimit rawParkingId completeDate
 
             return payment.CreateDate = completeDate
+    
+        | _  ->
+            return false
+
+    } |> Task.map Result.isOk
+
+[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+let ``Shouldn't create a payment and complete if parking is already completed`` (Dates (arrivalDate, completeDate, freeLimit)) =
+    taskResult {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+        
+            let rawParkingId = parking.Id |> ParkingId.toString
+
+            let! _ = createPayment dctx freeLimit rawParkingId completeDate
+
+            // try pay again
+            match! createPayment (createDctx ()) freeLimit rawParkingId completeDate with
+            | Ok _ ->
+                return false
+            | Error err ->
+                match err with
+                | TransitionError _ ->
+                    return true
+                | _ ->
+                    return false
+    
+        | _  ->
+            return false
+
+    } |> Task.map Result.isOk
+
+[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+let ``Shouldn't complete an already payed parking`` (Dates (arrivalDate, completeDate, freeLimit)) =
+    taskResult {
+        let dctx = createDctx ()
+
+        // clean db
+        do! cleanDb dctx
+
+        // create a started parking
+        match! createNewParking dctx arrivalDate with
+        | StartedFreeParking parking ->
+        
+            let rawParkingId = parking.Id |> ParkingId.toString
+
+            let! _ = createPayment dctx freeLimit rawParkingId completeDate
+
+            // try patch after payment
+            match! patchParking (createDctx ()) freeLimit rawParkingId (Completed.ToString()) completeDate with
+            | Ok _ -> 
+                return false
+            | Error err ->
+                match err with
+                | TransitionError _ ->
+                    return true
+                | _ ->
+                    return false
     
         | _  ->
             return false
