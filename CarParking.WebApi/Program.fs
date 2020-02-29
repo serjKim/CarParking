@@ -13,6 +13,7 @@ open System.Data.SqlClient
 open System.Data
 open Newtonsoft.Json
 open Giraffe.Serialization
+open Configuration
 
 module Program =
     let inline private ( <>> ) f g = g f
@@ -22,12 +23,11 @@ module Program =
         choose [
             GET >=> routeCi "/ping" >=> text "pong"
 
-            GET >=> routeCi "/parkings" >=> (getAllParkingsHandler <>> injectDctx)
-            GET >=> routeCif "/parkings/%s" (getParkingHandler      >> injectDctx)
-            POST >=> routeCi "/parkings" >=> (createParkingHandler <>> injectDctx)
-            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler  >> injectDctx)
-            
-            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> injectDctx) ]
+            GET >=> routeCi "/parkings" >=> (getAllParkingsHandler <>> withDctx)
+            GET >=> routeCif "/parkings/%s" (getParkingHandler      >> withDctx)
+            POST >=> routeCi "/parkings" >=> (createParkingHandler <>> withDctx)
+            PATCH >=> routeCif "/parkings/%s" (patchParkingHandler  >> withDctx >> withSettings)
+            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> withDctx >> withSettings) ]
 
     let configuration = 
         ConfigurationBuilder()
@@ -49,7 +49,8 @@ module Program =
         services
             .AddGiraffe()
             .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings))
-            .AddTransient<ICPDataContext>(fun _ -> createCPDataContext connStr) |> ignore
+            .AddTransient<ICPDataContext>(fun _ -> createCPDataContext connStr)
+            .Configure<CarParkingSettings>(host.Configuration.GetSection("CarParking")) |> ignore
 
     [<EntryPoint>]
     let main args =

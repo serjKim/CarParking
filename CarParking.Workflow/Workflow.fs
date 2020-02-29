@@ -64,7 +64,7 @@ module Parking =
             match! getParking dctx rawParkingId with
             | StartedFreeParking prk ->
                 let paymentId = PaymentId (Guid.NewGuid())
-                match transitionToCompletedFirst freeLimit prk paymentId completeDate with
+                match transitionToCompletedFirst freeLimit prk (paymentId, completeDate) with
                 | Ok firstPrk ->
                     do! Commands.transitionToCompletedFirst dctx firstPrk
                     return! firstPrk.Payment |> Ok

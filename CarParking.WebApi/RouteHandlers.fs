@@ -9,6 +9,8 @@ open CarParking.DataLayer.DataContext
 open Responses
 open Requests
 open System
+open Microsoft.Extensions.Options
+open Configuration
 
 module RouteHandlers =
     let ok obj = Successful.ok (json obj)
@@ -21,11 +23,16 @@ module RouteHandlers =
             | BadInput d -> RequestErrors.BAD_REQUEST d
             | TransitionError d -> RequestErrors.UNPROCESSABLE_ENTITY d
 
-    let injectDctx handler =
+    let withDctx handler =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             let cpdc = ctx.GetService<ICPDataContext>()
             let token = ctx.RequestAborted
             handler next ctx (cpdc, token)
+
+    let withSettings handler =
+        fun (next : HttpFunc) (ctx : HttpContext) ->
+            let settings = ctx.GetService<IOptionsMonitor<CarParkingSettings>>()
+            handler next ctx settings.CurrentValue
 
     let getParkingHandler rawParkingId =
         fun next ctx dctx ->
@@ -49,19 +56,21 @@ module RouteHandlers =
             }
     
     let patchParkingHandler rawParkingId =
-        fun next (ctx : HttpContext) dctx ->
+        fun next (ctx : HttpContext) dctx settings ->
             task {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
                 | Ok req -> 
-                    let! res = patchParking dctx (new TimeSpan(0, 10, 0)) rawParkingId req.Status DateTime.UtcNow
+                    let freeLimit = getFreeLimit settings
+                    let! res = patchParking dctx freeLimit rawParkingId req.Status DateTime.UtcNow
                     return! toResponse (fun _ -> Successful.NO_CONTENT) res next ctx
                 | Error err ->
                     return! RequestErrors.BAD_REQUEST err next ctx
             }
 
     let createPaymentHandler rawParkingId =
-        fun next ctx dctx ->
+        fun next ctx dctx settings ->
             task {
-                let! payment = createPayment dctx (new TimeSpan(0, 10, 0)) rawParkingId DateTime.UtcNow
+                let freeLimit = getFreeLimit settings
+                let! payment = createPayment dctx freeLimit rawParkingId DateTime.UtcNow
                 return! toResponse (PaymentResponse.FromPayment >> ok) payment next ctx
             }

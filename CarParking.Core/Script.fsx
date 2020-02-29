@@ -9,11 +9,12 @@ let s =
     { Id = ParkingId (Guid.NewGuid())
       ArrivalDate = DateTime.UtcNow.AddMinutes(-20.) }
 let d = DateTime.UtcNow
+let freeLimit = TimeSpan(0, 1, 0)
 
-calculateTariff s d
+calculateTariff freeLimit s d
 
 // Complete
-match transitionToCompletedFree s d with
+match transitionToCompletedFree freeLimit s d with
 | Ok prk ->
     printfn "Save %A to DB" prk
 | Error x ->
@@ -22,7 +23,7 @@ match transitionToCompletedFree s d with
 let pId = PaymentId (Guid.NewGuid())
 
 // Pay
-match transitionToCompletedFirst s (d, pId) with
+match transitionToCompletedFirst freeLimit s (pId, d) with
 | Ok prk ->
     printfn "%A" prk
 | Error x ->

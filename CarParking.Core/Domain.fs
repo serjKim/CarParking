@@ -103,7 +103,7 @@ module Parking =
         | First ->
             Error <| TransitionError "Free was expired"
 
-    let transitionToCompletedFirst freeLimit prk paymentId completeDate =
+    let transitionToCompletedFirst freeLimit prk (paymentId, completeDate) =
         match calculateTariff freeLimit prk completeDate with
         | Free ->
             Error <| TransitionError "Payment is not applicable for Free tariff"
