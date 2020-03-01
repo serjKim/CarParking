@@ -34,9 +34,9 @@ type CompletedFirstParking =
       Payment: Payment }
 
 type Parking =
-    | StartedFreeParking of StartedFreeParking
-    | CompletedFreeParking of CompletedFreeParking
-    | CompletedFirstParking of CompletedFirstParking
+    | StartedFree of StartedFreeParking
+    | CompletedFree of CompletedFreeParking
+    | CompletedFirst of CompletedFirstParking
 
 [<RequireQualifiedAccess>]
 module ParkingStatus =
@@ -108,9 +108,9 @@ module Parking =
         | Free ->
             Error <| TransitionError "Payment is not applicable for Free tariff"
         | First ->
-            { Id = prk.Id
-              ArrivalDate = prk.ArrivalDate 
-              CompleteDate = completeDate
-              Payment =
-                { Id = paymentId
-                  CreateDate = completeDate }} |> Ok
+            Ok { Id = prk.Id
+                 ArrivalDate = prk.ArrivalDate 
+                 CompleteDate = completeDate
+                 Payment =
+                    { Id = paymentId
+                      CreateDate = completeDate } }

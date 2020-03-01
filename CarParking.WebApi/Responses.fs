@@ -21,21 +21,21 @@ module Responses =
           Payment: PaymentResponse }
         static member FromParking(x: Parking) = 
             match x with
-            | StartedFreeParking prk ->
+            | StartedFree prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "StartedFreeParking"
+                  Type         = "StartedFree"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable()
                   Payment      = Unchecked.defaultof<PaymentResponse> }
-            | CompletedFreeParking prk ->
+            | CompletedFree prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "CompletedFreeParking"
+                  Type         = "CompletedFree"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
                   Payment      = Unchecked.defaultof<PaymentResponse> }
-            | CompletedFirstParking prk ->
+            | CompletedFirst prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "CompletedFirstParking"
+                  Type         = "CompletedFirst"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
                   Payment      = PaymentResponse.FromPayment prk.Payment }                

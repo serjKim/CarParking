@@ -17,7 +17,7 @@ module Parking =
                 { Id = ParkingId (Guid.NewGuid())
                   ArrivalDate = arrivalDate }
             let! _ = Commands.insertStartedFree dctx parking
-            return StartedFreeParking parking
+            return StartedFree parking
         }
 
     let getAllParkings dctx =
@@ -46,23 +46,23 @@ module Parking =
                 return! Error <| BadInput "Only Complete status is supported"
             | Completed ->
                 match! getParking dctx rawParkingId with
-                | StartedFreeParking prk ->
+                | StartedFree prk ->
 
                     match transitionToCompletedFree freeLimit prk completeDate with
                     | Ok freePrk ->
                         do! Commands.transitionToCompletedFree dctx freePrk
-                        return! CompletedFreeParking freePrk |> Ok
+                        return! CompletedFree freePrk |> Ok
                     | Error err ->
                         return! Error err
-                | CompletedFreeParking _ 
-                | CompletedFirstParking _ ->
+                | CompletedFree _ 
+                | CompletedFirst _ ->
                     return! Error <| TransitionError "Parking was already completed"
         }
 
     let createPayment dctx freeLimit rawParkingId completeDate =
         taskResult {
             match! getParking dctx rawParkingId with
-            | StartedFreeParking prk ->
+            | StartedFree prk ->
                 let paymentId = PaymentId (Guid.NewGuid())
                 match transitionToCompletedFirst freeLimit prk (paymentId, completeDate) with
                 | Ok firstPrk ->
@@ -70,7 +70,7 @@ module Parking =
                     return! firstPrk.Payment |> Ok
                 | Error err ->
                     return! Error err
-            | CompletedFreeParking _ 
-            | CompletedFirstParking _ ->
+            | CompletedFree _ 
+            | CompletedFirst _ ->
                 return! Error <| TransitionError "Parking was already completed"
         }

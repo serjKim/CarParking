@@ -54,14 +54,14 @@ let ``Should create a StartedFreeParking`` (arrivalDate: DateTime) =
         
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
             Assert.Equal (arrivalDate, parking.ArrivalDate)
             
             let rawParkingId = parking.Id |> ParkingId.toString
 
             // get the parking
             match! getParking dctx rawParkingId with
-            | StartedFreeParking prk ->
+            | StartedFree prk ->
                 return prk = parking
             | _ ->
                 return false
@@ -92,7 +92,7 @@ let ``Should create a bunch of StartedFreeParking`` () =
             createdParkings 
                 |> Array.choose (fun parking -> 
                     match parking with
-                    | StartedFreeParking prk ->
+                    | StartedFree prk ->
                         Some prk.ArrivalDate
                     | _ as p ->
                         Assert.True(false, sprintf "Expected Started but actual %A" p)
@@ -183,18 +183,18 @@ let ``Should patch a StartedFreeParking, transferring to Complete if Free tariff
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
             
             let rawParkingId = parking.Id |> ParkingId.toString
 
             match! patchParking dctx freeLimit rawParkingId (Completed.ToString()) completeDate with
-            | CompletedFreeParking prk ->
+            | CompletedFree prk ->
                 Assert.True(prk.Id = parking.Id && prk.ArrivalDate = parking.ArrivalDate && prk.CompleteDate = completeDate)
 
                 let rawId = prk.Id |> ParkingId.toString
 
                 match! getParking dctx rawId with
-                | CompletedFreeParking p ->
+                | CompletedFree p ->
                     return p = prk
                 | _ ->
                     return false
@@ -220,7 +220,7 @@ let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free ta
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
         
             let rawParkingId = parking.Id |> ParkingId.toString
 
@@ -251,7 +251,7 @@ let ``Patch returns BadInput if status is invalid`` (statusRaw: string)
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
             
             let rawParkingId = parking.Id |> ParkingId.toString
 
@@ -280,7 +280,7 @@ let ``Patch supports changing from Started to Completed`` (arrivalDate: DateTime
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
             
             let rawParkingId = parking.Id |> ParkingId.toString
 
@@ -307,13 +307,13 @@ let ``Shouldn't patch an already completed parking`` (Dates (arrivalDate, comple
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
         
             let rawParkingId = parking.Id |> ParkingId.toString
             let rawStatus = Completed.ToString()
 
             match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
-            | CompletedFreeParking prk ->
+            | CompletedFree prk ->
                 
                 // try patch again
                 match! patchParking dctx freeLimit (prk.Id |> ParkingId.toString) rawStatus completeDate with
@@ -343,7 +343,7 @@ let ``Should create a payment and complete a StartedFreeParking if Free tariff i
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
         
             let rawParkingId = parking.Id |> ParkingId.toString
 
@@ -366,7 +366,7 @@ let ``Shouldn't create a payment and complete if parking is already completed`` 
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
         
             let rawParkingId = parking.Id |> ParkingId.toString
 
@@ -398,7 +398,7 @@ let ``Shouldn't complete an already payed parking`` (Dates (arrivalDate, complet
 
         // create a started parking
         match! createNewParking dctx arrivalDate with
-        | StartedFreeParking parking ->
+        | StartedFree parking ->
         
             let rawParkingId = parking.Id |> ParkingId.toString
 

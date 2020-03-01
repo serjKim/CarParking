@@ -28,16 +28,16 @@ module internal Mapping =
             
             match (status, completeDate, payment, tariff) with
             | Ok Started, None, None, Ok Free ->
-                StartedFreeParking {
+                StartedFree {
                     Id = ParkingId dto.Id
                     ArrivalDate = dto.ArrivalDate } |> Some
             | Ok Completed, Some cdate, None, Ok Free ->
-                CompletedFreeParking {
+                CompletedFree {
                     Id = ParkingId dto.Id
                     ArrivalDate = dto.ArrivalDate
                     CompleteDate = cdate } |> Some
             | Ok Completed, Some cdate, Some p, Ok First ->
-                CompletedFirstParking {
+                CompletedFirst {
                     Id = ParkingId dto.Id
                     ArrivalDate = dto.ArrivalDate
                     CompleteDate = cdate
