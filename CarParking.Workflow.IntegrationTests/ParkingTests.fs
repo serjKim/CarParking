@@ -44,7 +44,7 @@ let cleanDb (cpdc, _) =
         return ()
     }
 
-[<Property(MaxTest = 1000)>]
+[<Property(MaxTest = 2000)>]
 let ``Should create a StartedFreeParking`` (arrivalDate: DateTime) =
     taskResult {
         let dctx = createDctx ()
@@ -111,7 +111,7 @@ let ``Should create a bunch of StartedFreeParking`` () =
         Assert.True((sortedLoadedParkings = sortedCreatedParkings))
     }
 
-[<Property(MaxTest = 1000)>]
+[<Property(MaxTest = 2000)>]
 let ``Should return EntityNotFound if parking is not exising`` (id: Guid) =
     task {
         let dctx = createDctx ()
@@ -173,7 +173,7 @@ type ArbitaryFreeParkingDates =
     static member FreeParkingDates() =
         generateFreeDatesArb (fun (_, delta, freeLimit) -> delta <= freeLimit)
         
-[<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
+[<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
 let ``Should patch a StartedFreeParking, transferring to Complete if Free tariff is not expired`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
@@ -210,7 +210,7 @@ type ArbitaryExpiredParkingDates =
     static member FreeParkingDates() =
         generateFreeDatesArb (fun (_, delta, freeLimit) -> delta > freeLimit)
 
-[<Property(MaxTest = 5000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+[<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
 let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free tariff is expired`` (Dates (arrivalDate, completeDate, freeLimit)) =
     task {
         let dctx = createDctx ()
@@ -238,7 +238,7 @@ let ``Shouldn't patch a StartedFreeParking, returning TransitionError if Free ta
             return false
     }
 
-[<Property(MaxTest = 5000)>]
+[<Property(MaxTest = 2000)>]
 let ``Patch returns BadInput if status is invalid`` (statusRaw: string)
                                                     (arrivalDate: DateTime)
                                                     (completeDate: DateTime)
@@ -268,7 +268,7 @@ let ``Patch returns BadInput if status is invalid`` (statusRaw: string)
             return false
     }
 
-[<Property(MaxTest = 5000)>]
+[<Property(MaxTest = 2000)>]
 let ``Patch supports changing from Started to Completed`` (arrivalDate: DateTime)
                                                           (completeDate: DateTime)
                                                           (freeLimit: TimeSpan) =
@@ -297,7 +297,7 @@ let ``Patch supports changing from Started to Completed`` (arrivalDate: DateTime
         | _  ->
             return false
     }
-[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
+[<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
 let ``Shouldn't patch an already completed parking`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
@@ -333,7 +333,7 @@ let ``Shouldn't patch an already completed parking`` (Dates (arrivalDate, comple
             return false
     } |> Task.map Result.isOk
 
-[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+[<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
 let ``Should create a payment and complete a StartedFreeParking if Free tariff is expired`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
@@ -356,7 +356,7 @@ let ``Should create a payment and complete a StartedFreeParking if Free tariff i
 
     } |> Task.map Result.isOk
 
-[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+[<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
 let ``Shouldn't create a payment and complete if parking is already completed`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
@@ -388,7 +388,7 @@ let ``Shouldn't create a payment and complete if parking is already completed`` 
 
     } |> Task.map Result.isOk
 
-[<Property(MaxTest = 1000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+[<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
 let ``Shouldn't complete an already payed parking`` (Dates (arrivalDate, completeDate, freeLimit)) =
     taskResult {
         let dctx = createDctx ()
