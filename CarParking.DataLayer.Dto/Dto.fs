@@ -23,12 +23,12 @@ module Dto =
           ArrivalDate: DateTime }
 
     [<CLIMutable; NoEquality; NoComparison>]
-    type FreeParkingDto = 
+    type CompletedFreeParkingDto = 
         { Id: Guid 
           CompleteDate: DateTime }
 
     [<CLIMutable; NoEquality; NoComparison>]
-    type FirstParkingDto = 
+    type CompletedFirstParkingDto = 
         { Id: Guid 
           CompleteDate: DateTime
           Payment: PaymentDto }

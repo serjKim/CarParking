@@ -64,37 +64,37 @@
             return new CommandDefinition(sqlQuery, parameters, cancellationToken: token);
         }
 
-        public static CommandDefinition TransitionToCompletedFree(FreeParkingDto dto, CancellationToken token = default)
+        public static CommandDefinition SaveCompletedFree(CompletedFreeParkingDto dto, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 update dbo.Parking
                     set StatusID = (select ParkingStatusID from dbo.ParkingStatus where Name = 'Completed'),
-                        CompleteDate = @{nameof(FreeParkingDto.CompleteDate)}
-                where ParkingID = @{nameof(FreeParkingDto.Id)}
+                        CompleteDate = @{nameof(CompletedFreeParkingDto.CompleteDate)}
+                where ParkingID = @{nameof(CompletedFreeParkingDto.Id)}
             ";
 
             var parameters = new DynamicParameters();
-            parameters.Add(nameof(FreeParkingDto.Id), dto.Id);
-            parameters.Add(nameof(FreeParkingDto.CompleteDate), dto.CompleteDate, DbType.DateTime2);
+            parameters.Add(nameof(CompletedFreeParkingDto.Id), dto.Id);
+            parameters.Add(nameof(CompletedFreeParkingDto.CompleteDate), dto.CompleteDate, DbType.DateTime2);
 
             return new CommandDefinition(sqlQuery, parameters, cancellationToken: token);
         }
 
-        public static CommandDefinition TransitionToCompletedFirst(FirstParkingDto dto, IDbTransaction tran, CancellationToken token = default)
+        public static CommandDefinition SaveCompletedFirst(CompletedFirstParkingDto dto, IDbTransaction tran, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 update dbo.Parking
                     set StatusID = (select ParkingStatusID from dbo.ParkingStatus where Name = 'Completed'),
                         TariffID = (select TariffID from dbo.Tariff where Name = 'First'),
-                        CompleteDate = @{nameof(FirstParkingDto.CompleteDate)},
-                        PaymentID = @{nameof(FirstParkingDto.PaymentId)}
-                where ParkingID = @{nameof(FirstParkingDto.Id)}
+                        CompleteDate = @{nameof(CompletedFirstParkingDto.CompleteDate)},
+                        PaymentID = @{nameof(CompletedFirstParkingDto.PaymentId)}
+                where ParkingID = @{nameof(CompletedFirstParkingDto.Id)}
             ";
 
             var parameters = new DynamicParameters();
-            parameters.Add(nameof(FirstParkingDto.Id), dto.Id);
-            parameters.Add(nameof(FirstParkingDto.CompleteDate), dto.CompleteDate, DbType.DateTime2);
-            parameters.Add(nameof(FirstParkingDto.PaymentId), dto.PaymentId);
+            parameters.Add(nameof(CompletedFirstParkingDto.Id), dto.Id);
+            parameters.Add(nameof(CompletedFirstParkingDto.CompleteDate), dto.CompleteDate, DbType.DateTime2);
+            parameters.Add(nameof(CompletedFirstParkingDto.PaymentId), dto.PaymentId);
 
             return new CommandDefinition(sqlQuery, dto, transaction: tran, cancellationToken: token);
         }

@@ -48,11 +48,11 @@ module internal Mapping =
         { Id = ParkingId.toGuid prk.Id 
           ArrivalDate = prk.ArrivalDate }
 
-    let toFreeParkingDto (prk: CompletedFreeParking) =
+    let toCompletedFreeParkingDto (prk: CompletedFreeParking) =
         { Id           = ParkingId.toGuid prk.Id
           CompleteDate = prk.CompleteDate }
 
-    let toFirstParkingDto (prk: CompletedFirstParking) =
+    let toCompletedFirstParkingDto (prk: CompletedFirstParking) =
         { Id           = ParkingId.toGuid prk.Id
           CompleteDate = prk.CompleteDate
           Payment      = toPaymentDto prk.Payment }

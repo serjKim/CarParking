@@ -49,9 +49,9 @@ module Parking =
                 | StartedFree prk ->
 
                     match transitionToCompletedFree freeLimit prk completeDate with
-                    | Ok freePrk ->
-                        do! Commands.transitionToCompletedFree dctx freePrk
-                        return! CompletedFree freePrk |> Ok
+                    | Ok completedFree ->
+                        do! Commands.saveCompletedFree dctx completedFree
+                        return! CompletedFree completedFree |> Ok
                     | Error err ->
                         return! Error err
                 | CompletedFree _ 
@@ -66,7 +66,7 @@ module Parking =
                 let paymentId = PaymentId (Guid.NewGuid())
                 match transitionToCompletedFirst freeLimit prk (paymentId, completeDate) with
                 | Ok firstPrk ->
-                    do! Commands.transitionToCompletedFirst dctx firstPrk
+                    do! Commands.saveCompletedFirst dctx firstPrk
                     return! firstPrk.Payment |> Ok
                 | Error err ->
                     return! Error err

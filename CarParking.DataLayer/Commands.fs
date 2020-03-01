@@ -18,17 +18,17 @@ module Commands =
             return (rows > 0)
         }
 
-    let transitionToCompletedFree (cpdc, token) freePrk =
+    let saveCompletedFree (cpdc, token) completedFree =
         let conn = getConn cpdc
-        let dto = toFreeParkingDto freePrk
-        let cmd = ParkingCmdDefs.TransitionToCompletedFree(dto, token)
+        let dto = toCompletedFreeParkingDto completedFree
+        let cmd = ParkingCmdDefs.SaveCompletedFree(dto, token)
         task {
             let! rows = conn.ExecuteAsync(cmd)
             return (rows > 0)            
         }
 
-    let transitionToCompletedFirst (cpdc, token) parking =
-        let dto = toFirstParkingDto parking
+    let saveCompletedFirst (cpdc, token) completedFirst =
+        let dto = toCompletedFirstParkingDto completedFirst
         task {
             use conn = getConn cpdc
             conn.Open()
@@ -37,7 +37,7 @@ module Commands =
                 let paymentCmd = PaymentCmdDefs.InsertPayment(dto.Payment, tran, token)
                 let! _ = conn.ExecuteAsync(paymentCmd)
 
-                let updateCmd = ParkingCmdDefs.TransitionToCompletedFirst(dto, tran, token)
+                let updateCmd = ParkingCmdDefs.SaveCompletedFirst(dto, tran, token)
                 let! rows = conn.ExecuteAsync(updateCmd)
 
                 tran.Commit()
