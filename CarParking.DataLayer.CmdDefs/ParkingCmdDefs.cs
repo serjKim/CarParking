@@ -8,41 +8,25 @@
 
     public static class ParkingCmdDefs
     {
-        public static (CommandDefinition, Func<ParkingDto, PaymentDto, ParkingDto>, string) ParkingById(Guid parkingId, CancellationToken token = default)
+        public static (CommandDefinition, string) ParkingById(Guid parkingId, CancellationToken token = default)
         {
             var sqlQuery = $@"
                 {GetSqlQuery()}
                 where p.ParkingID = @{nameof(parkingId)}
             ";
-
             var command = new CommandDefinition(sqlQuery, new { parkingId }, cancellationToken: token);
-
-            static ParkingDto Mapping(ParkingDto parking, PaymentDto payment)
-            {
-                parking.Payment = payment;
-                return parking;
-            }
-
             var splitOn = nameof(PaymentDto.PaymentId);
 
-            return (command, Mapping, splitOn);
+            return (command, splitOn);
         }
 
-        public static (CommandDefinition, Func<ParkingDto, PaymentDto, ParkingDto>, string) AllParking(CancellationToken token = default)
+        public static (CommandDefinition, string) AllParking(CancellationToken token = default)
         {
             var sqlQuery = GetSqlQuery();
-
             var command = new CommandDefinition(sqlQuery, cancellationToken: token);
-
-            static ParkingDto Mapping(ParkingDto parking, PaymentDto payment)
-            {
-                parking.Payment = payment;
-                return parking;
-            }
-
             var splitOn = nameof(PaymentDto.PaymentId);
 
-            return (command, Mapping, splitOn);
+            return (command, splitOn);
         }
 
         public static CommandDefinition InsertStartedFree(StartedFreeParkingDto dto, CancellationToken token = default)
