@@ -3,6 +3,7 @@
 open Mapping
 open DataContext
 open CarParking.Core
+open CarParking.Utils.NameOf
 open Dto
 open Dapper
 open CarParking.DataLayer.CmdDefs
