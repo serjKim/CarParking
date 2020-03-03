@@ -3,6 +3,7 @@
 open Mapping
 open DataContext
 open CarParking.Core
+open CarParking.Utils.NameOf
 open Dto
 open Dapper
 open CarParking.DataLayer.CmdDefs
@@ -10,19 +11,22 @@ open FSharp.Control.Tasks.V2.ContextInsensitive
 open System.Linq
 
 module Queries =
+    let private parkingMapping (parking: ParkingDto) payment =
+        parking.Payment <- payment
+        parking
 
     let queryParkingById (cpdc, token) parkingId =
-        let struct (cmd, mapping, splitOn) = ParkingCmdDefs.ParkingById(ParkingId.toGuid parkingId, token)
+        let struct (cmd, splitOn) = ParkingCmdDefs.ParkingById(ParkingId.toGuid parkingId, token)
         let conn = getConn cpdc
         task {
-            let! dto = conn.QueryAsync<ParkingDto, PaymentDto, ParkingDto> (cmd, mapping, splitOn)
+            let! dto = conn.QueryAsync<ParkingDto, PaymentDto, ParkingDto> (cmd, parkingMapping, splitOn)
             return dto.FirstOrDefault() |> toParking
         }
 
     let queryAllPacking (cpdc, token) =
-        let struct (cmd, mapping, splitOn) = ParkingCmdDefs.AllParking(token)
+        let struct (cmd, splitOn) = ParkingCmdDefs.AllParking(token)
         let conn = getConn cpdc
         task {
-            let! dtos = conn.QueryAsync<ParkingDto, PaymentDto, ParkingDto>(cmd, mapping, splitOn)
+            let! dtos = conn.QueryAsync<ParkingDto, PaymentDto, ParkingDto>(cmd, parkingMapping, splitOn)
             return dtos |> Seq.map toParking
         }

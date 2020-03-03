@@ -15,7 +15,7 @@ module Dto =
           ArrivalDate: DateTime
           CompleteDate: Nullable<DateTime>
           Tariff: string
-          Payment: PaymentDto }
+          mutable Payment: PaymentDto }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type StartedFreeParkingDto = 
