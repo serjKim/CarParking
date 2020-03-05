@@ -1,0 +1,5 @@
+$dashboard-margin: 35px;
+
+@mixin transition() {
+    transition: all .2s ease;
+}

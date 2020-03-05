@@ -1,11 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { CreateParkingButtonComponent } from './create-parking-button/create-parking-button.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ParkingsListComponent } from './parkings-list/parkings-list.component';
 import { ParkingComponent } from './parking/parking.component';
+import { ParkingsListComponent } from './parkings-list/parkings-list.component';
 
 @NgModule({
     declarations: [
@@ -13,8 +14,10 @@ import { ParkingComponent } from './parking/parking.component';
         DashboardComponent,
         ParkingsListComponent,
         ParkingComponent,
+        CreateParkingButtonComponent,
     ],
     imports: [
+        CommonModule,
         BrowserModule,
         AppRoutingModule,
     ],
