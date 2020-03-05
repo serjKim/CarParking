@@ -1,6 +1,7 @@
-@import '../../common.scss';
+@import '../../../common.scss';
 
 :host {
     display: flex;
     margin: $dashboard-margin;
+    flex-wrap: wrap;
 }

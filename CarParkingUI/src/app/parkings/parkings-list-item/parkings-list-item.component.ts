@@ -6,12 +6,12 @@ export const enum StatusType {
 }
 
 @Component({
-  selector: 'parking',
-  templateUrl: './parking.component.html',
-  styleUrls: ['./parking.component.scss'],
+  selector: 'parkings-list-item',
+  templateUrl: './parkings-list-item.component.html',
+  styleUrls: ['./parkings-list-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParkingComponent {
+export class ParkingsListItemComponent {
     public readonly startedStatus = StatusType.Started;
     public readonly completedStatus = StatusType.Completed;
     public selectedStatus = StatusType.Started;
