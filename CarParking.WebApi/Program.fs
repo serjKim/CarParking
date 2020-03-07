@@ -40,8 +40,13 @@ module Program =
         { new ICPDataContext with 
             member __.Connection = conn }
 
-    let configureApp (app : IApplicationBuilder) =
-        app.UseGiraffe webApp
+    let getCors (host: WebHostBuilderContext) =
+        host.Configuration.GetSection("Cors").Get<Cors>()
+
+    let configureApp (host: WebHostBuilderContext) (app : IApplicationBuilder) =
+        let cors = getCors host
+        app.UseCors(cors.WebUI.Policy)
+           .UseGiraffe webApp |> ignore
 
     let configureServices (host: WebHostBuilderContext) (services : IServiceCollection) =
         let connStr = host.Configuration.GetConnectionString("CarParking")
@@ -51,6 +56,14 @@ module Program =
             .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings))
             .AddTransient<ICPDataContext>(fun _ -> createCPDataContext connStr)
             .Configure<CarParkingSettings>(host.Configuration.GetSection("CarParking")) |> ignore
+        let cors = getCors host
+        services
+            .AddCors(fun options -> 
+                options.AddPolicy(cors.WebUI.Policy,
+                    fun builder -> 
+                        builder.WithOrigins(cors.WebUI.Origins)
+                               .AllowAnyHeader()
+                               .AllowAnyMethod() |> ignore) |> ignore ) |> ignore
 
     [<EntryPoint>]
     let main args =
@@ -59,7 +72,7 @@ module Program =
                 webBuilder
                     .UseKestrel()
                     .UseConfiguration(configuration)
-                    .Configure(Action<IApplicationBuilder> configureApp)
+                    .Configure(configureApp)
                     .ConfigureServices(configureServices) |> ignore)
             .Build()
             .Run()
