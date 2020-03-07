@@ -8,3 +8,4 @@ node_modules
 *.csproj.user
 .ionide
 .vscode
+dist

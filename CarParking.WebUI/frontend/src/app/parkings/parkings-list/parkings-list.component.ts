@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ParkingsApi } from '../parkings.api';
 
 @Component({
     selector: 'parkings-list',
@@ -7,5 +8,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParkingsListComponent {
-    constructor() { }
+    constructor(public parkingsApi: ParkingsApi) {
+        // tslint:disable-next-line: no-console
+        parkingsApi.getAll().subscribe(x => console.log(x));
+    }
 }

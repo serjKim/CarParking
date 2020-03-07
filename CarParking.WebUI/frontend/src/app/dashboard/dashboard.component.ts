@@ -8,6 +8,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 })
 export class DashboardComponent {
     public method(): string {
-        return 'asd';
+        return 'asd'; 
     }
 }

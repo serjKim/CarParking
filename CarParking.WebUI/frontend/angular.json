@@ -42,8 +42,13 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/CarParkingUI",
-            "index": "src/index.html",
+            "outputPath": "../dist/content",
+            "index": {
+                "input": "src/index.cshtml",
+                "output": "../index.cshtml"
+            },
+            "deleteOutputPath": true,
+            "deployUrl": "content/",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
