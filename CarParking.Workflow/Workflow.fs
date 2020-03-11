@@ -56,7 +56,7 @@ module Parking =
                         return! Error err
                 | CompletedFree _ 
                 | CompletedFirst _ ->
-                    return! Error <| TransitionError "Parking was already completed"
+                    return! Error <| TransitionError AlreadyCompleted
         }
 
     let createPayment dctx freeLimit rawParkingId completeDate =
@@ -72,5 +72,5 @@ module Parking =
                     return! Error err
             | CompletedFree _ 
             | CompletedFirst _ ->
-                return! Error <| TransitionError "Parking was already completed"
+                return! Error <| TransitionError AlreadyCompleted
         }

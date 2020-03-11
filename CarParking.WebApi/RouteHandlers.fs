@@ -19,9 +19,9 @@ module RouteHandlers =
         | Ok x -> okResult x
         | Error err ->
             match err with
-            | EntityNotFound d -> RequestErrors.NOT_FOUND d
-            | BadInput d -> RequestErrors.BAD_REQUEST d
-            | TransitionError d -> RequestErrors.UNPROCESSABLE_ENTITY d
+            | EntityNotFound message -> RequestErrors.NOT_FOUND message
+            | BadInput message -> RequestErrors.BAD_REQUEST message
+            | TransitionError error -> RequestErrors.UNPROCESSABLE_ENTITY { ErrorType = error.ToString() }
 
     let withDctx handler =
         fun (next : HttpFunc) (ctx : HttpContext) ->
@@ -38,21 +38,30 @@ module RouteHandlers =
         fun next ctx dctx ->
             task {
                 let! parking = getParking dctx rawParkingId
-                return! toResponse (ParkingResponse.FromParking >> ok) parking next ctx
+                return! toResponse (
+                    ParkingResponse.FromParking
+                    >> ParkingResponseModel.FromResponse 
+                    >> ok) parking next ctx
             }
 
     let getAllParkingsHandler =
         fun next ctx dctx ->
             task {
                 let! list = getAllParkings dctx
-                return! ok (list |> List.map ParkingResponse.FromParking) next ctx
+                return! ok (
+                    list 
+                    |> List.map ParkingResponse.FromParking
+                    |> ParkingsResponseModel.FromResponse) next ctx
             }
 
     let createParkingHandler =
         fun next ctx dctx ->
             task {
                 let! newParking = createNewParking dctx DateTime.UtcNow
-                return! ok (ParkingResponse.FromParking newParking) next ctx
+                return! ok (
+                    newParking
+                    |> ParkingResponse.FromParking
+                    |> ParkingResponseModel.FromResponse) next ctx
             }
     
     let patchParkingHandler rawParkingId =

@@ -38,5 +38,18 @@ module Responses =
                   Type         = "CompletedFirst"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
-                  Payment      = PaymentResponse.FromPayment prk.Payment }                
-            
+                  Payment      = PaymentResponse.FromPayment prk.Payment }
+    
+    [<CLIMutable; NoEquality; NoComparison>]
+    type ParkingResponseModel =
+        { Parking: ParkingResponse }
+        static member FromResponse x = { Parking = x }
+
+    [<CLIMutable; NoEquality; NoComparison>]
+    type ParkingsResponseModel =
+        { Parkings: ParkingResponse list }
+        static member FromResponse x = { Parkings = x }
+
+    [<CLIMutable; NoEquality; NoComparison>]
+    type TransitionErrorReponse = 
+        { ErrorType: string }
