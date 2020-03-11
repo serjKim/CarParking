@@ -6,8 +6,4 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     styleUrls: ['./dashboard.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent {
-    public method(): string {
-        return 'asd'; 
-    }
-}
+export class DashboardComponent { }

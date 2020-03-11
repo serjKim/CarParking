@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ParkingsStorage } from 'src/app/parkings/parkings.storage';
 
 @Component({
     selector: 'create-parking-button',
@@ -7,5 +8,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateParkingButtonComponent {
-    constructor() { }
+    constructor(private readonly parkingsStorage: ParkingsStorage) { }
+
+    public onCreate() {
+        this.parkingsStorage.create();
+    }
 }

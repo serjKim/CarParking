@@ -4,13 +4,10 @@ open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Options
 open CarParking.WebUI.Configuration
-
-[<CLIMutable>]
-type IndexModel =
-    { ApiUrl: string }
-
+open System.Text.Json
 type HomeController (logger : ILogger<HomeController>, settings: IOptionsMonitor<CarParkingUISettings>) =
     inherit Controller()
 
     member this.Index () =
-        this.View("dist/index.cshtml", { ApiUrl = settings.CurrentValue.ApiUrl })
+        let settingsJson = JsonSerializer.Serialize ({| apiUrl = settings.CurrentValue.ApiUrl |})
+        this.View("dist/index.cshtml", settingsJson)

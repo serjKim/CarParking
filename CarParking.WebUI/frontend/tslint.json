@@ -6,6 +6,10 @@
     "rules": {
         "quotemark": [true, "single", "avoid-escape", "avoid-template"],
         "object-literal-sort-keys": false,
-        "no-empty": false
+        "no-empty": false,
+        "max-classes-per-file": false,
+        "arrow-parens": false,
+        "interface-name": [true, "never-prefix"],
+        "interface-over-type-literal": false
     }
 }

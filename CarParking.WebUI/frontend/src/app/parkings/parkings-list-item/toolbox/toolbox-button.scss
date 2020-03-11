@@ -1,0 +1,36 @@
+@import '../../../../common.scss';
+
+.toolbox-button {
+    font-size: 21px;
+    cursor: pointer;
+    @include transition();
+
+    &.disabled {
+        cursor: default;
+    }
+
+    @mixin toolbox-button($color-button, $disabled-amount: 20) {
+        color: $color-button;
+
+        &:hover {
+            color: darken($color: $color-button, $amount: 12);
+        }
+
+        &.disabled {
+            $disabled-color: lighten($color: $color-button, $amount: $disabled-amount);
+            color: $disabled-color;
+
+            &:hover {
+                color: $disabled-color;
+            }
+        }
+    }
+
+    &.complete {
+        @include toolbox-button(#81c784);
+    }
+
+    &.pay {
+        @include toolbox-button(#ef9a9a, 13);
+    }
+}

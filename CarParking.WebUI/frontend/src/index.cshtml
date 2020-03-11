@@ -1,4 +1,4 @@
-@model CarParking.WebUI.Controllers.IndexModel
+@model string
 
 <!doctype html>
 <html lang="en">
@@ -11,7 +11,7 @@
         <link rel="preload" href="content/MaterialIcons-Regular.woff2" as="font" crossorigin>
     </head>
     <body>
-        @Model.ApiUrl
+        <input id="app-settings" type="hidden" value="@Model" />
         <application></application>
     </body>
 </html>

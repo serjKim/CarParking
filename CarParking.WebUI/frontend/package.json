@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --watch=true",
+    "build": "ng build --watch",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -22,6 +22,7 @@
     "material-design-icons": "^3.0.1",
     "normalize.css": "^8.0.1",
     "rxjs": "~6.5.4",
+    "santee-dcts": "^0.9.6",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },

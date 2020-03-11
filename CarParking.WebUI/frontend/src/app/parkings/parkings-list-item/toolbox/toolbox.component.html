@@ -1,0 +1,13 @@
+<div class="toolbox" [ngSwitch]="selectedButton">
+    <complete-button
+        *ngSwitchCase="toolboxButtonType.Complete"
+        [parking]="parking"
+        [disabled]="!canComplete"
+        (complete)="onComplete($event)">
+    </complete-button>
+    <pay-button
+        *ngSwitchCase="toolboxButtonType.Pay"
+        [parking]="parking"
+        [disabled]="!canPay">
+    </pay-button>
+</div>

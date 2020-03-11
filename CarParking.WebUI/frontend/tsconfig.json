@@ -5,6 +5,7 @@
     "outDir": "./dist/out-tsc",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "strictPropertyInitialization": false,
     "strict": true,
     "sourceMap": true,
     "declaration": false,

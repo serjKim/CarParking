@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ParkingsApi } from '../parkings.api';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ParkingsStorage } from '../parkings.storage';
 
 @Component({
     selector: 'parkings-list',
@@ -7,9 +7,12 @@ import { ParkingsApi } from '../parkings.api';
     styleUrls: ['./parkings-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParkingsListComponent {
-    constructor(public parkingsApi: ParkingsApi) {
-        // tslint:disable-next-line: no-console
-        parkingsApi.getAll().subscribe(x => console.log(x));
+export class ParkingsListComponent implements OnInit {
+    public readonly parkings$ = this.parkingsStorage.all;
+
+    constructor(private readonly parkingsStorage: ParkingsStorage) { }
+
+    public ngOnInit() {
+        this.parkingsStorage.loadStorage();
     }
 }

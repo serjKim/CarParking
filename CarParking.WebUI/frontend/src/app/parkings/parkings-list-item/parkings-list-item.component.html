@@ -1,23 +1,7 @@
-<div class="content" >
-    <ng-container [ngSwitch]="selectedStatus">
-        <div class="info" *ngSwitchCase="startedStatus">
-            <label class="label">
-                Arrival
-            </label>
-            <div class="date">
-                20 Dec 2019 10:20
-            </div>
-        </div>
-        <div class="info" *ngSwitchCase="completedStatus">
-            <label class="label">
-                Complete
-            </label>
-            <div class="date">
-                20 Dec 2019 11:00
-            </div>
-        </div>
+<div class="content" [class.disabled]="!canSwitchInfo" >
+    <ng-container [ngSwitch]="selectedInfo">
+        <started-info *ngSwitchCase="intoType.Started" [parking]="parking"></started-info>
+        <complete-info *ngSwitchCase="intoType.Completed" [parking]="parking"></complete-info>
     </ng-container>
-    <div class="toolbox">
-        <i class="material-icons toolbox-button complete" (click)="onComplete($event)">check_circle</i>
-    </div>
+    <toolbox [parking]="parking"></toolbox>
 </div>

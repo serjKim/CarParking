@@ -9,7 +9,6 @@
     border-radius: 5px;
     border: 1px solid #dadada;
     @include transition();
-    cursor: pointer;
     margin-right: 20px;
     margin-bottom: 20px;
 
@@ -21,41 +20,10 @@
         display: flex;
         margin: 15px;
         flex-grow: 1;
+        cursor: pointer;
 
-        .info {
-            display: flex;
-            flex-grow: 1;
-            flex-direction: column;
-            justify-content: space-between;
-
-            .label {
-                color: #adadad;
-                font-weight: 400;
-                font-size: 16px;
-            }
-
-            .date {
-                font-size: 18px;
-            }
-        }
-
-        .toolbox {
-            user-select: none;
-
-            .toolbox-button {
-                font-size: 21px;
-                cursor: pointer;
-                @include transition();
-
-                &.complete {
-                    $complete-color: #81c784;
-                    color: $complete-color;
-
-                    &:hover {
-                        color: darken($color: $complete-color, $amount: 12);
-                    }
-                }
-            }
+        &.disabled {
+            cursor: default;
         }
     }
 }
