@@ -14,6 +14,7 @@ open System.Data
 open Newtonsoft.Json
 open Giraffe.Serialization
 open Configuration
+open Newtonsoft.Json.Serialization
 
 module Program =
     let inline private ( <>> ) f g = g f
@@ -49,13 +50,19 @@ module Program =
            .UseGiraffe webApp |> ignore
 
     let configureServices (host: WebHostBuilderContext) (services : IServiceCollection) =
-        let connStr = host.Configuration.GetConnectionString("CarParking")
-        let jsonSettings = JsonSerializerSettings(DateTimeZoneHandling = DateTimeZoneHandling.Utc)
+        let jsonSettings =
+            JsonSerializerSettings
+                (DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                 ContractResolver = new DefaultContractResolver(NamingStrategy = new CamelCaseNamingStrategy()))
         services
             .AddGiraffe()
-            .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings))
+            .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings)) |> ignore
+
+        let connStr = host.Configuration.GetConnectionString("CarParking")
+        services
             .AddTransient<ICPDataContext>(fun _ -> createCPDataContext connStr)
             .Configure<CarParkingSettings>(host.Configuration.GetSection("CarParking")) |> ignore
+
         let cors = getCors host
         services
             .AddCors(fun options -> 
