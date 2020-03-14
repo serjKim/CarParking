@@ -11,6 +11,8 @@ module Responses =
         static member FromPayment(x: Payment) =
             { Id = PaymentId.toGuid x.Id
               CreateDate = x.CreateDate }
+        static member Null = 
+            Unchecked.defaultof<PaymentResponse>
 
     [<CLIMutable; NoEquality; NoComparison>]
     type ParkingResponse =
@@ -26,13 +28,13 @@ module Responses =
                   Type         = "StartedFree"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable()
-                  Payment      = Unchecked.defaultof<PaymentResponse> }
+                  Payment      = PaymentResponse.Null }
             | CompletedFree prk ->
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = "CompletedFree"
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
-                  Payment      = Unchecked.defaultof<PaymentResponse> }
+                  Payment      = PaymentResponse.Null }
             | CompletedFirst prk ->
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = "CompletedFirst"
