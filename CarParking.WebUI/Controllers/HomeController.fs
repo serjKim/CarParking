@@ -5,6 +5,7 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Options
 open CarParking.WebUI.Configuration
 open System.Text.Json
+
 type HomeController (logger : ILogger<HomeController>, settings: IOptionsMonitor<CarParkingUISettings>) =
     inherit Controller()
 
