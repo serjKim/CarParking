@@ -2,27 +2,12 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 import { assertUnhandledType } from 'src/app/util';
 import { CompletionResultType } from '../../models/completion';
 import { Parking, ParkingType } from '../../models/parking';
+import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
 
 enum ToolboxButton {
     Complete,
     Pay,
 }
-
-const enum ToolboxButtonEventType {
-    Completion,
-}
-
-export class CompleteButtonEvent {
-    public readonly eventType = ToolboxButtonEventType.Completion;
-
-    constructor(
-        public readonly completionResult: CompletionResultType,
-    ) { }
-}
-
-export type ToolboxButtonEvent =
-    | CompleteButtonEvent
-    ;
 
 @Component({
     selector: 'toolbox',

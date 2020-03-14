@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ParkingsStorage } from 'src/app/parkings/parkings.storage';
 import { Parking, ParkingType } from '../../../models/parking';
-import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox.component';
+import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event';
 
 @Component({
     selector: 'complete-button',
