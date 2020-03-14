@@ -5,11 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="dist\**" />
-    <EmbeddedResource Remove="dist\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="Configuration.fs" />
     <Compile Include="Controllers/HomeController.fs" />
     <Compile Include="Startup.fs" />
@@ -18,6 +13,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="dist\content\" />
   </ItemGroup>
 
 </Project>
