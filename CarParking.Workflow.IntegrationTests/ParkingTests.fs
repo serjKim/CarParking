@@ -365,7 +365,7 @@ type ParkingWorkflowTests () =
 
         } |> expectTrue
 
-    [<Property(MaxTest = 2000, Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
+    [<Property(Arbitrary = [| typeof<ArbitaryExpiredParkingDates> |])>]
     member _.``Shouldn't complete an already payed parking`` (FreeParkingDates.Dates (arrivalDate, completeDate, freeLimit)) =
         taskResult {
             let dctx = createDctx ()
