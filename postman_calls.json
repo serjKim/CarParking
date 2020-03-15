@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "769e7399-9cea-49d3-98e1-f0f9a3f549ca",
+		"name": "cp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:5000/parkings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/parkings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"parkings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/parkings/a180ec43-84a3-4274-8e4f-0f0657a89133",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/parkings/a180ec43-84a3-4274-8e4f-0f0657a89133",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"parkings",
+						"a180ec43-84a3-4274-8e4f-0f0657a89133"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/parkings",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/parkings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"parkings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/parkings/46726716-ba39-4ce6-9d4c-7690c2cb05ed",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Status",
+							"value": "Completed",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/parkings/46726716-ba39-4ce6-9d4c-7690c2cb05ed",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"parkings",
+						"46726716-ba39-4ce6-9d4c-7690c2cb05ed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/parkings/9b68438f-94bc-4f77-a116-93b8888dfa18/payments",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/parkings/9b68438f-94bc-4f77-a116-93b8888dfa18/payments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"parkings",
+						"9b68438f-94bc-4f77-a116-93b8888dfa18",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
