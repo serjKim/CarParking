@@ -10,7 +10,6 @@ open CarParking.DataLayer
 open FsToolkit.ErrorHandling
 
 module Parking =
-
     let createNewParking dctx arrivalDate =
         task {
             let parking = 

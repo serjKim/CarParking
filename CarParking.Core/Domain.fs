@@ -81,7 +81,6 @@ module Tariff =
         else Error <| BadInput (sprintf "Couldn't parse %s tariff" str)
 
 module Parking =
-
     let (|FirstTariff|_|) (freeLimit: TimeSpan) (prk: StartedFreeParking, date: DateTime) =
         let diff = prk.ArrivalDate - date
         if Math.Abs(diff.TotalMinutes) > freeLimit.TotalMinutes then
