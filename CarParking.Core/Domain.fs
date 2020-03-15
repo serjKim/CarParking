@@ -94,23 +94,23 @@ module Parking =
         | FirstTariff freeLimit t -> t
         | _ -> Free
 
-    let transitionToCompletedFree freeLimit prk completeDate =
-        match calculateTariff freeLimit prk completeDate with
-        | Free ->
-            Ok { Id = prk.Id
-                 ArrivalDate = prk.ArrivalDate 
-                 CompleteDate = completeDate }
-        | First ->
-            Error <| TransitionError FreeExpired
+    [<RequireQualifiedAccess>]
+    module Transitions =
+        let toCompletedFree freeLimit prk completeDate =
+            match calculateTariff freeLimit prk completeDate with
+            | Free ->
+                Ok { Id = prk.Id
+                     ArrivalDate = prk.ArrivalDate 
+                     CompleteDate = completeDate }
+            | First ->
+                Error <| TransitionError FreeExpired
 
-    let transitionToCompletedFirst freeLimit prk (paymentId, completeDate) =
-        match calculateTariff freeLimit prk completeDate with
-        | Free ->
-            Error <| TransitionError PaymentNotApplicable
-        | First ->
-            Ok { Id = prk.Id
-                 ArrivalDate = prk.ArrivalDate 
-                 CompleteDate = completeDate
-                 Payment =
-                    { Id = paymentId
-                      CreateDate = completeDate } }
+        let toCompletedFirst freeLimit prk payment =
+            match calculateTariff freeLimit prk payment.CreateDate with
+            | Free ->
+                Error <| TransitionError PaymentNotApplicable
+            | First ->
+                Ok { Id = prk.Id
+                     ArrivalDate = prk.ArrivalDate 
+                     CompleteDate = payment.CreateDate
+                     Payment = payment }

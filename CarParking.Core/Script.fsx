@@ -14,16 +14,16 @@ let freeLimit = TimeSpan(0, 1, 0)
 calculateTariff freeLimit s d
 
 // Complete
-match transitionToCompletedFree freeLimit s d with
+match Transitions.toCompletedFree freeLimit s d with
 | Ok prk ->
     printfn "Save %A to DB" prk
 | Error x ->
     printfn "%A" x
 
-let pId = PaymentId (Guid.NewGuid())
+let p = { Id = PaymentId (Guid.NewGuid()); CreateDate = d }
 
 // Pay
-match transitionToCompletedFirst freeLimit s (pId, d) with
+match Transitions.toCompletedFirst freeLimit s p with
 | Ok prk ->
     printfn "%A" prk
 | Error x ->

@@ -36,7 +36,7 @@ module Parking =
             | Some prk ->
                 return! Ok prk
             | None ->
-                return! Error <| EntityNotFound "Parking not existing"
+                return! Error <| EntityNotFound "Parking not found"
         }
 
     let patchParking dctx freeLimit rawParkingId rawStatus completeDate =
@@ -47,8 +47,7 @@ module Parking =
             | Completed ->
                 match! getParking dctx rawParkingId with
                 | StartedFree prk ->
-
-                    match transitionToCompletedFree freeLimit prk completeDate with
+                    match Transitions.toCompletedFree freeLimit prk completeDate with
                     | Ok completedFree ->
                         do! Commands.saveCompletedFree dctx completedFree
                         return! CompletedFree completedFree |> Ok
@@ -63,8 +62,10 @@ module Parking =
         taskResult {
             match! getParking dctx rawParkingId with
             | StartedFree prk ->
-                let paymentId = PaymentId (Guid.NewGuid())
-                match transitionToCompletedFirst freeLimit prk (paymentId, completeDate) with
+                let payment = 
+                    { Id = PaymentId (Guid.NewGuid())
+                      CreateDate = completeDate }
+                match Transitions.toCompletedFirst freeLimit prk payment with
                 | Ok firstPrk ->
                     do! Commands.saveCompletedFirst dctx firstPrk
                     return! firstPrk.Payment |> Ok
