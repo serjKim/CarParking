@@ -5,9 +5,6 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.FileProviders
-open System.IO
-open Microsoft.AspNetCore.Http
 open Configuration
 
 type Startup private () =
@@ -27,13 +24,8 @@ type Startup private () =
             app.UseDeveloperExceptionPage() |> ignore
             
         app.UseHttpsRedirection() |> ignore
-
-        let staticFilesOptions = 
-            new StaticFileOptions(
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "dist/content")),
-                RequestPath = new PathString("/content"))
-
-        app.UseStaticFiles(staticFilesOptions)
+        
+        app.UseStaticFiles()
            .UseRouting()
            .UseAuthorization()
            .UseEndpoints(fun endpoints ->

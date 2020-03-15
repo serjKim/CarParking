@@ -11,4 +11,4 @@ type HomeController (logger : ILogger<HomeController>, settings: IOptionsMonitor
 
     member this.Index () =
         let settingsJson = JsonSerializer.Serialize ({| apiUrl = settings.CurrentValue.ApiUrl |})
-        this.View("dist/index.cshtml", settingsJson)
+        this.View("wwwroot/index.cshtml", settingsJson)
