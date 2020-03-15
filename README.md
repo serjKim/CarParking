@@ -4,7 +4,7 @@ A hybrid "real" web app written on F#.
 ## Description
 The goal is to demonstrate an interaction between F#, SQL database and frontend part.
 
-## Requirements:
+## Requirements
 - .NET Core >= 3.1
 - Docker >= 19
 - (Optional) Paket: You can get all dependencies using `dotnet restore` without having Paket, since there is `.paket/Paket.Restore.targets`
