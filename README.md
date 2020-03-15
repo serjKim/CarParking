@@ -17,16 +17,14 @@ docker-compose up database
 2. Build the Web api
 ```cmd
 cd CarParking.WebApi
-dotnet build
 dotnet run ASPNETCORE_ENVIRONMENT=Development
 ```
-3. Web api is ready for work. That's enough to be able to use Postman or other client to play with the api. `postman_calls.json` - a collection of api calls
+3. Web api is ready for work. That's enough to be able to use Postman or other client to play with the api. `postman_calls.json` - a collection of api calls intended to be imported to Postman.
 
 ## Build UI
 4. Run the Web server
 ```cmd
 cd CarParking.WebUI
-dotnet build
 dotnet run ASPNETCORE_ENVIRONMENT=Development
 ```
 5. Build angular app
