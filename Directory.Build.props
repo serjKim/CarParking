@@ -1,0 +1,5 @@
+<Project>
+ <PropertyGroup>
+   <WarningsAsErrors>FS0025;</WarningsAsErrors>
+ </PropertyGroup>
+</Project>
