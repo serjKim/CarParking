@@ -168,7 +168,7 @@ type ParkingWorkflowTests () =
         That's the property we need to test. Lets implement an Arbitrary instance that would generate data, satisfing our condition.
     *)
     [<Property(Arbitrary = [| typeof<ArbitaryFreeParkingDates> |])>]
-    member _.``Should patch a StartedFreeParking, transferring to Complete if Free tariff is not expired`` (FreeParkingDates.Dates (arrivalDate, completeDate, freeLimit)) =
+    member _.``Should patch a StartedFreeParking, transiting to Complete if Free tariff is not expired`` (FreeParkingDates.Dates (arrivalDate, completeDate, freeLimit)) =
         taskResult {
             let dctx = createDctx ()
 
