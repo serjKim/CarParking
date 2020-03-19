@@ -22,6 +22,9 @@ A web server (Razor pages) serving an angular app.
 Property-based integration testing
 </ul>
 
+## How it works
+![workflow](docs/workflow.png "Workflow")
+
 ## Requirements
 - .NET Core >= 3.1
 - Docker >= 19
