@@ -45,7 +45,7 @@ module internal Mapping =
             | _,_,_,_ -> None
 
     let toStartedFreeParkingDto (prk: StartedFreeParking) =
-        { Id = ParkingId.toGuid prk.Id 
+        { Id          = ParkingId.toGuid prk.Id 
           ArrivalDate = prk.ArrivalDate }
 
     let toCompletedFreeParkingDto (prk: CompletedFreeParking) =

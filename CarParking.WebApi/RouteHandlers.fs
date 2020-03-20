@@ -38,30 +38,27 @@ module RouteHandlers =
         fun next ctx dctx ->
             task {
                 let! parking = getParking dctx rawParkingId
-                return! toResponse (
-                    ParkingResponse.FromParking
-                    >> ParkingResponseModel.FromResponse 
-                    >> ok) parking next ctx
+                return! toResponse (ParkingResponse.FromParking
+                                    >> ParkingResponseModel.FromResponse 
+                                    >> ok) parking next ctx
             }
 
     let getAllParkingsHandler =
         fun next ctx dctx ->
             task {
                 let! list = getAllParkings dctx
-                return! ok (
-                    list 
-                    |> List.map ParkingResponse.FromParking
-                    |> ParkingsResponseModel.FromResponse) next ctx
+                return! ok (list 
+                            |> List.map ParkingResponse.FromParking
+                            |> ParkingsResponseModel.FromResponse) next ctx
             }
 
     let createParkingHandler =
         fun next ctx dctx ->
             task {
                 let! newParking = createNewParking dctx DateTime.UtcNow
-                return! ok (
-                    newParking
-                    |> ParkingResponse.FromParking
-                    |> ParkingResponseModel.FromResponse) next ctx
+                return! ok (newParking
+                            |> ParkingResponse.FromParking
+                            |> ParkingResponseModel.FromResponse) next ctx
             }
     
     let patchParkingHandler rawParkingId =

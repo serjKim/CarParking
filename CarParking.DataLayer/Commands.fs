@@ -8,7 +8,6 @@ open FSharp.Control.Tasks.V2
 open Dapper
 
 module Commands =
-
     let insertStartedFree (cpdc, token) parking =
         let conn = getConn cpdc
         let dto = toStartedFreeParkingDto parking
