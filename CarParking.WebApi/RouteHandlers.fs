@@ -11,6 +11,9 @@ open Requests
 open System
 open Microsoft.Extensions.Options
 open Configuration
+open CarParking.Core
+open FsToolkit.ErrorHandling
+open System.Threading.Tasks
 
 module RouteHandlers =
     let ok obj = Successful.ok (json obj)
@@ -22,6 +25,12 @@ module RouteHandlers =
             | EntityNotFound message -> RequestErrors.NOT_FOUND message
             | BadInput message -> RequestErrors.BAD_REQUEST message
             | TransitionError error -> RequestErrors.UNPROCESSABLE_ENTITY { ErrorType = error.ToString() }
+
+    let toResponseAsync okResult next ctx (result: Task<_>) = 
+        task {
+            let! x = result
+            return! toResponse okResult x next ctx
+        }
 
     let withDctx handler =
         fun (next : HttpFunc) (ctx : HttpContext) ->
@@ -36,12 +45,12 @@ module RouteHandlers =
 
     let getParkingHandler rawParkingId =
         fun next ctx dctx ->
-            task {
-                let! parking = getParking dctx rawParkingId
-                return! toResponse (ParkingResponse.FromParking
-                                    >> ParkingResponseModel.FromResponse 
-                                    >> ok) parking next ctx
-            }
+            taskResult {
+                let! parkingId = ParkingId.parse rawParkingId
+                return! getParking dctx parkingId
+            } |> toResponseAsync (ParkingResponse.FromParking
+                                  >> ParkingResponseModel.FromResponse 
+                                  >> ok) next ctx
 
     let getAllParkingsHandler =
         fun next ctx dctx ->
@@ -63,20 +72,21 @@ module RouteHandlers =
     
     let patchParkingHandler rawParkingId =
         fun next (ctx : HttpContext) dctx settings ->
-            task {
+            taskResult {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
                 | Ok req -> 
                     let freeLimit = getFreeLimit settings
-                    let! res = patchParking dctx freeLimit rawParkingId req.Status DateTime.UtcNow
-                    return! toResponse (fun _ -> Successful.NO_CONTENT) res next ctx
+                    let! parkingId = ParkingId.parse rawParkingId
+                    let! status = ParkingStatus.parse req.Status
+                    return! patchParking dctx freeLimit parkingId status DateTime.UtcNow
                 | Error err ->
-                    return! RequestErrors.BAD_REQUEST err next ctx
-            }
+                    return! Error <| BadInput err
+            } |> toResponseAsync (fun _ -> Successful.NO_CONTENT) next ctx
 
     let createPaymentHandler rawParkingId =
         fun next ctx dctx settings ->
-            task {
+            taskResult {
                 let freeLimit = getFreeLimit settings
-                let! payment = createPayment dctx freeLimit rawParkingId DateTime.UtcNow
-                return! toResponse (PaymentResponse.FromPayment >> ok) payment next ctx
-            }
+                let! parkingId = ParkingId.parse rawParkingId
+                return! createPayment dctx freeLimit parkingId DateTime.UtcNow
+            } |> toResponseAsync (PaymentResponse.FromPayment >> ok) next ctx

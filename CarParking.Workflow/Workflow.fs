@@ -27,9 +27,8 @@ module Parking =
             |> Seq.toList
         }
 
-    let getParking dctx rawParkingId =
+    let getParking dctx parkingId =
         taskResult {
-            let! parkingId = ParkingId.parse rawParkingId
             let! parking = queryParkingById dctx parkingId
             match parking with
             | Some prk ->
@@ -38,13 +37,13 @@ module Parking =
                 return! Error <| EntityNotFound "Parking not found"
         }
 
-    let patchParking dctx freeLimit rawParkingId rawStatus completeDate =
+    let patchParking dctx freeLimit parkingId status completeDate =
         taskResult {
-            match! ParkingStatus.parse rawStatus with
+            match status with
             | Started ->
                 return! Error <| BadInput "Only Complete status is supported"
             | Completed ->
-                match! getParking dctx rawParkingId with
+                match! getParking dctx parkingId with
                 | StartedFree prk ->
                     match Transitions.toCompletedFree freeLimit prk completeDate with
                     | Ok completedFree ->
@@ -57,9 +56,9 @@ module Parking =
                     return! Error <| TransitionError AlreadyCompleted
         }
 
-    let createPayment dctx freeLimit rawParkingId completeDate =
+    let createPayment dctx freeLimit parkingId completeDate =
         taskResult {
-            match! getParking dctx rawParkingId with
+            match! getParking dctx parkingId with
             | StartedFree prk ->
                 let payment = 
                     { Id = PaymentId (Guid.NewGuid())

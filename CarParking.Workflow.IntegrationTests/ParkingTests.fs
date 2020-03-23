@@ -87,11 +87,9 @@ type ParkingWorkflowTests () =
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
                 Assert.Equal (arrivalDate, parking.ArrivalDate)
-                
-                let rawParkingId = parking.Id |> ParkingId.toString
     
                 // get the parking
-                match! getParking dctx rawParkingId with
+                match! getParking dctx parking.Id with
                 | StartedFree prk ->
                     return prk = parking
                 | _ ->
@@ -135,9 +133,9 @@ type ParkingWorkflowTests () =
     member _.``Should return EntityNotFound if parking is not exising`` (id: Guid) =
         task {
             let dctx = createDctx ()
-            let rawId = id.ToString()
+            let parkingId = ParkingId id
 
-            match! getParking dctx rawId with
+            match! getParking dctx parkingId with
             | Ok _ ->
                 return false
             | Error err ->
@@ -175,19 +173,14 @@ type ParkingWorkflowTests () =
             // create a started parking
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
-            
-                let rawParkingId = parking.Id |> ParkingId.toString
-                let rawStatus = Completed.ToString()
 
-                match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
+                match! patchParking dctx freeLimit parking.Id Completed completeDate with
                 | CompletedFree prk ->
                     Assert.True(prk.Id           = parking.Id &&
                                 prk.ArrivalDate  = parking.ArrivalDate &&
                                 prk.CompleteDate = completeDate)
 
-                    let rawId = prk.Id |> ParkingId.toString
-
-                    match! getParking dctx rawId with
+                    match! getParking dctx prk.Id with
                     | CompletedFree p ->
                         return p = prk
                     | _ ->
@@ -208,11 +201,8 @@ type ParkingWorkflowTests () =
             // create a started parking
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
-        
-                let rawParkingId = parking.Id |> ParkingId.toString
-                let rawStatus = Completed.ToString()
 
-                match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
+                match! patchParking dctx freeLimit parking.Id Completed completeDate with
                 | Ok _ ->
                     return false
                 | Error err ->
@@ -231,33 +221,6 @@ type ParkingWorkflowTests () =
         }
 
     [<Property>]
-    member _.``Patch returns BadInput if status is invalid`` (rawStatus: string)
-                                                             (arrivalDate: DateTime)
-                                                             (completeDate: DateTime)
-                                                             (freeLimit: TimeSpan) =
-        task {
-            let dctx = createDctx ()
-
-            // create a started parking
-            match! createNewParking dctx arrivalDate with
-            | StartedFree parking ->
-            
-                let rawParkingId = parking.Id |> ParkingId.toString
-
-                match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
-                | Ok _ ->
-                    return false
-                | Error err ->
-                    match err with
-                    | BadInput _ ->
-                        return true
-                    | _ ->
-                        return false
-            | _  ->
-                return false
-        }
-
-    [<Property>]
     member _.``Patch return BadInput when Completed is changed to Started`` (arrivalDate: DateTime)
                                                                             (completeDate: DateTime)
                                                                             (freeLimit: TimeSpan) =
@@ -268,11 +231,8 @@ type ParkingWorkflowTests () =
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
             
-                let rawParkingId = parking.Id |> ParkingId.toString
-                let rawStatus = Started.ToString()
-
                 // try patch to Started status
-                match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
+                match! patchParking dctx freeLimit parking.Id Started completeDate with
                 | Ok _ ->
                     return false
                 | Error err ->
@@ -293,15 +253,12 @@ type ParkingWorkflowTests () =
             // create a started parking
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
-        
-                let rawParkingId = parking.Id |> ParkingId.toString
-                let rawStatus = Completed.ToString()
 
-                match! patchParking dctx freeLimit rawParkingId rawStatus completeDate with
+                match! patchParking dctx freeLimit parking.Id Completed completeDate with
                 | CompletedFree prk ->
 
                     // try patch again
-                    match! patchParking dctx freeLimit (prk.Id |> ParkingId.toString) rawStatus completeDate with
+                    match! patchParking dctx freeLimit prk.Id Completed completeDate with
                     | Ok _ -> 
                         return false
                     | Error err ->
@@ -326,10 +283,7 @@ type ParkingWorkflowTests () =
             // create a started parking
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
-        
-                let rawParkingId = parking.Id |> ParkingId.toString
-                let! payment = createPayment dctx freeLimit rawParkingId completeDate
-
+                let! payment = createPayment dctx freeLimit parking.Id completeDate
                 return payment.CreateDate = completeDate
             | _  ->
                 return false
@@ -345,12 +299,10 @@ type ParkingWorkflowTests () =
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
         
-                let rawParkingId = parking.Id |> ParkingId.toString
-
-                let! _ = createPayment dctx freeLimit rawParkingId completeDate
+                let! _ = createPayment dctx freeLimit parking.Id completeDate
 
                 // try pay again
-                match! createPayment (createDctx ()) freeLimit rawParkingId completeDate with
+                match! createPayment (createDctx ()) freeLimit parking.Id completeDate with
                 | Ok _ ->
                     return false
                 | Error err ->
@@ -374,12 +326,10 @@ type ParkingWorkflowTests () =
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
         
-                let rawParkingId = parking.Id |> ParkingId.toString
-
-                let! _ = createPayment dctx freeLimit rawParkingId completeDate
+                let! _ = createPayment dctx freeLimit parking.Id completeDate
 
                 // try patch after payment
-                match! patchParking (createDctx ()) freeLimit rawParkingId (Completed.ToString()) completeDate with
+                match! patchParking (createDctx ()) freeLimit parking.Id Completed completeDate with
                 | Ok _ -> 
                     return false
                 | Error err ->
