@@ -1,5 +1,5 @@
 # CarParking
-A hybrid "real" web app written on F#.
+A "real" web app written on F#.
 
 ## Description
 The goal is to demonstrate an interaction between F#, SQL database and frontend part.
