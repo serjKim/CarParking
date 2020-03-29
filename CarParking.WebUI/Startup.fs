@@ -29,7 +29,7 @@ type Startup private () =
            .UseRouting()
            .UseAuthorization()
            .UseEndpoints(fun endpoints ->
-                endpoints.MapDefaultControllerRoute() |> ignore
+                endpoints.MapControllerRoute("default", "{*url}", {| Controller = "Home"; Action = "Index" |}) |> ignore
                 endpoints.MapRazorPages() |> ignore) |> ignore
 
     member val Configuration : IConfiguration = null with get, set
