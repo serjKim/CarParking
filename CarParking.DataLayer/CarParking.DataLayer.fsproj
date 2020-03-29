@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Parameters.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="DataContext.fs" />
     <Compile Include="Queries.fs" />
@@ -11,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
-    <ProjectReference Include="..\CarParking.DataLayer.CmdDefs\CarParking.DataLayer.CmdDefs.csproj" />
     <ProjectReference Include="..\CarParking.DataLayer.Dto\CarParking.DataLayer.Dto.fsproj" />
     <ProjectReference Include="..\CarParking.Utils\CarParking.Utils.fsproj" />
   </ItemGroup>

@@ -19,9 +19,9 @@ module Parking =
             return StartedFree parking
         }
 
-    let getAllParkings dctx =
+    let getAllParkings dctx types =
         task {
-            let! prks = queryAllPacking dctx
+            let! prks = queryAllPacking dctx (QueryAllParkingFilter.ByTypes types)
             return prks 
             |> Seq.choose id
             |> Seq.toList

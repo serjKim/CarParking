@@ -25,3 +25,14 @@ type OptionExtensions() =
         this
         |> Option.map mapping
         |> Option.defaultValue Unchecked.defaultof<'U>
+
+module NameOf =
+    open Microsoft.FSharp.Quotations
+
+    let nameOf (q:Expr<_>) = 
+        match q with 
+        | Patterns.PropertyGet(_, mi, _) -> mi.Name
+        | Patterns.ValueWithName (_,_,name) -> name
+        | _ -> failwith "Unexpected format"
+
+    let p<'T> : 'T = failwith "!"

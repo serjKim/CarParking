@@ -43,6 +43,28 @@ module RouteHandlers =
             let settings = ctx.GetService<IOptionsMonitor<CarParkingSettings>>()
             handler next ctx settings.CurrentValue
 
+    let deserializeFilterItems (ctx : HttpContext) =
+        match ctx.TryGetQueryStringValue "types" with
+        | Some raw ->
+            if String.IsNullOrEmpty (raw) then
+                []
+            else
+                raw.Split ','
+                |> Array.filter (not << String.IsNullOrWhiteSpace)
+                |> Array.choose (fun rawType ->
+                    match rawType.Split '|' with
+                    | [| rawTariff; rawStatus |] ->
+                        let r = result {
+                            let! tariff = Tariff.parse rawTariff
+                            let! status = ParkingStatus.parse rawStatus
+                            return (tariff, status) } 
+                        match r with
+                        | Ok x -> Some x
+                        | Error _ -> None
+                    | _ -> None)
+                |> List.ofArray
+        | None -> []
+
     let getParkingHandler rawParkingId =
         fun next ctx dctx ->
             taskResult {
@@ -53,13 +75,13 @@ module RouteHandlers =
                                   >> ok) next ctx
 
     let getAllParkingsHandler =
-        fun next ctx dctx ->
-            task {
-                let! list = getAllParkings dctx
-                return! ok (list 
-                            |> List.map ParkingResponse.FromParking
-                            |> ParkingsResponseModel.FromResponse) next ctx
-            }
+        fun next (ctx : HttpContext) dctx ->
+            taskResult {
+                let byTypes = deserializeFilterItems ctx
+                return! getAllParkings dctx byTypes
+            } |> toResponseAsync (List.map (ParkingResponse.FromParking) 
+                                  >> ParkingsResponseModel.FromResponse 
+                                  >> ok) next ctx
 
     let createParkingHandler =
         fun next ctx dctx ->
@@ -74,7 +96,7 @@ module RouteHandlers =
         fun next (ctx : HttpContext) dctx settings ->
             taskResult {
                 match! ctx.TryBindFormAsync<ParkingPatchRequest>() with
-                | Ok req -> 
+                | Ok (req: ParkingPatchRequest) -> 
                     let freeLimit = getFreeLimit settings
                     let! parkingId = ParkingId.parse rawParkingId
                     let! status = ParkingStatus.parse req.Status

@@ -49,6 +49,8 @@ module ParkingStatus =
         if parseStatus Started then Ok Started
         elif parseStatus Completed then Ok Completed
         else Error <| BadInput (sprintf "Couldn't parse %s status" str)
+    
+    let toString (s: ParkingStatus) = s.ToString()
 
 [<RequireQualifiedAccess>]
 module ParkingId =
@@ -76,6 +78,8 @@ module Tariff =
         if parseTariff Free then Ok Free
         elif parseTariff First then Ok First
         else Error <| BadInput (sprintf "Couldn't parse %s tariff" str)
+
+    let toString (x: Tariff) = x.ToString()
 
 module Parking =
     let (|FirstTariff|_|) (freeLimit: TimeSpan) (prk: StartedFreeParking, date: DateTime) =

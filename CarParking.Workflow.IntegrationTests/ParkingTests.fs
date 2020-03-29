@@ -124,7 +124,7 @@ type ParkingWorkflowTests () =
             Assert.True((createdArrivalDates = arrivalDates))
 
             // get all
-            let! loadedParkings = createDctx () |> getAllParkings
+            let! loadedParkings = getAllParkings (createDctx ()) []
 
             return ((loadedParkings |> List.sort) = createdParkings)
         } |> expectTrue
@@ -150,7 +150,7 @@ type ParkingWorkflowTests () =
     member _.``Should return an empty array if there isn't parkings`` () =
         task {
             let dctx = createDctx ()
-            let! parkings = getAllParkings dctx
+            let! parkings = getAllParkings dctx []
 
             return List.isEmpty parkings
         }
