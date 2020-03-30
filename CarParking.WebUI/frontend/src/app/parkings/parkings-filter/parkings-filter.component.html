@@ -1,0 +1,12 @@
+<div class="statuses">
+    <label class="type-button-label" *ngFor="let typeButton of typeButtons" [for]="typeButton.buttonName">
+        <input class="checkbox"
+               type="checkbox"
+               [name]="typeButton.buttonName"
+               [id]="typeButton.buttonName"
+               [formControl]="typeButton.control" >
+        <div class="selector-icon"></div>
+        <i class="material-icons type-button" [ngClass]="typeButton.style.className">{{ typeButton.style.icon }}</i>
+    </label>
+</div>
+<div class="line"></div>

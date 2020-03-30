@@ -1,11 +1,12 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { deserialize } from 'santee-dcts';
 import { AppSettings } from '../app-settings';
 import { CompletionResult, CompletionResultType } from './models/completion';
-import { Parking, ParkingReadModel, ParkingsReadModel, StartedFree } from './models/parking';
+import { Parking, ParkingReadModel, ParkingsReadModel, ParkingStatus, ParkingType, ParkingTypeKey, StartedFree, Tariff } from './models/parking';
+import { ParkingsFilter } from './parkings-filter/parking-filter';
 
 const enum TransitionErrorType {
     FreeExpired = 'FreeExpired',
@@ -15,6 +16,45 @@ interface TransitionErrorResponse {
     readonly errorType: TransitionErrorType;
 }
 
+type ByTypeFilterItems = {
+    readonly [key in ParkingTypeKey]: ByTypeFilterItem
+};
+
+export interface ByTypeFilterItem {
+    readonly tariff: Tariff;
+    readonly status: ParkingStatus;
+}
+
+export class ParkingsApiFilter {
+    private readonly byTypeFilterItems: ByTypeFilterItems = {
+        [ParkingType.StartedFree]: { tariff: Tariff.Free, status: ParkingStatus.Started },
+        [ParkingType.CompletedFree]: { tariff: Tariff.Free, status: ParkingStatus.Completed },
+        [ParkingType.CompletedFirst]: { tariff: Tariff.First, status: ParkingStatus.Completed },
+    };
+
+    private readonly separator = '|';
+    private readonly typesQueryKey = 'types';
+
+    public toQueryParams(filter: ParkingsFilter): HttpParams {
+        const params = new HttpParams();
+
+        const byType = this.mapFilterItem(filter.parkingTypeKeys);
+
+        if (byType.length > 0) {
+            const types = byType.map(item => `${item.tariff}${this.separator}${item.status}`).join(',');
+            return params.set(this.typesQueryKey, types);
+        }
+
+        return params;
+    }
+
+    private mapFilterItem(parkingTypeKeys: ReadonlySet<ParkingTypeKey>): readonly ByTypeFilterItem[] {
+        return Array
+            .from(parkingTypeKeys)
+            .map(key => this.byTypeFilterItems[key]);
+    }
+}
+
 @Injectable()
 export class ParkingsApi {
     constructor(
@@ -22,8 +62,8 @@ export class ParkingsApi {
         private readonly settings: AppSettings,
     ) { }
 
-    public getAll(): Observable<readonly Parking[]> {
-        return this.httpClient.get(`${this.settings.apiUrl}/parkings`).pipe(
+    public getAll(queryParams: HttpParams): Observable<readonly Parking[]> {
+        return this.httpClient.get(`${this.settings.apiUrl}/parkings`, { params: queryParams }).pipe(
             map(obj => {
                 return deserialize(obj, ParkingsReadModel).parkings;
             }),

@@ -17,6 +17,20 @@ export enum ParkingType {
     CompletedFirst = 'CompletedFirst',
 }
 
+export type ParkingTypeKey = keyof typeof ParkingType;
+
+export const PARKING_TYPE_KEYS = new Set<ParkingTypeKey>(Object.keys(ParkingType) as ParkingTypeKey[]);
+
+export const enum Tariff {
+    Free = 'Free',
+    First = 'First',
+}
+
+export const enum ParkingStatus {
+    Started = 'Started',
+    Completed = 'Completed',
+}
+
 export class Payment {
     @dataMember()
     @required()

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ParkingsStorage } from '../parkings.storage';
 
 @Component({
@@ -7,12 +7,8 @@ import { ParkingsStorage } from '../parkings.storage';
     styleUrls: ['./parkings-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParkingsListComponent implements OnInit {
+export class ParkingsListComponent {
     public readonly parkings$ = this.parkingsStorage.all;
 
     constructor(private readonly parkingsStorage: ParkingsStorage) { }
-
-    public ngOnInit() {
-        this.parkingsStorage.loadStorage();
-    }
 }

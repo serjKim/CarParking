@@ -9,15 +9,14 @@
         cursor: default;
     }
 
-    @mixin toolbox-button($color-button, $disabled-amount: 20) {
+    @mixin toolbox-button($color-button, $disabled-color) {
         color: $color-button;
 
         &:hover {
-            color: darken($color: $color-button, $amount: 12);
+            color: darken($color: $color-button, $amount: $hover-amount);
         }
 
         &.disabled {
-            $disabled-color: lighten($color: $color-button, $amount: $disabled-amount);
             color: $disabled-color;
 
             &:hover {
@@ -27,10 +26,10 @@
     }
 
     &.complete {
-        @include toolbox-button(#81c784);
+        @include toolbox-button($complete-color, $completed-color);
     }
 
     &.pay {
-        @include toolbox-button(#ef9a9a, 13);
+        @include toolbox-button($pay-color, $payed-color);
     }
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { deserialize } from 'santee-dcts';
+import { AppRoutingModule } from './app-routing.module';
 import { AppSettings } from './app-settings';
 import { AppComponent } from './app.component';
 import { DashboardModule } from './dashboard/dashboard.module';
@@ -22,6 +23,7 @@ const appSettings = deserialize(JSON.parse(field.value), AppSettings);
         CommonModule,
         BrowserModule,
         DashboardModule,
+        AppRoutingModule,
     ],
     providers: [
         { provide: AppSettings, useValue: appSettings },

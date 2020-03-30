@@ -1,5 +1,16 @@
 $dashboard-margin: 35px;
 
+@function disabled-color ($color, $amount: 20) {
+    @return lighten($color, $amount)
+}
+
+$complete-color: #81c784;
+$completed-color: disabled-color($complete-color);
+$pay-color: #ef9a9a;
+$payed-color: disabled-color($pay-color, 13);
+
+$hover-amount: 12;
+
 @mixin transition() {
     transition: box-shadow .2s ease, color .2s ease;
 }

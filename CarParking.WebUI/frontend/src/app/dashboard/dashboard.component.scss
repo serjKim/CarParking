@@ -1,5 +1,7 @@
+@import '../../common.scss';
+
 :host {
     background-color: #eee;
     display: block;
-    padding: 1px;
+    padding: $dashboard-margin;
 }
