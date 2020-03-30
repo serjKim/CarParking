@@ -66,7 +66,7 @@ export class ParkingsFilterComponent {
     private applyNewFilterOnValueChanges() {
         const buttonValues$ = this.typeButtons.map<Observable<void>>(btn => btn.control.valueChanges);
 
-        const newFilter = merge(...buttonValues$).pipe(
+        merge(...buttonValues$).pipe(
             mergeMap(() => {
                 const parkingTypeKeys = this.typeButtons
                     .filter(x => !!x.control.value)
@@ -77,9 +77,9 @@ export class ParkingsFilterComponent {
                 );
             }),
             takeUntil(this.destroyer$),
-        );
-
-        this.parkingsFilterStorage.applyFilter(newFilter);
+        ).subscribe(newFilter => {
+            this.parkingsFilterStorage.applyFilter(newFilter);
+        });
     }
 
     private loadStorage() {

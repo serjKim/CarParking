@@ -24,11 +24,9 @@ export class ParkingsFilterStorage {
         return this.filter$;
     }
 
-    public applyFilter(filter$: Observable<ParkingsFilter>) {
-        filter$.subscribe(filter => {
-            this.router.navigate([], {
-                queryParams: this.serializeFilter(filter),
-            });
+    public applyFilter(filter: ParkingsFilter) {
+        this.router.navigate([], {
+            queryParams: this.serializeFilter(filter),
         });
     }
 
