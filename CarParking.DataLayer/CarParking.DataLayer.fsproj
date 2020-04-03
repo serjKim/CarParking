@@ -4,7 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Parameters.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="DbConstants.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="DataContext.fs" />
     <Compile Include="Queries.fs" />

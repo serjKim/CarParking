@@ -28,7 +28,9 @@ module Program =
             GET >=> routeCif "/parkings/%s" (getParkingHandler      >> withDctx)
             POST >=> routeCi "/parkings" >=> (createParkingHandler <>> withDctx)
             PATCH >=> routeCif "/parkings/%s" (patchParkingHandler  >> withDctx >> withSettings)
-            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> withDctx >> withSettings) ]
+            POST >=> routeCif "/parkings/%s/payments" (createPaymentHandler >> withDctx >> withSettings)
+            
+            GET >=> routeCi "/transitions" >=> (getAllTransitions <>> withDctx) ]
 
     let configuration = 
         ConfigurationBuilder()

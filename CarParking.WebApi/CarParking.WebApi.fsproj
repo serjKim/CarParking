@@ -5,6 +5,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ClientConstants.fs" />
     <Compile Include="Requests.fs" />
     <Compile Include="Responses.fs" />
     <Compile Include="Configuration.fs" />

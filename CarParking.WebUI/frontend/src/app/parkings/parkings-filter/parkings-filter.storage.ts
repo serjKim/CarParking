@@ -1,16 +1,22 @@
+import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { PARKING_TYPE_KEYS, ParkingType, ParkingTypeKey } from '../models/parking';
+import { ParkingType } from '../models/parking';
+import { TRANSITION_NAMES, TransitionName } from '../models/transition';
 import { ParkingsFilter } from './parking-filter';
 
 export interface ParkingsFilterQueryParams extends Params {
-    readonly types?: string | null;
+    readonly transitions?: string | null;
 }
 
 @Injectable()
 export class ParkingsFilterStorage {
+
+    public get filter(): Observable<ParkingsFilter> {
+        return this.filter$;
+    }
     private readonly filter$: Observable<ParkingsFilter>;
 
     constructor(activatedRoute: ActivatedRoute, private readonly router: Router) {
@@ -20,41 +26,48 @@ export class ParkingsFilterStorage {
             );
     }
 
-    public get filter(): Observable<ParkingsFilter> {
-        return this.filter$;
-    }
-
     public applyFilter(filter: ParkingsFilter) {
         this.router.navigate([], {
             queryParams: this.serializeFilter(filter),
         });
     }
 
+    public toHttpParams(filter: ParkingsFilter): HttpParams {
+        const httpParams = new HttpParams();
+        const queryParams = this.serializeFilter(filter);
+
+        if (!!queryParams.transitions) {
+            return new HttpParams({ fromObject: queryParams });
+        }
+
+        return httpParams;
+    }
+
     private serializeFilter(filter: ParkingsFilter): ParkingsFilterQueryParams {
         return {
-            types: filter.parkingTypeKeys.size > 0
-                ? this.serializeParkingTypeKeys(filter.parkingTypeKeys)
+            transitions: filter.transitionNames.size > 0
+                ? this.serializeTransitionNames(filter.transitionNames)
                 : null,
         };
     }
 
     private deserializeFilter(params: Params): ParkingsFilter {
-        const keys = this.deserializeParkingTypeKeys(params);
+        const keys = this.deserializeTransitionNames(params);
         return new ParkingsFilter(keys);
     }
 
-    private deserializeParkingTypeKeys = (params: Params): ReadonlySet<ParkingTypeKey> => {
-        const types: string | null | undefined = (params as ParkingsFilterQueryParams).types;
-        const parsedParkingTypes = types?.split(',').filter(this.isParkingTypeKey) ?? [];
+    private deserializeTransitionNames = (params: Params): ReadonlySet<TransitionName> => {
+        const transitions: string | null | undefined = (params as ParkingsFilterQueryParams).transitions;
+        const transitionNames = transitions?.split(',').filter(this.isTransitionName) ?? [];
 
-        return new Set(parsedParkingTypes);
+        return new Set(transitionNames);
     }
 
-    private isParkingTypeKey = (raw: string): raw is ParkingTypeKey => {
-        return PARKING_TYPE_KEYS.has(raw as keyof typeof ParkingType);
+    private isTransitionName = (raw: string): raw is TransitionName => {
+        return TRANSITION_NAMES.has(raw as keyof typeof ParkingType);
     }
 
-    private serializeParkingTypeKeys(keys: ReadonlySet<ParkingTypeKey>): string {
-        return Array.from(keys).join(',');
+    private serializeTransitionNames(names: ReadonlySet<TransitionName>): string {
+        return Array.from(names).join(',');
     }
 }

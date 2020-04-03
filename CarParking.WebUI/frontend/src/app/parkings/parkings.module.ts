@@ -14,6 +14,7 @@ import { ParkingsListComponent } from './parkings-list/parkings-list.component';
 import { ParkingsApi } from './parkings.api';
 import { ParkingsStorage } from './parkings.storage';
 import { ParkingsComponent } from './parkings/parkings.component';
+import { TransitionsApi } from './transitions.api';
 
 @NgModule({
     declarations: [
@@ -39,6 +40,7 @@ import { ParkingsComponent } from './parkings/parkings.component';
         ParkingsApi,
         ParkingsStorage,
         ParkingsFilterStorage,
+        TransitionsApi,
     ],
 })
 export class ParkingsModule { }

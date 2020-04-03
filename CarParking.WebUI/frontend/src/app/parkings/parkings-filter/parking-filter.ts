@@ -1,10 +1,10 @@
-import { ParkingTypeKey } from '../models/parking';
+import { TransitionName } from '../models/transition';
 
 export class ParkingsFilter {
-    constructor(public readonly parkingTypeKeys: ReadonlySet<ParkingTypeKey>) {
+    constructor(public readonly transitionNames: ReadonlySet<TransitionName>) {
     }
 
-    public setParkingTypes(parkingTypeKeys: ReadonlySet<ParkingTypeKey>): ParkingsFilter {
-        return new ParkingsFilter(parkingTypeKeys);
+    public setTransitionNames(transitionNames: ReadonlySet<TransitionName>): ParkingsFilter {
+        return new ParkingsFilter(transitionNames);
     }
 }

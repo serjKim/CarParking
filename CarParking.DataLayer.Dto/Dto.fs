@@ -33,3 +33,11 @@ module Dto =
           CompleteDate: DateTime
           Payment: PaymentDto }
         member x.PaymentId = x.Payment.PaymentId
+
+    [<CLIMutable; NoEquality; NoComparison>]
+    type TransitionDto =
+        { Name: string 
+          FromTariff: string 
+          FromStatus: string 
+          ToTariff: string
+          ToStatus: string }

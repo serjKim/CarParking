@@ -1,4 +1,3 @@
-import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, publishLast, refCount, switchMap } from 'rxjs/operators';
@@ -6,7 +5,7 @@ import { CompletionResult, CompletionResultType } from './models/completion';
 import { Parking, StartedFree } from './models/parking';
 import { ParkingsFilter } from './parkings-filter/parking-filter';
 import { ParkingsFilterStorage } from './parkings-filter/parkings-filter.storage';
-import { ParkingsApi, ParkingsApiFilter } from './parkings.api';
+import { ParkingsApi } from './parkings.api';
 
 type Parkings$ = Observable<readonly Parking[]>;
 
@@ -30,8 +29,9 @@ export class ParkingsStorage {
         const loadedParkings$ = filter$
             .pipe(
                 switchMap(filter => {
-                    const converterApiFilter = new ParkingsApiFilter();
-                    return this.parkingsApi.getAll(converterApiFilter.toQueryParams(filter))
+                    const httpParams = this.parkingsFilterStorage.toHttpParams(filter);
+
+                    return this.parkingsApi.getAll(httpParams)
                         .pipe(
                             publishLast(),
                             refCount(),

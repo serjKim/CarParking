@@ -6,6 +6,7 @@ open FSharp.Control.Tasks.V2.ContextInsensitive
 open CarParking.Error
 open CarParking.Workflow.Parking
 open CarParking.DataLayer.DataContext
+open CarParking.DataLayer.Queries
 open Responses
 open Requests
 open System
@@ -44,24 +45,13 @@ module RouteHandlers =
             handler next ctx settings.CurrentValue
 
     let deserializeFilterItems (ctx : HttpContext) =
-        match ctx.TryGetQueryStringValue "types" with
+        match ctx.TryGetQueryStringValue "transitions" with
         | Some raw ->
             if String.IsNullOrEmpty (raw) then
                 []
             else
                 raw.Split ','
                 |> Array.filter (not << String.IsNullOrWhiteSpace)
-                |> Array.choose (fun rawType ->
-                    match rawType.Split '|' with
-                    | [| rawTariff; rawStatus |] ->
-                        let r = result {
-                            let! tariff = Tariff.parse rawTariff
-                            let! status = ParkingStatus.parse rawStatus
-                            return (tariff, status) } 
-                        match r with
-                        | Ok x -> Some x
-                        | Error _ -> None
-                    | _ -> None)
                 |> List.ofArray
         | None -> []
 
@@ -77,9 +67,9 @@ module RouteHandlers =
     let getAllParkingsHandler =
         fun next (ctx : HttpContext) dctx ->
             taskResult {
-                let byTypes = deserializeFilterItems ctx
-                return! getAllParkings dctx byTypes
-            } |> toResponseAsync (List.map (ParkingResponse.FromParking) 
+                let transitionNames = deserializeFilterItems ctx
+                return! getAllParkings dctx transitionNames
+            } |> toResponseAsync (List.map ParkingResponse.FromParking
                                   >> ParkingsResponseModel.FromResponse 
                                   >> ok) next ctx
 
@@ -112,3 +102,11 @@ module RouteHandlers =
                 let! parkingId = ParkingId.parse rawParkingId
                 return! createPayment dctx freeLimit parkingId DateTime.UtcNow
             } |> toResponseAsync (PaymentResponse.FromPayment >> ok) next ctx
+
+    let getAllTransitions =
+        fun next ctx dctx ->
+            taskResult {
+                return! queryAllTransitions dctx
+            } |> toResponseAsync (Seq.choose id 
+                                  >> Seq.map TransitionResponse.FromTransition
+                                  >> TransitionReponseModel.FromResponse >> ok) next ctx

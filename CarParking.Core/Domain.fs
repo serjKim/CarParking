@@ -40,17 +40,25 @@ type Parking =
 
 [<RequireQualifiedAccess>]
 module ParkingStatus =
+    [<Literal>]
+    let StartedName = "Started"
+
+    [<Literal>]
+    let CompletedName = "Completed"
+
     let parse str =
         let parseStatus status = 
             String.Equals 
-                (status.ToString(), str, 
+                (status, str, 
                 StringComparison.Ordinal)
 
-        if parseStatus Started then Ok Started
-        elif parseStatus Completed then Ok Completed
+        if parseStatus StartedName then Ok Started
+        elif parseStatus CompletedName then Ok Completed
         else Error <| BadInput (sprintf "Couldn't parse %s status" str)
-    
-    let toString (s: ParkingStatus) = s.ToString()
+
+    let toString = function 
+        | Started -> StartedName
+        | Completed -> CompletedName
 
 [<RequireQualifiedAccess>]
 module ParkingId =
@@ -69,17 +77,25 @@ module PaymentId =
 
 [<RequireQualifiedAccess>]
 module Tariff =
+    [<Literal>]
+    let FreeName = "Free"
+
+    [<Literal>]
+    let FirstName = "First"
+
     let parse str =
         let parseTariff tariff = 
             String.Equals 
-                (tariff.ToString(), str, 
+                (tariff, str, 
                 StringComparison.Ordinal)
 
-        if parseTariff Free then Ok Free
-        elif parseTariff First then Ok First
+        if parseTariff FreeName then Ok Free
+        elif parseTariff FirstName then Ok First
         else Error <| BadInput (sprintf "Couldn't parse %s tariff" str)
 
-    let toString (x: Tariff) = x.ToString()
+    let toString = function 
+        | Free -> FreeName
+        | First -> FirstName
 
 module Parking =
     let (|FirstTariff|_|) (freeLimit: TimeSpan) (prk: StartedFreeParking, date: DateTime) =

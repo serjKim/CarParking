@@ -26,6 +26,12 @@ type OptionExtensions() =
         |> Option.map mapping
         |> Option.defaultValue Unchecked.defaultof<'U>
 
+
+module Result =
+    let toOption = function
+        | Ok x -> Some x
+        | Error _ -> None
+
 module NameOf =
     open Microsoft.FSharp.Quotations
 

@@ -11,3 +11,4 @@ type internal DynamicParametersExtensions() =
     static member AddParam (this: DynamicParameters, name, value, ?dbType: Data.DbType) = 
         this.Add (name, value, dbType.ToNullable())
         this
+

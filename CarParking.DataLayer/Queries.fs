@@ -3,40 +3,21 @@
 [<RequireQualifiedAccess>]
 module QueryAllParkingFilter =
     open Dapper
-    open CarParking.Core
+    open CarParking.Utils.NameOf
+    
+    type Filter = ByTransitionNames of string list
 
-    type Filter = ByTypes of (Tariff * ParkingStatus) list
-
-    let apply (ByTypes types) sql =
-        match types with
+    let apply (ByTransitionNames transitionNames) sql =
+        match transitionNames with
         | [] ->
             (new DynamicParameters(), sql)
         | _ ->
-            let namedTypes = 
-                types
-                |> Seq.distinct
-                |> Seq.indexed
-                |> Seq.map (fun (i, (tariff, status)) -> 
-                    {| TariffName = sprintf "Tariff%i" i
-                       TariffValue = Tariff.toString tariff
-                       StatusName = sprintf "Status%i" i
-                       StatusValue = ParkingStatus.toString status |})
-                |> Seq.toArray
-
-            let whereClauses = 
-                 namedTypes
-                 |> Array.map (fun t -> sprintf "(t.Name = @%s and ps.Name = @%s)" t.TariffName t.StatusName)                 
-                 |> String.concat " or "
-
+            let transitionParamName = nameOf <@ transitionNames @>
             let sql = sprintf "%s 
-                               where %s" sql whereClauses
-            
-            let parameters = 
-                namedTypes
-                |> Array.fold (fun (p: DynamicParameters) t ->
-                    p.AddParam(t.TariffName, t.TariffValue)
-                     .AddParam(t.StatusName, t.StatusValue)) (new DynamicParameters())
-
+                            inner join dbo.Transition tr
+                                on tr.ToTariff = p.TariffID and tr.ToStatus = p.StatusID
+                            where tr.Name in @%s" sql transitionParamName
+            let parameters = DynamicParameters().AddParam(transitionParamName, List.distinct transitionNames)
             (parameters, sql)
 
 module Queries =
@@ -71,9 +52,24 @@ module Queries =
             let parameters = DynamicParameters().AddParam(nameOf <@ parkingId @>, ParkingId.toGuid parkingId)
             new CommandDefinition(queryText, parameters, cancellationToken = token)
 
-        let queryAllPacking types token =
-            let (parameters, queryText) = QueryAllParkingFilter.apply types parkingQuerySql
+        let queryAllPacking filter token =
+            let (parameters, queryText) = QueryAllParkingFilter.apply filter parkingQuerySql
             new CommandDefinition(queryText, parameters, cancellationToken = token)
+
+        let queryAllTransitions token =
+            let queryText = "
+                    select t.[Name]  [" + nameOf <@ p<TransitionDto>.Name       @> + "],
+                    	   ft.[Name] [" + nameOf <@ p<TransitionDto>.FromTariff @> + "], 
+                    	   fs.[Name] [" + nameOf <@ p<TransitionDto>.FromStatus @> + "],
+                    	   tt.[Name] [" + nameOf <@ p<TransitionDto>.ToTariff   @> + "],
+                    	   ts.[Name] [" + nameOf <@ p<TransitionDto>.ToStatus   @> + "]
+                    from dbo.Transition t
+                    left join dbo.Tariff ft on ft.TariffID = t.FromTariff
+                    left join dbo.ParkingStatus fs on fs.ParkingStatusID = t.FromStatus
+                    inner join dbo.Tariff tt on tt.TariffID = t.ToTariff
+                    inner join dbo.ParkingStatus ts on ts.ParkingStatusID = t.ToStatus
+                    "
+            new CommandDefinition(queryText, cancellationToken = token)
 
     open Mapping
     open DataContext
@@ -101,4 +97,12 @@ module Queries =
         task {
             let! dtos = conn.QueryAsync<ParkingDto, PaymentDto, ParkingDto>(cmd, parkingMapping, splitOn = nameOf <@ p<PaymentDto>.PaymentId @>)
             return dtos |> Seq.map toParking
+        }
+
+    let queryAllTransitions (cpdc, token) =
+        let cmd = CommandDefinitions.queryAllTransitions token
+        let conn = getConn cpdc
+        task {
+            let! dtos = conn.QueryAsync<TransitionDto> (cmd)
+            return dtos |> Seq.map toTransition
         }

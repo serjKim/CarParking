@@ -1,12 +1,11 @@
 <div class="statuses">
-    <label class="type-button-label" *ngFor="let typeButton of typeButtons" [for]="typeButton.buttonName">
+    <label class="type-button-label" *ngFor="let transitionButton of transitionButtons$ | async" [for]="transitionButton.buttonId">
         <input class="checkbox"
                type="checkbox"
-               [name]="typeButton.buttonName"
-               [id]="typeButton.buttonName"
-               [formControl]="typeButton.control" >
+               [id]="transitionButton.buttonId"
+               [formControl]="transitionButton.control" >
         <div class="selector-icon"></div>
-        <i class="material-icons type-button" [ngClass]="typeButton.style.className">{{ typeButton.style.icon }}</i>
+        <i class="material-icons type-button" [ngClass]="transitionButton.style.className">{{ transitionButton.style.icon }}</i>
     </label>
 </div>
 <div class="line"></div>

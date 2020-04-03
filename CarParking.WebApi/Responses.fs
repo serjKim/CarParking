@@ -1,6 +1,7 @@
 ﻿namespace CarParking.WebApi
 
 open CarParking.Core
+open CarParking.Utils
 open System
 
 module Responses =
@@ -22,22 +23,23 @@ module Responses =
           CompleteDate: Nullable<DateTime>
           Payment: PaymentResponse }
         static member FromParking(x: Parking) = 
+            let parkingType = ClientConstants.Parking.ofParking x
             match x with
             | StartedFree prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "StartedFree"
+                  Type         = parkingType
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable()
                   Payment      = PaymentResponse.Null }
             | CompletedFree prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "CompletedFree"
+                  Type         = parkingType
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
                   Payment      = PaymentResponse.Null }
             | CompletedFirst prk ->
                 { Id           = ParkingId.toGuid prk.Id
-                  Type         = "CompletedFirst"
+                  Type         = parkingType
                   ArrivalDate  = prk.ArrivalDate
                   CompleteDate = Nullable(prk.CompleteDate)
                   Payment      = PaymentResponse.FromPayment prk.Payment }
@@ -55,3 +57,22 @@ module Responses =
     [<CLIMutable; NoEquality; NoComparison>]
     type TransitionErrorReponse = 
         { ErrorType: string }
+
+    [<CLIMutable; NoEquality; NoComparison>]
+    type TransitionResponse =
+        { Name: string
+          FromTariff: string 
+          FromStatus: string 
+          ToTariff: string
+          ToStatus: string }
+        static member FromTransition (name, fromTariff: Tariff option, fromStatus: ParkingStatus option, toTariff: Tariff, toStatus: ParkingStatus) =
+            { Name = name
+              FromTariff = fromTariff.MapOrDefault Tariff.toString
+              FromStatus = fromStatus.MapOrDefault ParkingStatus.toString
+              ToTariff = toTariff |> Tariff.toString
+              ToStatus = toStatus |> ParkingStatus.toString }
+
+    [<CLIMutable; NoEquality; NoComparison>]
+    type TransitionReponseModel =
+        { Transitions: TransitionResponse seq }
+        static member FromResponse x = { Transitions = x }
