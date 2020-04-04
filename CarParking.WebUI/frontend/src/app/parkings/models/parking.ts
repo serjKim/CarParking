@@ -111,7 +111,7 @@ const parkingDeserializer = (raw: Parking) => {
 };
 
 export class ParkingReadModel {
-    @dataMember({ customDeserializer: parkingDeserializer})
+    @dataMember({ customDeserializer: parkingDeserializer })
     @required()
     public parking: Parking;
 }
