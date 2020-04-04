@@ -36,7 +36,7 @@ module Commands =
             let queryText = "
                     update p
                         set p.StatusID = t.ToStatus,
-		                    p.TariffID = t.ToTariff,
+                            p.TariffID = t.ToTariff,
                             p.CompleteDate = @" + completeDateName + "
                     from dbo.Parking p
                     inner join dbo.Transition t
