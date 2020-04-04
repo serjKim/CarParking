@@ -1,6 +1,7 @@
 namespace CarParking.WebApi
 
 open System
+open System.Linq
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
@@ -70,7 +71,7 @@ module Program =
             .AddCors(fun options -> 
                 options.AddPolicy(cors.WebUI.Policy,
                     fun builder -> 
-                        builder.WithOrigins(cors.WebUI.Origins)
+                        builder.WithOrigins(cors.WebUI.Origins.ToArray())
                                .AllowAnyHeader()
                                .AllowAnyMethod() |> ignore) |> ignore ) |> ignore
 
