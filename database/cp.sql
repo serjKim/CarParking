@@ -14,7 +14,8 @@ GO
 CREATE TABLE [dbo].[ParkingStatus] (
     [ParkingStatusID] UNIQUEIDENTIFIER NOT NULL,
     [Name]            NVARCHAR (100)   NOT NULL,
-    PRIMARY KEY CLUSTERED ([ParkingStatusID])
+    PRIMARY KEY CLUSTERED ([ParkingStatusID]),
+    CONSTRAINT ParkingStatus_U_Name UNIQUE ([Name])
 );
 GO
 CREATE NONCLUSTERED INDEX [IX_ParkingStatus_Name]
@@ -24,7 +25,8 @@ CREATE NONCLUSTERED INDEX [IX_ParkingStatus_Name]
 CREATE TABLE [dbo].[Tariff] (
     [TariffID] UNIQUEIDENTIFIER NOT NULL,
     [Name]     NVARCHAR (100)   NOT NULL,
-    PRIMARY KEY CLUSTERED ([TariffID] ASC)
+    PRIMARY KEY CLUSTERED ([TariffID] ASC),
+    CONSTRAINT Tariff_U_Name UNIQUE ([Name])
 );
 GO
 CREATE NONCLUSTERED INDEX [IX_Tariff_Name]
@@ -62,6 +64,7 @@ CREATE TABLE [dbo].[Transition]
     CONSTRAINT [FK_Transition_FromStatus] FOREIGN KEY ([FromStatus]) REFERENCES [dbo].[ParkingStatus]([ParkingStatusID]),
     CONSTRAINT [FK_Transition_ToTariff] FOREIGN KEY ([ToTariff]) REFERENCES [dbo].[Tariff]([TariffID]),
 	CONSTRAINT [FK_Transition_ToStatus] FOREIGN KEY ([ToStatus]) REFERENCES [dbo].[ParkingStatus]([ParkingStatusID]),
+    CONSTRAINT Transition_U_Name UNIQUE ([Name])
 )
 
 
