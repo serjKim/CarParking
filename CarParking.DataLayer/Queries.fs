@@ -64,10 +64,14 @@ module Queries =
                     	   tt.[Name] [" + nameOf <@ p<TransitionDto>.ToTariff   @> + "],
                     	   ts.[Name] [" + nameOf <@ p<TransitionDto>.ToStatus   @> + "]
                     from dbo.Transition t
-                    left join dbo.Tariff ft on ft.TariffID = t.FromTariff
-                    left join dbo.ParkingStatus fs on fs.ParkingStatusID = t.FromStatus
-                    inner join dbo.Tariff tt on tt.TariffID = t.ToTariff
-                    inner join dbo.ParkingStatus ts on ts.ParkingStatusID = t.ToStatus
+                    left join dbo.Tariff ft 
+                        on ft.TariffID = t.FromTariff
+                    left join dbo.ParkingStatus fs 
+                        on fs.ParkingStatusID = t.FromStatus
+                    inner join dbo.Tariff tt 
+                        on tt.TariffID = t.ToTariff
+                    inner join dbo.ParkingStatus ts 
+                        on ts.ParkingStatusID = t.ToStatus
                     "
             new CommandDefinition(queryText, cancellationToken = token)
 

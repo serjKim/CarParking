@@ -39,7 +39,8 @@ module Commands =
 		                    p.TariffID = t.ToTariff,
                             p.CompleteDate = @" + completeDateName + "
                     from dbo.Parking p
-                    inner join dbo.Transition t on t.Name = '" + DbConstants.Transitions.CompletedFree + "'
+                    inner join dbo.Transition t
+                        on t.Name = '" + DbConstants.Transitions.CompletedFree + "'
                     where p.ParkingID = @" + idName
 
             let parameters = 
@@ -59,7 +60,8 @@ module Commands =
                             p.CompleteDate = @" + completeDateName + ",
                             p.PaymentID = @" + paymentIdName + "
                     from dbo.Parking p
-                    inner join dbo.Transition t on t.Name = '" + DbConstants.Transitions.CompletedFirst + "'
+                    inner join dbo.Transition t
+                        on t.Name = '" + DbConstants.Transitions.CompletedFirst + "'
                     where ParkingID = @" + idName
             let parameters = 
                 DynamicParameters()
