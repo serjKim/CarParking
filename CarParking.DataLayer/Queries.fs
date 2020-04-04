@@ -4,8 +4,9 @@
 module QueryAllParkingFilter =
     open Dapper
     open CarParking.Utils.NameOf
-    
-    type Filter = ByTransitionNames of string list
+    open CarParking.Core
+
+    type Filter = ByTransitionNames of TransitionName list
 
     let apply (ByTransitionNames transitionNames) sql =
         match transitionNames with

@@ -65,12 +65,12 @@ module Responses =
           FromStatus: string 
           ToTariff: string
           ToStatus: string }
-        static member FromTransition (name, fromTariff: Tariff option, fromStatus: ParkingStatus option, toTariff: Tariff, toStatus: ParkingStatus) =
-            { Name = name
-              FromTariff = fromTariff.MapOrDefault Tariff.toString
-              FromStatus = fromStatus.MapOrDefault ParkingStatus.toString
-              ToTariff = toTariff |> Tariff.toString
-              ToStatus = toStatus |> ParkingStatus.toString }
+        static member FromTransition (transition: Transition) =
+            { Name = transition.Name
+              FromTariff = transition.FromTariff.MapOrDefault Tariff.toString
+              FromStatus = transition.FromStatus.MapOrDefault ParkingStatus.toString
+              ToTariff = transition.ToTariff |> Tariff.toString
+              ToStatus = transition.ToStatus |> ParkingStatus.toString }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type TransitionReponseModel =

@@ -57,17 +57,18 @@ module internal Mapping =
           CompleteDate = prk.CompleteDate
           Payment      = toPaymentDto prk.Payment }
 
-    let toTransition (dto: TransitionDto) =
+    let toTransition dto : Transition option =
         let fromTariff = dto.FromTariff |> Tariff.parse |> Result.toOption
         let fromStatus = dto.FromStatus |> ParkingStatus.parse |> Result.toOption
         let toTariff = Tariff.parse dto.ToTariff
         let toStatus = ParkingStatus.parse dto.ToStatus
         match toTariff,toStatus with
         | Ok t, Ok s -> 
-            Some (dto.Name, fromTariff, fromStatus, t, s)
-        | Error _, Error _ -> 
-            None
-        | Error _, Ok _ -> 
-            None
-        | Ok _, Error _ -> 
-            None
+            Some { Name = dto.Name
+                   FromTariff = fromTariff
+                   FromStatus = fromStatus
+                   ToTariff = t
+                   ToStatus = s }
+        | Error _, Error _ -> None
+        | Error _, Ok _ -> None
+        | Ok _, Error _ -> None

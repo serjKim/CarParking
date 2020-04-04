@@ -38,6 +38,15 @@ type Parking =
     | CompletedFree of CompletedFreeParking
     | CompletedFirst of CompletedFirstParking
 
+type TransitionName = string
+
+type Transition = 
+    { Name: TransitionName 
+      FromTariff: Tariff option
+      FromStatus: ParkingStatus option
+      ToTariff: Tariff
+      ToStatus: ParkingStatus }
+
 [<RequireQualifiedAccess>]
 module ParkingStatus =
     [<Literal>]
