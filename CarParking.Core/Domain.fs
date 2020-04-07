@@ -2,6 +2,7 @@
 
 open CarParking.Error
 open System
+open FsToolkit.ErrorHandling
 
 type ParkingStatus =
     | Started
@@ -107,35 +108,47 @@ module Tariff =
         | First -> FirstName
 
 module Parking =
-    let (|FirstTariff|_|) (freeLimit: TimeSpan) (prk: StartedFreeParking, date: DateTime) =
-        let diff = prk.ArrivalDate - date
-        if Math.Abs(diff.TotalMinutes) > freeLimit.TotalMinutes then
+    let private checkDates (start: DateTime, complete: DateTime) =
+        if complete < start then 
+            Error <| BadInput ("Complete date can't be less than the start date")
+        else
+            Ok (start, complete)
+
+    let private (|FirstTariff|_|) (freeLimit: TimeSpan) (start: DateTime, complete: DateTime) =
+        let diff = complete - start
+        if diff.TotalMinutes > freeLimit.TotalMinutes then
             Some First
         else
             None
 
-    let calculateTariff freeLimit prk date =
-        match prk,date with
-        | FirstTariff freeLimit t -> t
-        | _ -> Free
+    let calculateTariff freeLimit (prk: StartedFreeParking) complete =
+        result {
+            match! checkDates (prk.ArrivalDate, complete) with
+            | FirstTariff freeLimit t -> return! Ok t
+            | _ -> return! Ok Free
+        }
 
     [<RequireQualifiedAccess>]
     module Transitions =
         let toCompletedFree freeLimit prk completeDate =
-            match calculateTariff freeLimit prk completeDate with
-            | Free ->
-                Ok { Id = prk.Id
-                     ArrivalDate = prk.ArrivalDate 
-                     CompleteDate = completeDate }
-            | First ->
-                Error <| TransitionError FreeExpired
+            result {
+                match! calculateTariff freeLimit prk completeDate with
+                | Free ->
+                    return! Ok { Id = prk.Id
+                                 ArrivalDate = prk.ArrivalDate 
+                                 CompleteDate = completeDate }
+                | First ->
+                    return! Error <| TransitionError FreeExpired
+            }
 
         let toCompletedFirst freeLimit prk payment =
-            match calculateTariff freeLimit prk payment.CreateDate with
-            | Free ->
-                Error <| TransitionError PaymentNotApplicable
-            | First ->
-                Ok { Id = prk.Id
-                     ArrivalDate = prk.ArrivalDate 
-                     CompleteDate = payment.CreateDate
-                     Payment = payment }
+            result {
+                match! calculateTariff freeLimit prk payment.CreateDate with
+                | Free ->
+                    return! Error <| TransitionError PaymentNotApplicable
+                | First ->
+                    return! Ok { Id = prk.Id
+                                 ArrivalDate = prk.ArrivalDate 
+                                 CompleteDate = payment.CreateDate
+                                 Payment = payment }
+            }

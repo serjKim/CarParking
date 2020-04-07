@@ -1,4 +1,5 @@
 ﻿#load "..\\CarParking.Error\Error.fs"
+#r "..\\..\\..\\..\\.nuget\\packages\\fstoolkit.errorhandling\\1.2.6\\lib\\netstandard2.0\\FsToolkit.ErrorHandling.dll"
 #load "Domain.fs"
 
 open System
