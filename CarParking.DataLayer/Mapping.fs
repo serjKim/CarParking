@@ -46,7 +46,7 @@ module internal Mapping =
                         Interval = interval
                         Payment = p }
                 | _,_,_,_ ->
-                    return! Error <| BadInput "Invalid dto"
+                    return! Error <| BadInput "Unknown fields combo"
             } |> Result.mapError (function
                 | BadInput inputError ->
                     BadInput <| sprintf "Invalid ParkingDto (Id = %A): %s" dto.Id inputError
