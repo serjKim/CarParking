@@ -20,10 +20,10 @@ module internal Mapping =
           CreateDate = payment.CreateDate }
 
     let toParking dto =
-        result {
-            if (isNull (box dto)) then
-                return! Error <| BadInput "Dto instance is null"
-            else
+        if (isNull (box dto)) then
+            Error <| BadInput "Dto instance is null"
+        else
+            result {
                 let! status = ParkingStatus.parse dto.Status
                 let completeDate = dto.CompleteDate.ToOption()
                 let payment = toPayment dto.Payment
@@ -46,8 +46,11 @@ module internal Mapping =
                         Interval = interval
                         Payment = p }
                 | _,_,_,_ ->
-                    return! Error <| BadInput (sprintf "Invalid dto (Id = %A)" dto.Id)
-        }
+                    return! Error <| BadInput "Invalid dto"
+            } |> Result.mapError (function
+                | BadInput inputError ->
+                    BadInput <| sprintf "Invalid ParkingDto (Id = %A): %s" dto.Id inputError
+                | _ as other -> other)
 
     let toStartedFreeParkingDto (prk: StartedFreeParking) =
         { Id          = ParkingId.toGuid prk.Id 
