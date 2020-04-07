@@ -32,16 +32,18 @@ module Responses =
                   CompleteDate = Nullable()
                   Payment      = PaymentResponse.Null }
             | CompletedFree prk ->
+                let (arrivalDate, completeDate) = ParkingInterval.getDates prk.Interval
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = parkingType
-                  ArrivalDate  = prk.ArrivalDate
-                  CompleteDate = Nullable(prk.CompleteDate)
+                  ArrivalDate  = arrivalDate
+                  CompleteDate = Nullable(completeDate)
                   Payment      = PaymentResponse.Null }
             | CompletedFirst prk ->
+                let (arrivalDate, completeDate) = ParkingInterval.getDates prk.Interval
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = parkingType
-                  ArrivalDate  = prk.ArrivalDate
-                  CompleteDate = Nullable(prk.CompleteDate)
+                  ArrivalDate  = arrivalDate
+                  CompleteDate = Nullable(completeDate)
                   Payment      = PaymentResponse.FromPayment prk.Payment }
     
     [<CLIMutable; NoEquality; NoComparison>]

@@ -1,9 +1,11 @@
 ﻿namespace CarParking.DataLayer
 
 module internal Mapping =
+    open CarParking.Error
     open CarParking.Core
     open CarParking.DataLayer.Dto
     open CarParking.Utils
+    open FsToolkit.ErrorHandling
 
     let toPayment (dto: PaymentDto) =
         if (isNull (box dto)) then
@@ -17,32 +19,35 @@ module internal Mapping =
         { PaymentId = PaymentId.toGuid payment.Id
           CreateDate = payment.CreateDate }
 
-    let toParking dto : Parking option =
-        if (isNull (box dto)) then
-            None
-        else
-            let status = ParkingStatus.parse dto.Status
-            let completeDate = dto.CompleteDate.ToOption()
-            let payment = toPayment dto.Payment
-            let tariff = Tariff.parse dto.Tariff
+    let toParking dto =
+        result {
+            if (isNull (box dto)) then
+                return! Error <| BadInput "Dto instance is null"
+            else
+                let! status = ParkingStatus.parse dto.Status
+                let completeDate = dto.CompleteDate.ToOption()
+                let payment = toPayment dto.Payment
+                let! tariff = Tariff.parse dto.Tariff
             
-            match (status, completeDate, payment, tariff) with
-            | Ok Started, None, None, Ok Free ->
-                StartedFree {
-                    Id = ParkingId dto.Id
-                    ArrivalDate = dto.ArrivalDate } |> Some
-            | Ok Completed, Some cdate, None, Ok Free ->
-                CompletedFree {
-                    Id = ParkingId dto.Id
-                    ArrivalDate = dto.ArrivalDate
-                    CompleteDate = cdate } |> Some
-            | Ok Completed, Some cdate, Some p, Ok First ->
-                CompletedFirst {
-                    Id = ParkingId dto.Id
-                    ArrivalDate = dto.ArrivalDate
-                    CompleteDate = cdate
-                    Payment = p } |> Some
-            | _,_,_,_ -> None
+                match (status, completeDate, payment, tariff) with
+                | Started, None, None, Free ->
+                    return StartedFree {
+                        Id = ParkingId dto.Id
+                        ArrivalDate = dto.ArrivalDate }
+                | Completed, Some cdate, None, Free ->
+                    let! interval = ParkingInterval.create (dto.ArrivalDate, cdate)
+                    return CompletedFree {
+                        Id = ParkingId dto.Id
+                        Interval = interval }
+                | Completed, Some cdate, Some p, First ->
+                    let! interval = ParkingInterval.create (dto.ArrivalDate, cdate)
+                    return CompletedFirst {
+                        Id = ParkingId dto.Id
+                        Interval = interval
+                        Payment = p }
+                | _,_,_,_ ->
+                    return! Error <| BadInput (sprintf "Invalid dto (Id = %A)" dto.Id)
+        }
 
     let toStartedFreeParkingDto (prk: StartedFreeParking) =
         { Id          = ParkingId.toGuid prk.Id 
@@ -50,11 +55,11 @@ module internal Mapping =
 
     let toCompletedFreeParkingDto (prk: CompletedFreeParking) =
         { Id           = ParkingId.toGuid prk.Id
-          CompleteDate = prk.CompleteDate }
+          CompleteDate = ParkingInterval.getCompleteDate prk.Interval }
 
     let toCompletedFirstParkingDto (prk: CompletedFirstParking) =
         { Id           = ParkingId.toGuid prk.Id
-          CompleteDate = prk.CompleteDate
+          CompleteDate = ParkingInterval.getCompleteDate prk.Interval
           Payment      = toPaymentDto prk.Payment }
 
     let toTransition dto : Transition option =

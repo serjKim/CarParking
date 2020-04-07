@@ -176,9 +176,10 @@ type ParkingWorkflowTests () =
 
                 match! patchParking dctx freeLimit parking.Id Completed completeDate with
                 | CompletedFree prk ->
-                    Assert.True(prk.Id           = parking.Id &&
-                                prk.ArrivalDate  = parking.ArrivalDate &&
-                                prk.CompleteDate = completeDate)
+                    let (a, c) = ParkingInterval.getDates prk.Interval
+                    Assert.True(prk.Id = parking.Id &&
+                                a = parking.ArrivalDate &&
+                                c = completeDate)
 
                     match! getParking dctx prk.Id with
                     | CompletedFree p ->

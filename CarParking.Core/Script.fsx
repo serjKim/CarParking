@@ -12,7 +12,9 @@ let s =
 let d = DateTime.UtcNow
 let freeLimit = TimeSpan(0, 1, 0)
 
-calculateTariff freeLimit s d
+match ParkingInterval.create (s.ArrivalDate, d) with
+| Ok interval -> Ok <| calculateTariff freeLimit interval
+| Error err -> Error err
 
 // Complete
 match Transitions.toCompletedFree freeLimit s d with

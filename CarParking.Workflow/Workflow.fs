@@ -2,6 +2,7 @@
 
 open System
 open FSharp.Control.Tasks.V2.ContextInsensitive
+open CarParking.Utils
 open CarParking.Error
 open CarParking.Core
 open CarParking.Core.Parking
@@ -23,7 +24,7 @@ module Parking =
         task {
             let! prks = queryAllPacking dctx (QueryAllParkingFilter.ByTransitionNames transitionNames)
             return prks 
-            |> Seq.choose id
+            |> Seq.choose Result.toOption
             |> Seq.toList
         }
 
@@ -31,9 +32,9 @@ module Parking =
         taskResult {
             let! parking = queryParkingById dctx parkingId
             match parking with
-            | Some prk ->
+            | Ok prk ->
                 return! Ok prk
-            | None ->
+            | Error _ ->
                 return! Error <| EntityNotFound "Parking not found"
         }
 

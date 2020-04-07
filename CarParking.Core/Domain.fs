@@ -19,19 +19,19 @@ type Tariff =
     | Free
     | First
 
+type ParkingInterval = private ParkingInterval of arrival: DateTime * complete: DateTime
+
 type StartedFreeParking = 
     { Id: ParkingId
       ArrivalDate: DateTime }
 
 type CompletedFreeParking =    
     { Id: ParkingId
-      ArrivalDate: DateTime
-      CompleteDate: DateTime }
+      Interval: ParkingInterval }
 
 type CompletedFirstParking = 
     { Id: ParkingId
-      ArrivalDate: DateTime
-      CompleteDate: DateTime
+      Interval: ParkingInterval
       Payment: Payment }
 
 type Parking =
@@ -107,48 +107,59 @@ module Tariff =
         | Free -> FreeName
         | First -> FirstName
 
-module Parking =
-    let private checkDates (start: DateTime, complete: DateTime) =
-        if complete < start then 
-            Error <| BadInput ("Complete date can't be less than the start date")
+[<RequireQualifiedAccess>]
+module ParkingInterval =
+    let private checkInterval (arrival: DateTime, complete: DateTime) =
+        if complete < arrival then 
+            Error <| BadInput ("Complete date can't be less than the arrival date")
         else
-            Ok (start, complete)
+            Ok (arrival, complete)
 
-    let private (|FirstTariff|_|) (freeLimit: TimeSpan) (start: DateTime, complete: DateTime) =
-        let diff = complete - start
+    let create dates =
+        result {
+            let! validDates = checkInterval dates
+            return ParkingInterval validDates
+        }
+
+    let diff (ParkingInterval (arrival, complete)) = complete - arrival
+    let getDates (ParkingInterval(a, c)) = (a, c)
+    let getArrivalDate (ParkingInterval (a, _)) = a
+    let getCompleteDate (ParkingInterval (_, c)) = c
+
+module Parking =
+    let private (|FirstTariff|_|) (freeLimit: TimeSpan) interval =
+        let diff = ParkingInterval.diff interval
         if diff.TotalMinutes > freeLimit.TotalMinutes then
             Some First
         else
             None
 
-    let calculateTariff freeLimit (prk: StartedFreeParking) complete =
-        result {
-            match! checkDates (prk.ArrivalDate, complete) with
-            | FirstTariff freeLimit t -> return! Ok t
-            | _ -> return! Ok Free
-        }
+    let calculateTariff freeLimit interval =
+        match interval with
+        | FirstTariff freeLimit t -> t
+        | _ -> Free
 
     [<RequireQualifiedAccess>]
     module Transitions =
         let toCompletedFree freeLimit prk completeDate =
             result {
-                match! calculateTariff freeLimit prk completeDate with
+                let! interval = ParkingInterval.create (prk.ArrivalDate, completeDate)
+                match calculateTariff freeLimit interval with
                 | Free ->
                     return! Ok { Id = prk.Id
-                                 ArrivalDate = prk.ArrivalDate 
-                                 CompleteDate = completeDate }
+                                 Interval = interval }
                 | First ->
                     return! Error <| TransitionError FreeExpired
             }
 
         let toCompletedFirst freeLimit prk payment =
             result {
-                match! calculateTariff freeLimit prk payment.CreateDate with
+                let! interval = ParkingInterval.create (prk.ArrivalDate, payment.CreateDate)
+                match calculateTariff freeLimit interval with
                 | Free ->
                     return! Error <| TransitionError PaymentNotApplicable
                 | First ->
                     return! Ok { Id = prk.Id
-                                 ArrivalDate = prk.ArrivalDate 
-                                 CompleteDate = payment.CreateDate
+                                 Interval = interval
                                  Payment = payment }
             }
