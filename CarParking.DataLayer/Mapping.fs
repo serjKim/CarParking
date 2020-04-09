@@ -41,10 +41,10 @@ module internal Mapping =
                         Interval = interval }
                 | Completed, Some cdate, Some p, First ->
                     let! interval = ParkingInterval.create (dto.ArrivalDate, cdate)
+                    let! paidInterval = PaidInterval.create interval p
                     return CompletedFirst {
                         Id = ParkingId dto.Id
-                        Interval = interval
-                        Payment = p }
+                        PaidInterval = paidInterval }
                 | _,_,_,_ ->
                     return! Error <| BadInput "Unknown fields combo"
             } |> Result.mapError (function
@@ -62,8 +62,12 @@ module internal Mapping =
 
     let toCompletedFirstParkingDto (prk: CompletedFirstParking) =
         { Id           = ParkingId.toGuid prk.Id
-          CompleteDate = ParkingInterval.getCompleteDate prk.Interval
-          Payment      = toPaymentDto prk.Payment }
+          CompleteDate = prk.PaidInterval 
+                         |> PaidInterval.getInterval
+                         |> ParkingInterval.getCompleteDate 
+          Payment      = prk.PaidInterval
+                         |> PaidInterval.getPayment
+                         |> toPaymentDto }
 
     let toTransition dto : Transition option =
         let fromTariff = dto.FromTariff |> Tariff.parse |> Result.toOption

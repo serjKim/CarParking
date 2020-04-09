@@ -39,12 +39,12 @@ module Responses =
                   CompleteDate = Nullable(completeDate)
                   Payment      = PaymentResponse.Null }
             | CompletedFirst prk ->
-                let (arrivalDate, completeDate) = ParkingInterval.getDates prk.Interval
+                let (arrivalDate, completeDate) = prk.PaidInterval |> PaidInterval.getInterval |> ParkingInterval.getDates 
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = parkingType
                   ArrivalDate  = arrivalDate
                   CompleteDate = Nullable(completeDate)
-                  Payment      = PaymentResponse.FromPayment prk.Payment }
+                  Payment      = prk.PaidInterval |> PaidInterval.getPayment |> PaymentResponse.FromPayment }
     
     [<CLIMutable; NoEquality; NoComparison>]
     type ParkingResponseModel =

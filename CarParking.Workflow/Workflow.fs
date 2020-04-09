@@ -67,7 +67,9 @@ module Parking =
                 match Transitions.toCompletedFirst freeLimit prk payment with
                 | Ok firstPrk ->
                     do! Commands.saveCompletedFirst dctx firstPrk
-                    return! firstPrk.Payment |> Ok
+                    return! firstPrk.PaidInterval
+                            |> PaidInterval.getPayment
+                            |> Ok
                 | Error err ->
                     return! Error err
             | CompletedFree _ 

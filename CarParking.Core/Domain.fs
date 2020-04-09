@@ -21,6 +21,10 @@ type Tariff =
 
 type ParkingInterval = private ParkingInterval of arrival: DateTime * complete: DateTime
 
+type PaidInterval =
+    private { Interval: ParkingInterval
+              Payment: Payment }
+
 type StartedFreeParking = 
     { Id: ParkingId
       ArrivalDate: DateTime }
@@ -31,8 +35,7 @@ type CompletedFreeParking =
 
 type CompletedFirstParking = 
     { Id: ParkingId
-      Interval: ParkingInterval
-      Payment: Payment }
+      PaidInterval: PaidInterval }
 
 type Parking =
     | StartedFree of StartedFreeParking
@@ -126,6 +129,25 @@ module ParkingInterval =
     let getArrivalDate (ParkingInterval (a, _)) = a
     let getCompleteDate (ParkingInterval (_, c)) = c
 
+[<RequireQualifiedAccess>]
+module PaidInterval =
+    let private checkDates (interval, payment) =
+        let completeDate = ParkingInterval.getCompleteDate interval
+        if completeDate = payment.CreateDate then
+            Ok (interval, payment)
+        else
+            Error <| BadInput (sprintf "Complete date and payment's create date must be equal. Payment = %A" payment)
+
+    let create interval payment =
+        result {
+            let! (i, p) = checkDates (interval, payment)
+            return { Interval = i
+                     Payment = p }
+        }
+
+    let getInterval (x: PaidInterval) = x.Interval
+    let getPayment (x: PaidInterval) = x.Payment
+
 module Parking =
     let private (|FirstTariff|_|) (freeLimit: TimeSpan) interval =
         let diff = ParkingInterval.diff interval
@@ -155,11 +177,11 @@ module Parking =
         let toCompletedFirst freeLimit prk payment =
             result {
                 let! interval = ParkingInterval.create (prk.ArrivalDate, payment.CreateDate)
+                let! paidInterval = PaidInterval.create interval payment
                 match calculateTariff freeLimit interval with
                 | Free ->
                     return! Error <| TransitionError PaymentNotApplicable
                 | First ->
                     return! Ok { Id = prk.Id
-                                 Interval = interval
-                                 Payment = payment }
+                                 PaidInterval = paidInterval }
             }
