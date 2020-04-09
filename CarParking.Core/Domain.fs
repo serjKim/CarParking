@@ -110,7 +110,6 @@ module Tariff =
         | Free -> FreeName
         | First -> FirstName
 
-[<RequireQualifiedAccess>]
 module ParkingInterval =
     let private checkInterval (arrival: DateTime, complete: DateTime) =
         if complete < arrival then 
@@ -118,16 +117,14 @@ module ParkingInterval =
         else
             Ok (arrival, complete)
 
-    let create dates =
-        result {
-            let! validDates = checkInterval dates
-            return ParkingInterval validDates
-        }
-
-    let diff (ParkingInterval (arrival, complete)) = complete - arrival
-    let getDates (ParkingInterval(a, c)) = (a, c)
+    let createInterval = checkInterval >> Result.map ParkingInterval
+    let duration (ParkingInterval (arrival, complete)) = complete - arrival
     let getArrivalDate (ParkingInterval (a, _)) = a
     let getCompleteDate (ParkingInterval (_, c)) = c
+
+    type ParkingInterval with
+        member x.ArrivalDate = getArrivalDate x
+        member x.CompleteDate = getCompleteDate x
 
 [<RequireQualifiedAccess>]
 module PaidInterval =
@@ -138,19 +135,19 @@ module PaidInterval =
         else
             Error <| BadInput (sprintf "Complete date and payment's create date must be equal. Payment = %A" payment)
 
-    let create interval payment =
-        result {
-            let! (i, p) = checkDates (interval, payment)
-            return { Interval = i
-                     Payment = p }
-        }
+    let private createPayment (interval, payment) =
+        { Interval = interval
+          Payment = payment }
 
+    let create = checkDates >> Result.map createPayment
     let getInterval (x: PaidInterval) = x.Interval
     let getPayment (x: PaidInterval) = x.Payment
 
 module Parking =
+    open ParkingInterval
+
     let private (|FirstTariff|_|) (freeLimit: TimeSpan) interval =
-        let diff = ParkingInterval.diff interval
+        let diff = duration interval
         if diff.TotalMinutes > freeLimit.TotalMinutes then
             Some First
         else
@@ -165,7 +162,7 @@ module Parking =
     module Transitions =
         let toCompletedFree freeLimit prk completeDate =
             result {
-                let! interval = ParkingInterval.create (prk.ArrivalDate, completeDate)
+                let! interval = createInterval (prk.ArrivalDate, completeDate)
                 match calculateTariff freeLimit interval with
                 | Free ->
                     return! Ok { Id = prk.Id
@@ -176,8 +173,8 @@ module Parking =
 
         let toCompletedFirst freeLimit prk payment =
             result {
-                let! interval = ParkingInterval.create (prk.ArrivalDate, payment.CreateDate)
-                let! paidInterval = PaidInterval.create interval payment
+                let! interval = createInterval (prk.ArrivalDate, payment.CreateDate)
+                let! paidInterval = PaidInterval.create (interval, payment)
                 match calculateTariff freeLimit interval with
                 | Free ->
                     return! Error <| TransitionError PaymentNotApplicable

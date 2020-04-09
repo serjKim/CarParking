@@ -1,6 +1,7 @@
 ﻿namespace CarParking.WebApi
 
 open CarParking.Core
+open CarParking.Core.ParkingInterval
 open CarParking.Utils
 open System
 
@@ -32,18 +33,17 @@ module Responses =
                   CompleteDate = Nullable()
                   Payment      = PaymentResponse.Null }
             | CompletedFree prk ->
-                let (arrivalDate, completeDate) = ParkingInterval.getDates prk.Interval
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = parkingType
-                  ArrivalDate  = arrivalDate
-                  CompleteDate = Nullable(completeDate)
+                  ArrivalDate  = prk.Interval.ArrivalDate
+                  CompleteDate = Nullable(prk.Interval.CompleteDate)
                   Payment      = PaymentResponse.Null }
             | CompletedFirst prk ->
-                let (arrivalDate, completeDate) = prk.PaidInterval |> PaidInterval.getInterval |> ParkingInterval.getDates 
+                let interval = prk.PaidInterval |> PaidInterval.getInterval
                 { Id           = ParkingId.toGuid prk.Id
                   Type         = parkingType
-                  ArrivalDate  = arrivalDate
-                  CompleteDate = Nullable(completeDate)
+                  ArrivalDate  = interval.ArrivalDate
+                  CompleteDate = Nullable(interval.CompleteDate)
                   Payment      = prk.PaidInterval |> PaidInterval.getPayment |> PaymentResponse.FromPayment }
     
     [<CLIMutable; NoEquality; NoComparison>]

@@ -3,6 +3,7 @@
 module internal Mapping =
     open CarParking.Error
     open CarParking.Core
+    open CarParking.Core.ParkingInterval
     open CarParking.DataLayer.Dto
     open CarParking.Utils
     open FsToolkit.ErrorHandling
@@ -35,13 +36,13 @@ module internal Mapping =
                         Id = ParkingId dto.Id
                         ArrivalDate = dto.ArrivalDate }
                 | Completed, Some cdate, None, Free ->
-                    let! interval = ParkingInterval.create (dto.ArrivalDate, cdate)
+                    let! interval = createInterval (dto.ArrivalDate, cdate)
                     return CompletedFree {
                         Id = ParkingId dto.Id
                         Interval = interval }
                 | Completed, Some cdate, Some p, First ->
-                    let! interval = ParkingInterval.create (dto.ArrivalDate, cdate)
-                    let! paidInterval = PaidInterval.create interval p
+                    let! interval = createInterval (dto.ArrivalDate, cdate)
+                    let! paidInterval = PaidInterval.create (interval, p)
                     return CompletedFirst {
                         Id = ParkingId dto.Id
                         PaidInterval = paidInterval }
@@ -58,16 +59,13 @@ module internal Mapping =
 
     let toCompletedFreeParkingDto (prk: CompletedFreeParking) =
         { Id           = ParkingId.toGuid prk.Id
-          CompleteDate = ParkingInterval.getCompleteDate prk.Interval }
+          CompleteDate = prk.Interval.CompleteDate }
 
     let toCompletedFirstParkingDto (prk: CompletedFirstParking) =
+        let interval = PaidInterval.getInterval prk.PaidInterval
         { Id           = ParkingId.toGuid prk.Id
-          CompleteDate = prk.PaidInterval 
-                         |> PaidInterval.getInterval
-                         |> ParkingInterval.getCompleteDate 
-          Payment      = prk.PaidInterval
-                         |> PaidInterval.getPayment
-                         |> toPaymentDto }
+          CompleteDate = interval.CompleteDate
+          Payment      = prk.PaidInterval |> PaidInterval.getPayment |> toPaymentDto }
 
     let toTransition dto : Transition option =
         let fromTariff = dto.FromTariff |> Tariff.parse |> Result.toOption

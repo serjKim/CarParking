@@ -6,6 +6,7 @@ open CarParking.Workflow.Parking
 open System.Data.SqlClient
 open CarParking.DataLayer.DataContext
 open CarParking.Core
+open CarParking.Core.ParkingInterval
 open CarParking.Error
 open System.Data
 open System.Threading
@@ -176,10 +177,9 @@ type ParkingWorkflowTests () =
 
                 match! patchParking dctx freeLimit parking.Id Completed completeDate with
                 | CompletedFree prk ->
-                    let (a, c) = ParkingInterval.getDates prk.Interval
                     Assert.True(prk.Id = parking.Id &&
-                                a = parking.ArrivalDate &&
-                                c = completeDate)
+                                prk.Interval.ArrivalDate = parking.ArrivalDate &&
+                                prk.Interval.CompleteDate = completeDate)
 
                     match! getParking dctx prk.Id with
                     | CompletedFree p ->
