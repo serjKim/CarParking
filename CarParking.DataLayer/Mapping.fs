@@ -47,10 +47,10 @@ module internal Mapping =
                         Id = ParkingId dto.Id
                         PaidInterval = paidInterval }
                 | _,_,_,_ ->
-                    return! Error <| BadInput "Unknown fields combo"
+                    return! Error <| BadInput (sprintf "Unknown fields combo: Status = %s, CompleteDate = %A, PaymentId = %A, Tariff = %A"
+                                              (status |> ParkingStatus.toString) dto.CompleteDate (payment.MapOrDefault(fun p -> p.Id)) tariff)
             } |> Result.mapError (function
-                | BadInput inputError ->
-                    BadInput <| sprintf "Invalid ParkingDto (Id = %A): %s" dto.Id inputError
+                | BadInput inputError -> BadInput <| sprintf "Invalid ParkingDto (Id = %A): %s" dto.Id inputError
                 | _ as other -> other)
 
     let toStartedFreeParkingDto (prk: StartedFreeParking) =
