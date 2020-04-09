@@ -46,7 +46,7 @@ module Parking =
             | Completed ->
                 match! getParking dctx parkingId with
                 | StartedFree prk ->
-                    match Transitions.toCompletedFree freeLimit prk completeDate with
+                    match Transitions.toCompletedFree freeLimit completeDate prk with
                     | Ok completedFree ->
                         do! Commands.saveCompletedFree dctx completedFree
                         return! CompletedFree completedFree |> Ok
@@ -64,7 +64,7 @@ module Parking =
                 let payment = 
                     { Id = PaymentId (Guid.NewGuid())
                       CreateDate = completeDate }
-                match Transitions.toCompletedFirst freeLimit prk payment with
+                match Transitions.toCompletedFirst freeLimit payment prk with
                 | Ok firstPrk ->
                     do! Commands.saveCompletedFirst dctx firstPrk
                     return! firstPrk.PaidInterval

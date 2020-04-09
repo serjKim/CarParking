@@ -160,7 +160,7 @@ module Parking =
 
     [<RequireQualifiedAccess>]
     module Transitions =
-        let toCompletedFree freeLimit prk completeDate =
+        let toCompletedFree freeLimit completeDate prk =
             result {
                 let! interval = createInterval (prk.ArrivalDate, completeDate)
                 match calculateTariff freeLimit interval with
@@ -171,7 +171,7 @@ module Parking =
                     return! Error <| TransitionError FreeExpired
             }
 
-        let toCompletedFirst freeLimit prk payment =
+        let toCompletedFirst freeLimit payment prk =
             result {
                 let! interval = createInterval (prk.ArrivalDate, payment.CreateDate)
                 let! paidInterval = PaidInterval.create (interval, payment)
