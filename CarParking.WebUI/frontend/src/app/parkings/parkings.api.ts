@@ -2,10 +2,10 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { deserialize } from 'santee-dcts';
 import { AppSettings } from '../app-settings';
+import { deserializeParking, deserializeParkings } from './dtos/deserializers';
 import { CompletionResult, CompletionResultType } from './models/completion';
-import { Parking, ParkingReadModel, ParkingsReadModel, StartedFree } from './models/parking';
+import { Parking, StartedFree } from './models/parking';
 
 const enum TransitionErrorType {
     FreeExpired = 'FreeExpired',
@@ -23,17 +23,15 @@ export class ParkingsApi {
     ) { }
 
     public getAll(queryParams: HttpParams): Observable<readonly Parking[]> {
-        return this.httpClient.get(`${this.settings.apiUrl}/parkings`, { params: queryParams }).pipe(
-            map(obj => {
-                return deserialize(obj, ParkingsReadModel).parkings;
-            }),
+        return this.httpClient.get<object[]>(`${this.settings.apiUrl}/parkings`, { params: queryParams }).pipe(
+            map(obj => deserializeParkings(obj)),
         );
     }
 
     public create(): Promise<Parking> {
-        return this.httpClient.post(`${this.settings.apiUrl}/parkings`, null)
-            .pipe(map((obj: object) => deserialize(obj, ParkingReadModel).parking))
-            .toPromise();
+        return this.httpClient.post<object>(`${this.settings.apiUrl}/parkings`, null).pipe(
+            map(obj => deserializeParking(obj)),
+        ).toPromise();
     }
 
     public async complete(parking: StartedFree): Promise<CompletionResult> {

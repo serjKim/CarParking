@@ -45,16 +45,6 @@ module Responses =
                   ArrivalDate  = interval.ArrivalDate
                   CompleteDate = Nullable(interval.CompleteDate)
                   Payment      = prk.PaidInterval |> PaidInterval.getPayment |> PaymentResponse.FromPayment }
-    
-    [<CLIMutable; NoEquality; NoComparison>]
-    type ParkingResponseModel =
-        { Parking: ParkingResponse }
-        static member FromResponse x = { Parking = x }
-
-    [<CLIMutable; NoEquality; NoComparison>]
-    type ParkingsResponseModel =
-        { Parkings: ParkingResponse list }
-        static member FromResponse x = { Parkings = x }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type TransitionErrorReponse = 
@@ -73,8 +63,3 @@ module Responses =
               FromStatus = transition.FromStatus.MapOrDefault ParkingStatus.toString
               ToTariff = transition.ToTariff |> Tariff.toString
               ToStatus = transition.ToStatus |> ParkingStatus.toString }
-
-    [<CLIMutable; NoEquality; NoComparison>]
-    type TransitionReponseModel =
-        { Transitions: TransitionResponse seq }
-        static member FromResponse x = { Transitions = x }

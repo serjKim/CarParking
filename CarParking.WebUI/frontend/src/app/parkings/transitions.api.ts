@@ -2,9 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { deserialize } from 'santee-dcts';
+import { deserializeArray } from 'santee-dcts';
 import { AppSettings } from '../app-settings';
-import { Transition, TransitionReadModel } from './models/transition';
+import { TransitionDto } from './dtos/transition-dto';
+import { Transition } from './models/transition';
 
 @Injectable()
 export class TransitionsApi {
@@ -14,10 +15,8 @@ export class TransitionsApi {
     ) { }
 
     public getTransitions(): Observable<Transition[]> {
-        return this.httpClient.get(`${this.settings.apiUrl}/transitions`).pipe(
-            map(obj => {
-                return deserialize(obj, TransitionReadModel).transitions;
-            }),
+        return this.httpClient.get<object[]>(`${this.settings.apiUrl}/transitions`).pipe(
+            map(obj => deserializeArray(obj, TransitionDto)),
         );
     }
 }

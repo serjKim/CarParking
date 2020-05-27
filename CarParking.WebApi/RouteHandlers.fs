@@ -60,26 +60,20 @@ module RouteHandlers =
             taskResult {
                 let! parkingId = ParkingId.parse rawParkingId
                 return! getParking dctx parkingId
-            } |> toResponseAsync (ParkingResponse.FromParking
-                                  >> ParkingResponseModel.FromResponse 
-                                  >> ok) next ctx
+            } |> toResponseAsync (ParkingResponse.FromParking >> ok) next ctx
 
     let getAllParkingsHandler =
         fun next (ctx : HttpContext) dctx ->
             taskResult {
                 let transitionNames = deserializeFilterItems ctx
                 return! getAllParkings dctx transitionNames
-            } |> toResponseAsync (List.map ParkingResponse.FromParking
-                                  >> ParkingsResponseModel.FromResponse 
-                                  >> ok) next ctx
+            } |> toResponseAsync (List.map ParkingResponse.FromParking >> ok) next ctx
 
     let createParkingHandler =
         fun next ctx dctx ->
             task {
                 let! newParking = createNewParking dctx DateTime.UtcNow
-                return! ok (newParking
-                            |> ParkingResponse.FromParking
-                            |> ParkingResponseModel.FromResponse) next ctx
+                return! ok (newParking |> ParkingResponse.FromParking) next ctx
             }
     
     let patchParkingHandler rawParkingId =
@@ -109,4 +103,4 @@ module RouteHandlers =
                 return! queryAllTransitions dctx
             } |> toResponseAsync (Seq.choose id 
                                   >> Seq.map TransitionResponse.FromTransition
-                                  >> TransitionReponseModel.FromResponse >> ok) next ctx
+                                  >> ok) next ctx

@@ -14,30 +14,11 @@ const transitionNamesArray: TransitionNames = ['StartedFree', 'CompletedFree', '
 export const TRANSITION_NAMES = new Set(transitionNamesArray);
 
 export class Transition {
-    @dataMember()
-    @required()
-    public name: TransitionName;
-
-    @dataMember()
-    @required({ nullable: true })
-    public fromTariff: Tariff | null;
-
-    @dataMember()
-    @required({ nullable: true })
-    public fromStatus: ParkingStatus | null;
-
-    @dataMember()
-    @required()
-    public toTariff: Tariff;
-
-    @dataMember()
-    @required()
-    public toStatus: ParkingStatus;
-}
-
-export class TransitionReadModel {
-    @dataMember()
-    @required()
-    @typedArray(Transition)
-    public transitions: Transition[];
+    constructor(
+        public readonly name: TransitionName,
+        public readonly fromTariff: Tariff | null,
+        public readonly fromStatus: ParkingStatus | null,
+        public readonly toTariff: Tariff,
+        public readonly toStatus: ParkingStatus,
+    ) { }
 }
