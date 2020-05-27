@@ -285,7 +285,15 @@ type ParkingWorkflowTests () =
             match! createNewParking dctx arrivalDate with
             | StartedFree parking ->
                 let! payment = createPayment dctx freeLimit parking.Id completeDate
-                return payment.CreateDate = completeDate
+                Assert.True(payment.CreateDate = completeDate)
+
+                match! getParking (createDctx ()) parking.Id with
+                | CompletedFirst p ->
+                    let interval = PaidInterval.getInterval p.PaidInterval
+                    let payment = PaidInterval.getPayment p.PaidInterval
+                    return interval.CompleteDate = payment.CreateDate
+                | _ ->
+                    return false
             | _  ->
                 return false
 

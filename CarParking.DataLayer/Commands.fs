@@ -80,7 +80,11 @@ module Commands =
                     values(
                         @" + idName + ",
                         @" + createDateName + ")"
-            new CommandDefinition(queryText, dto, cancellationToken = token, transaction = tran)
+            let parameters =
+                DynamicParameters()
+                    .AddParam(idName, dto.PaymentId)
+                    .AddParam(createDateName, dto.CreateDate, DbType.DateTime2)
+            new CommandDefinition(queryText, parameters, cancellationToken = token, transaction = tran)
 
     open System
     open Mapping
