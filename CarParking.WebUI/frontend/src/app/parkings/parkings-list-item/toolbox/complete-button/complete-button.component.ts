@@ -11,10 +11,10 @@ import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event
 })
 export class CompleteButtonComponent {
     @Input()
-    public parking: Parking;
+    public parking!: Parking;
 
     @Input()
-    public disabled: boolean;
+    public disabled!: boolean;
 
     @Output()
     public complete = new EventEmitter<ToolboxButtonEvent>();

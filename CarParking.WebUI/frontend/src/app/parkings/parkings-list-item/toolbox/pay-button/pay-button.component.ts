@@ -10,10 +10,10 @@ import { ParkingsStorage } from '../../../parkings.storage';
 })
 export class PayButtonComponent {
     @Input()
-    public parking: Parking;
+    public parking!: Parking;
 
     @Input()
-    public disabled: boolean;
+    public disabled!: boolean;
 
     constructor(
         private readonly parkingsStorage: ParkingsStorage,

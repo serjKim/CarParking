@@ -14,11 +14,11 @@ export const deserializeDate = (str: string) => {
 export class PaymentDto {
     @dataMember()
     @required()
-    public id: string;
+    public id: string = '';
 
     @dataMember({ customDeserializer: deserializeDate })
     @required()
-    public createDate: Date;
+    public createDate: Date = new Date();
 }
 
 export class StartedFreeDto {
@@ -26,11 +26,11 @@ export class StartedFreeDto {
 
     @dataMember()
     @required()
-    public id: string;
+    public id: string = '';
 
     @dataMember({ customDeserializer: deserializeDate })
     @required()
-    public arrivalDate: Date;
+    public arrivalDate: Date = new Date();
 }
 
 export class CompletedFreeDto {
@@ -38,15 +38,15 @@ export class CompletedFreeDto {
 
     @dataMember()
     @required()
-    public id: string;
+    public id: string = '';
 
     @dataMember({ customDeserializer: deserializeDate })
     @required()
-    public arrivalDate: Date;
+    public arrivalDate: Date = new Date();
 
     @dataMember({ customDeserializer: deserializeDate })
     @required()
-    public completeDate: Date;
+    public completeDate: Date = new Date();
 }
 
 export class CompletedFirstDto {
@@ -54,19 +54,19 @@ export class CompletedFirstDto {
 
     @dataMember()
     @required()
-    public id: string;
+    public id: string = '';
 
     @dataMember({ customDeserializer: deserializeDate })
     @required()
-    public arrivalDate: Date;
+    public arrivalDate: Date = new Date();
 
     @dataMember({ customDeserializer: deserializeDate })
     @required()
-    public completeDate: Date;
+    public completeDate: Date = new Date();
 
     @dataMember()
     @required()
-    public payment: PaymentDto;
+    public payment: PaymentDto = new PaymentDto();
 }
 
 export type ParkingDto =

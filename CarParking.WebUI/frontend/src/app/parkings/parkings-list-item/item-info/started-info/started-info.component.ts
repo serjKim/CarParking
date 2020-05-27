@@ -9,5 +9,5 @@ import { StartedFree } from '../../../models/parking';
 })
 export class StartedInfoComponent {
     @Input()
-    public parking: StartedFree;
+    public parking!: StartedFree;
 }

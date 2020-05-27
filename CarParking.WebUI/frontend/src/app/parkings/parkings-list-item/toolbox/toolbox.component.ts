@@ -17,7 +17,7 @@ enum ToolboxButton {
 })
 export class ToolboxComponent implements OnInit {
     @Input()
-    public parking: Parking;
+    public parking!: Parking;
 
     public readonly toolboxButtonType = ToolboxButton;
     public selectedButton = ToolboxButton.Complete;

@@ -9,5 +9,5 @@ import { CompletedFirst, CompletedFree } from '../../../models/parking';
 })
 export class CompletedInfoComponent {
     @Input()
-    public parking: CompletedFree | CompletedFirst;
+    public parking!: CompletedFree | CompletedFirst;
 }

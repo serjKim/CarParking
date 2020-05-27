@@ -19,7 +19,7 @@ export class ParkingsListItemComponent implements OnInit {
     public canSwitchInfo = false;
 
     @Input()
-    public parking: Parking;
+    public parking!: Parking;
 
     @HostListener('click')
     public onSwitchInfo() {
