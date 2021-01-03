@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Utils.fs" />
+    <Compile Include="DapperExtensions.fs" />
     <Compile Include="DbConstants.fs" />
     <Compile Include="Mapping.fs" />
     <Compile Include="DataContext.fs" />
