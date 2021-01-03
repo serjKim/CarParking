@@ -47,7 +47,7 @@ module Parking =
                 | StartedFree prk ->
                     match Transitions.toCompletedFree freeLimit completeDate prk with
                     | Ok completedFree ->
-                        let! _ = Commands.saveCompletedFree dctx completedFree
+                        do! Commands.saveCompletedFree dctx completedFree
                         return! CompletedFree completedFree |> Ok
                     | Error err ->
                         return! Error err
@@ -65,7 +65,7 @@ module Parking =
                       CreateDate = completeDate }
                 match Transitions.toCompletedFirst freeLimit payment prk with
                 | Ok firstPrk ->
-                    let! _ = Commands.saveCompletedFirst dctx firstPrk
+                    do! Commands.saveCompletedFirst dctx firstPrk
                     return! firstPrk.PaidInterval
                             |> PaidInterval.getPayment
                             |> Ok
