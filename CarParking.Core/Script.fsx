@@ -8,8 +8,8 @@ open CarParking.Core.Parking
 
 let s =
     { Id = ParkingId (Guid.NewGuid())
-      ArrivalDate = DateTime.UtcNow.AddMinutes(-20.) }
-let d = DateTime.UtcNow
+      ArrivalDate = DateTimeOffset.UtcNow.AddMinutes(-20.) }
+let d = DateTimeOffset.UtcNow
 let freeLimit = TimeSpan(0, 1, 0)
 
 match ParkingInterval.createInterval (s.ArrivalDate, d) with
