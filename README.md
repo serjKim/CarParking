@@ -28,6 +28,7 @@ Property-based integration testing
 ## Requirements
 - .NET Core >= 5.0
 - Docker >= 19
+- ~~(Optional) Paket: You can get all dependencies using `dotnet restore` without having Paket, since there is the `.paket/Paket.Restore.targets` file~~ Revert back later :)
 - (Optional) Node >= 12.14, npm >= 6.13: Required if there is a desire to build UI
 
 ## Getting Started
