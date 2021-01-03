@@ -1,5 +1,5 @@
-﻿#load "..\\CarParking.Error\Error.fs"
-#r "..\\..\\..\\..\\.nuget\\packages\\fstoolkit.errorhandling\\1.2.6\\lib\\netstandard2.0\\FsToolkit.ErrorHandling.dll"
+﻿#r "nuget: FsToolkit.ErrorHandling, 1.2.6"
+#load "..\\CarParking.Error\Error.fs"
 #load "Domain.fs"
 
 open System
@@ -12,7 +12,7 @@ let s =
 let d = DateTime.UtcNow
 let freeLimit = TimeSpan(0, 1, 0)
 
-match ParkingInterval.create (s.ArrivalDate, d) with
+match ParkingInterval.createInterval (s.ArrivalDate, d) with
 | Ok interval -> Ok <| calculateTariff freeLimit interval
 | Error err -> Error err
 
