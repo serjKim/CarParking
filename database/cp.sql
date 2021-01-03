@@ -4,56 +4,47 @@ USE CarParking
 GO
 
 CREATE TABLE [dbo].[Payment] (
-    [PaymentID]  UNIQUEIDENTIFIER NOT NULL,
-    [CreateDate] DATETIME2 (7)    NOT NULL
-    PRIMARY KEY CLUSTERED ([PaymentID])
-);
+    [PaymentID]  UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+    [CreateDate] DATETIMEOFFSET NOT NULL
+)
 GO
 
-
 CREATE TABLE [dbo].[ParkingStatus] (
-    [ParkingStatusID] UNIQUEIDENTIFIER NOT NULL,
+    [ParkingStatusID] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [Name]            NVARCHAR (100)   NOT NULL,
-    PRIMARY KEY CLUSTERED ([ParkingStatusID]),
     CONSTRAINT ParkingStatus_U_Name UNIQUE ([Name])
-);
+)
 GO
 CREATE NONCLUSTERED INDEX [IX_ParkingStatus_Name]
     ON [dbo].[ParkingStatus]([Name]);
 
-
 CREATE TABLE [dbo].[Tariff] (
-    [TariffID] UNIQUEIDENTIFIER NOT NULL,
+    [TariffID] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [Name]     NVARCHAR (100)   NOT NULL,
-    PRIMARY KEY CLUSTERED ([TariffID] ASC),
     CONSTRAINT Tariff_U_Name UNIQUE ([Name])
-);
+)
 GO
 CREATE NONCLUSTERED INDEX [IX_Tariff_Name]
     ON [dbo].[Tariff]([Name] ASC);
 
-
 GO
 CREATE TABLE [dbo].[Parking] (
-    [ParkingID]    UNIQUEIDENTIFIER NOT NULL,
-    [ArrivalDate]  DATETIME2 (7)    NOT NULL,
+    [ParkingID]    UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+    [ArrivalDate]  DATETIMEOFFSET   NOT NULL,
     [StatusID]     UNIQUEIDENTIFIER NOT NULL,
     [TariffID]     UNIQUEIDENTIFIER NOT NULL,
-    [CompleteDate] DATETIME2 (7)    NULL,
+    [CompleteDate] DATETIMEOFFSET   NULL,
     [PaymentID]    UNIQUEIDENTIFIER NULL,
-    PRIMARY KEY CLUSTERED ([ParkingID]),
     CONSTRAINT [FK_Parking_ToParkingStatus] FOREIGN KEY ([StatusID]) REFERENCES [dbo].[ParkingStatus] ([ParkingStatusID]),
     CONSTRAINT [FK_Parking_ToPaymentID] FOREIGN KEY ([PaymentID]) REFERENCES [dbo].[Payment] ([PaymentID]),
     CONSTRAINT [FK_Parking_ToTariffID] FOREIGN KEY ([TariffID]) REFERENCES [dbo].[Tariff] ([TariffID])
-);
+)
 GO
 CREATE NONCLUSTERED INDEX [IX_Parking_StatusID]
     ON [dbo].[Parking]([StatusID]);
 
-
 GO
-CREATE TABLE [dbo].[Transition]
-(
+CREATE TABLE [dbo].[Transition] (
     [TransitionID] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY, 
     [Name] NVARCHAR(100) NOT NULL, 
     [FromTariff] UNIQUEIDENTIFIER NULL, 
@@ -66,7 +57,6 @@ CREATE TABLE [dbo].[Transition]
     CONSTRAINT [FK_Transition_ToStatus] FOREIGN KEY ([ToStatus]) REFERENCES [dbo].[ParkingStatus]([ParkingStatusID]),
     CONSTRAINT Transition_U_Name UNIQUE ([Name])
 )
-
 
 GO
 insert into dbo.ParkingStatus (ParkingStatusID, Name)

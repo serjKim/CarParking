@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
@@ -24,5 +24,18 @@
     <ProjectReference Include="..\CarParking.Error\CarParking.Error.fsproj" />
     <ProjectReference Include="..\CarParking.Workflow\CarParking.Workflow.fsproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="TaskBuilder.fs" Version="2.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="FsCheck" Version="3.0.0-alpha4" />
+    <PackageReference Include="FsCheck.Xunit" Version="3.0.0-alpha4" />
+    <PackageReference Include="Dapper" Version="2.0.78" />
+  </ItemGroup>
+  
 </Project>

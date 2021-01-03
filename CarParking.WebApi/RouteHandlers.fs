@@ -1,22 +1,22 @@
 ﻿namespace CarParking.WebApi
 
-open Microsoft.AspNetCore.Http
-open Giraffe
-open FSharp.Control.Tasks.V2.ContextInsensitive
-open CarParking.Error
-open CarParking.Workflow.Parking
-open CarParking.DataLayer.DataContext
-open CarParking.DataLayer.Queries
-open Responses
-open Requests
-open System
-open Microsoft.Extensions.Options
-open Configuration
-open CarParking.Core
-open FsToolkit.ErrorHandling
-open System.Threading.Tasks
-
 module RouteHandlers =
+    open Microsoft.AspNetCore.Http
+    open Giraffe
+    open FSharp.Control.Tasks.V2.ContextInsensitive
+    open CarParking.Error
+    open CarParking.Workflow.Parking
+    open CarParking.DataLayer.DataContext
+    open CarParking.DataLayer.Queries
+    open Responses
+    open Requests
+    open System
+    open Microsoft.Extensions.Options
+    open Configuration
+    open CarParking.Core
+    open FsToolkit.ErrorHandling
+    open System.Threading.Tasks
+
     let ok obj = Successful.ok (json obj)
 
     let toResponse okResult = function
@@ -72,7 +72,7 @@ module RouteHandlers =
     let createParkingHandler =
         fun next ctx dctx ->
             task {
-                let! newParking = createNewParking dctx DateTime.UtcNow
+                let! newParking = createNewParking dctx DateTimeOffset.UtcNow
                 return! ok (newParking |> ParkingResponse.FromParking) next ctx
             }
     
@@ -84,7 +84,7 @@ module RouteHandlers =
                     let freeLimit = getFreeLimit settings
                     let! parkingId = ParkingId.parse rawParkingId
                     let! status = ParkingStatus.parse req.Status
-                    return! patchParking dctx freeLimit parkingId status DateTime.UtcNow
+                    return! patchParking dctx freeLimit parkingId status DateTimeOffset.UtcNow
                 | Error err ->
                     return! Error <| BadInput err
             } |> toResponseAsync (fun _ -> Successful.NO_CONTENT) next ctx
@@ -94,7 +94,7 @@ module RouteHandlers =
             taskResult {
                 let freeLimit = getFreeLimit settings
                 let! parkingId = ParkingId.parse rawParkingId
-                return! createPayment dctx freeLimit parkingId DateTime.UtcNow
+                return! createPayment dctx freeLimit parkingId DateTimeOffset.UtcNow
             } |> toResponseAsync (PaymentResponse.FromPayment >> ok) next ctx
 
     let getAllTransitions =

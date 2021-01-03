@@ -1,16 +1,16 @@
 ﻿namespace CarParking.Workflow
 
-open System
-open FSharp.Control.Tasks.V2.ContextInsensitive
-open CarParking.Utils
-open CarParking.Error
-open CarParking.Core
-open CarParking.Core.Parking
-open CarParking.DataLayer.Queries
-open CarParking.DataLayer
-open FsToolkit.ErrorHandling
-
 module Parking =
+    open System
+    open FSharp.Control.Tasks.V2.ContextInsensitive
+    open CarParking.Utils
+    open CarParking.Error
+    open CarParking.Core
+    open CarParking.Core.Parking
+    open CarParking.DataLayer.Queries
+    open CarParking.DataLayer
+    open FsToolkit.ErrorHandling
+
     let createNewParking dctx arrivalDate =
         task {
             let parking = 
@@ -29,13 +29,12 @@ module Parking =
         }
 
     let getParking dctx parkingId =
-        taskResult {
-            let! parking = queryParkingById dctx parkingId
-            match parking with
+        task {
+            match! queryParkingById dctx parkingId with
             | Ok prk ->
-                return! Ok prk
+                return Ok prk
             | Error _ ->
-                return! Error <| EntityNotFound "Parking not found"
+                return Error <| EntityNotFound "Parking not found"
         }
 
     let patchParking dctx freeLimit parkingId status completeDate =

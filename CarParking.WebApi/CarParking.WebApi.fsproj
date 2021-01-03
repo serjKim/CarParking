@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
@@ -13,9 +13,13 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Giraffe" Version="4.0.1" />
+    <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="1.2.6" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CarParking.DataLayer\CarParking.DataLayer.fsproj" />
     <ProjectReference Include="..\CarParking.Utils\CarParking.Utils.fsproj" />
     <ProjectReference Include="..\CarParking.Workflow\CarParking.Workflow.fsproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

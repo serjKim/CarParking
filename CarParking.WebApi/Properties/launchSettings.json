@@ -18,7 +18,6 @@
     },
     "CarParking.WebApi": {
       "commandName": "Project",
-      "launchUrl": "weatherforecast",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
