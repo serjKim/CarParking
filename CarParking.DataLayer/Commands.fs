@@ -9,63 +9,54 @@ module Commands =
         open Dapper
 
         let insertStartedFree (dto: StartedFreeParkingDto) token = 
-            let idName = nameOf <@ p<StartedFreeParkingDto>.Id @>
-            let arrivalDateName = nameOf <@ p<StartedFreeParkingDto>.ArrivalDate @>
-            let queryText = "
-                    insert into dbo.Parking (
-                        ParkingID,
-                        StatusID,
-                        ArrivalDate,
-                        TariffID)
-                    select
-                        @" + idName + ",
-                        ToStatus,
-                        @" + arrivalDateName + ",
-                        ToTariff
-                    from dbo.Transition
-                    where Name = '" + DbConstants.Transitions.StartedFree + "'"
+            let queryText = $"
+                insert into dbo.Parking (
+                    ParkingID,
+                    StatusID,
+                    ArrivalDate,
+                    TariffID)
+                select
+                    @{nameof prop<StartedFreeParkingDto>.Id},
+                    ToStatus,
+                    @{nameof prop<StartedFreeParkingDto>.ArrivalDate},
+                    ToTariff
+                from dbo.Transition
+                where Name = '{DbConstants.Transitions.StartedFree}'"
             new CommandDefinition (queryText, dto, cancellationToken = token)
 
         let saveCompletedFree (dto: CompletedFreeParkingDto) token = 
-            let completeDateName = nameOf <@ p<CompletedFreeParkingDto>.CompleteDate @>
-            let idName = nameOf <@ p<CompletedFreeParkingDto>.Id @>
-            let queryText = "
-                    update p
-                        set p.StatusID = t.ToStatus,
-                            p.TariffID = t.ToTariff,
-                            p.CompleteDate = @" + completeDateName + "
-                    from dbo.Parking p
-                    inner join dbo.Transition t
-                        on t.Name = '" + DbConstants.Transitions.CompletedFree + "'
-                    where p.ParkingID = @" + idName
+            let queryText = $"
+                update p
+                    set p.StatusID = t.ToStatus,
+                        p.TariffID = t.ToTariff,
+                        p.CompleteDate = @{nameof prop<CompletedFreeParkingDto>.CompleteDate}
+                from dbo.Parking p
+                inner join dbo.Transition t
+                    on t.Name = '{DbConstants.Transitions.CompletedFree}'
+                where p.ParkingID = @{nameof prop<CompletedFreeParkingDto>.Id}"
             new CommandDefinition(queryText, dto, cancellationToken = token)
 
         let saveCompletedFirst (dto: CompletedFirstParkingDto) (tran: IDbTransaction) token =
-            let completeDateName = nameOf <@ p<CompletedFirstParkingDto>.CompleteDate @>
-            let paymentIdName = nameOf <@ p<CompletedFirstParkingDto>.PaymentId @>
-            let idName = nameOf <@ p<CompletedFirstParkingDto>.Id @>
-            let queryText = "
+            let queryText = $"
                     update p
                         set p.StatusID = t.ToStatus,
                             p.TariffID = t.ToTariff,
-                            p.CompleteDate = @" + completeDateName + ",
-                            p.PaymentID = @" + paymentIdName + "
+                            p.CompleteDate = @{nameof prop<CompletedFirstParkingDto>.CompleteDate},
+                            p.PaymentID = @{nameof prop<CompletedFirstParkingDto>.PaymentId}
                     from dbo.Parking p
                     inner join dbo.Transition t
-                        on t.Name = '" + DbConstants.Transitions.CompletedFirst + "'
-                    where ParkingID = @" + idName
+                        on t.Name = '{DbConstants.Transitions.CompletedFirst}'
+                    where ParkingID = @{nameof prop<CompletedFirstParkingDto>.Id}"
             new CommandDefinition(queryText, dto, transaction = tran, cancellationToken = token);
 
         let insertPayment (dto: PaymentDto) (tran: IDbTransaction) token  =
-            let idName = nameOf <@ p<PaymentDto>.PaymentId @>
-            let createDateName = nameOf <@ p<PaymentDto>.CreateDate @>
-            let queryText = "
+            let queryText = $"
                     insert into dbo.Payment(
                         PaymentID,
                         CreateDate)
                     values(
-                        @" + idName + ",
-                        @" + createDateName + ")"
+                        @{nameof prop<PaymentDto>.PaymentId},
+                        @{nameof prop<PaymentDto>.CreateDate})"
             new CommandDefinition(queryText, dto, cancellationToken = token, transaction = tran)
 
     open System
