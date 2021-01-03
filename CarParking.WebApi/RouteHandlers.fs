@@ -72,7 +72,7 @@ module RouteHandlers =
     let createParkingHandler =
         fun next ctx dctx ->
             task {
-                let! newParking = createNewParking dctx DateTime.UtcNow
+                let! newParking = createNewParking dctx DateTimeOffset.UtcNow
                 return! ok (newParking |> ParkingResponse.FromParking) next ctx
             }
     
@@ -84,7 +84,7 @@ module RouteHandlers =
                     let freeLimit = getFreeLimit settings
                     let! parkingId = ParkingId.parse rawParkingId
                     let! status = ParkingStatus.parse req.Status
-                    return! patchParking dctx freeLimit parkingId status DateTime.UtcNow
+                    return! patchParking dctx freeLimit parkingId status DateTimeOffset.UtcNow
                 | Error err ->
                     return! Error <| BadInput err
             } |> toResponseAsync (fun _ -> Successful.NO_CONTENT) next ctx
@@ -94,7 +94,7 @@ module RouteHandlers =
             taskResult {
                 let freeLimit = getFreeLimit settings
                 let! parkingId = ParkingId.parse rawParkingId
-                return! createPayment dctx freeLimit parkingId DateTime.UtcNow
+                return! createPayment dctx freeLimit parkingId DateTimeOffset.UtcNow
             } |> toResponseAsync (PaymentResponse.FromPayment >> ok) next ctx
 
     let getAllTransitions =

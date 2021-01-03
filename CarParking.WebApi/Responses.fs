@@ -9,7 +9,7 @@ module Responses =
     [<CLIMutable; NoEquality; NoComparison>]
     type PaymentResponse =
         { Id: Guid 
-          CreateDate: DateTime }
+          CreateDate: DateTimeOffset }
         static member FromPayment(x: Payment) =
             { Id = PaymentId.toGuid x.Id
               CreateDate = x.CreateDate }
@@ -20,8 +20,8 @@ module Responses =
     type ParkingResponse =
         { Id: Guid
           Type: string
-          ArrivalDate: DateTime
-          CompleteDate: Nullable<DateTime>
+          ArrivalDate: DateTimeOffset
+          CompleteDate: Nullable<DateTimeOffset>
           Payment: PaymentResponse }
         static member FromParking(x: Parking) = 
             let parkingType = ClientConstants.Parking.ofParking x

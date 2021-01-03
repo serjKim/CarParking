@@ -45,13 +45,13 @@ let cleanDb (cpdc, _) =
     ") |> ignore
 
 [<RequireQualifiedAccess>]
-type FreeParkingDates = Dates of DateTime * DateTime * TimeSpan
+type FreeParkingDates = Dates of DateTimeOffset * DateTimeOffset * TimeSpan
 
 let generateFreeDatesArb condition =
-    Arb.generate<DateTime * uint32 * uint32> 
+    Arb.generate<DateTimeOffset * uint32 * uint32> 
     |> Gen.filter condition
     |> Gen.map (fun (date, delta, freeLimit) ->
-        let arrivalDate = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0)
+        let arrivalDate = new DateTimeOffset(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0, TimeSpan.Zero)
         let completeDate  = arrivalDate.AddMinutes (float delta)
         FreeParkingDates.Dates (arrivalDate, completeDate, TimeSpan(0, int freeLimit, 0)))
     |> Arb.fromGen
@@ -65,14 +65,13 @@ type ArbitaryExpiredParkingDates =
         generateFreeDatesArb (fun (_, delta, freeLimit) -> delta > freeLimit)
 
 [<RequireQualifiedAccess>]
-type ArrivalDates = Dates of DateTime list
+type ArrivalDates = Dates of DateTimeOffset list
 
 type ArbitaryArrivalDates =
     static member ArrivalDates() =
-        let mapUtc date = DateTime.SpecifyKind(date, DateTimeKind.Utc)
-        Gen.listOf Arb.generate<DateTime>
+        Gen.listOf Arb.generate<DateTimeOffset>
         |> Gen.filter (not << List.isEmpty)
-        |> Gen.map (List.map mapUtc >> List.sort >> ArrivalDates.Dates)
+        |> Gen.map (List.sort >> ArrivalDates.Dates)
         |> Arb.fromGen
 
 [<Properties(MaxTest = 2000, Parallelism = 8)>]
@@ -80,7 +79,7 @@ type ParkingWorkflowTests () =
     do createDctx () |> cleanDb
  
     [<Property>]
-    member _.``Should create a StartedFreeParking`` (arrivalDate: DateTime) =
+    member _.``Should create a StartedFreeParking`` (arrivalDate: DateTimeOffset) =
         taskResult {
             let dctx = createDctx ()
 
@@ -222,8 +221,8 @@ type ParkingWorkflowTests () =
         }
 
     [<Property>]
-    member _.``Patch return BadInput when Completed is changed to Started`` (arrivalDate: DateTime)
-                                                                            (completeDate: DateTime)
+    member _.``Patch return BadInput when Completed is changed to Started`` (arrivalDate: DateTimeOffset)
+                                                                            (completeDate: DateTimeOffset)
                                                                             (freeLimit: TimeSpan) =
         task {
             let dctx = createDctx ()

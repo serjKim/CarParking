@@ -6,31 +6,31 @@ module Dto =
     [<CLIMutable; NoEquality; NoComparison>]
     type PaymentDto =
         { PaymentId: Guid 
-          CreateDate: DateTime }
+          CreateDate: DateTimeOffset }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type ParkingDto = 
         { Id: Guid 
           Status: string
-          ArrivalDate: DateTime
-          CompleteDate: Nullable<DateTime>
+          ArrivalDate: DateTimeOffset
+          CompleteDate: Nullable<DateTimeOffset>
           Tariff: string
           mutable Payment: PaymentDto }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type StartedFreeParkingDto = 
         { Id: Guid 
-          ArrivalDate: DateTime }
+          ArrivalDate: DateTimeOffset }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type CompletedFreeParkingDto = 
         { Id: Guid 
-          CompleteDate: DateTime }
+          CompleteDate: DateTimeOffset }
 
     [<CLIMutable; NoEquality; NoComparison>]
     type CompletedFirstParkingDto = 
         { Id: Guid 
-          CompleteDate: DateTime
+          CompleteDate: DateTimeOffset
           Payment: PaymentDto }
         member x.PaymentId = x.Payment.PaymentId
 

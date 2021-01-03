@@ -13,13 +13,13 @@ type PaymentId = PaymentId of Guid
 
 type Payment = 
     { Id: PaymentId
-      CreateDate: DateTime }
+      CreateDate: DateTimeOffset }
 
 type Tariff =
     | Free
     | First
 
-type ParkingInterval = private ParkingInterval of arrival: DateTime * complete: DateTime
+type ParkingInterval = private ParkingInterval of arrival: DateTimeOffset * complete: DateTimeOffset
 
 type PaidInterval =
     private { Interval: ParkingInterval
@@ -27,7 +27,7 @@ type PaidInterval =
 
 type StartedFreeParking = 
     { Id: ParkingId
-      ArrivalDate: DateTime }
+      ArrivalDate: DateTimeOffset }
 
 type CompletedFreeParking =    
     { Id: ParkingId
@@ -111,7 +111,7 @@ module Tariff =
         | First -> FirstName
 
 module ParkingInterval =
-    let private checkInterval (arrival: DateTime, complete: DateTime) =
+    let private checkInterval (arrival: DateTimeOffset, complete: DateTimeOffset) =
         if complete < arrival then 
             Error <| BadInput ("Complete date can't be less than the arrival date")
         else

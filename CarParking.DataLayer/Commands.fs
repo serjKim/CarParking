@@ -24,11 +24,7 @@ module Commands =
                         ToTariff
                     from dbo.Transition
                     where Name = '" + DbConstants.Transitions.StartedFree + "'"
-            let parameters = 
-                DynamicParameters()
-                    .AddParam(idName, dto.Id)
-                    .AddParam(arrivalDateName, dto.ArrivalDate, DbType.DateTime2);
-            new CommandDefinition (queryText, parameters, cancellationToken = token)
+            new CommandDefinition (queryText, dto, cancellationToken = token)
 
         let saveCompletedFree (dto: CompletedFreeParkingDto) token = 
             let completeDateName = nameOf <@ p<CompletedFreeParkingDto>.CompleteDate @>
@@ -42,12 +38,7 @@ module Commands =
                     inner join dbo.Transition t
                         on t.Name = '" + DbConstants.Transitions.CompletedFree + "'
                     where p.ParkingID = @" + idName
-
-            let parameters = 
-                DynamicParameters()
-                    .AddParam(idName, dto.Id)
-                    .AddParam(completeDateName, dto.CompleteDate, DbType.DateTime2)
-            new CommandDefinition(queryText, parameters, cancellationToken = token)
+            new CommandDefinition(queryText, dto, cancellationToken = token)
 
         let saveCompletedFirst (dto: CompletedFirstParkingDto) (tran: IDbTransaction) token =
             let completeDateName = nameOf <@ p<CompletedFirstParkingDto>.CompleteDate @>
@@ -63,12 +54,7 @@ module Commands =
                     inner join dbo.Transition t
                         on t.Name = '" + DbConstants.Transitions.CompletedFirst + "'
                     where ParkingID = @" + idName
-            let parameters = 
-                DynamicParameters()
-                    .AddParam(idName, dto.Id)
-                    .AddParam(completeDateName, dto.CompleteDate, DbType.DateTime2)
-                    .AddParam(paymentIdName, dto.PaymentId)
-            new CommandDefinition(queryText, parameters, transaction = tran, cancellationToken = token);
+            new CommandDefinition(queryText, dto, transaction = tran, cancellationToken = token);
 
         let insertPayment (dto: PaymentDto) (tran: IDbTransaction) token  =
             let idName = nameOf <@ p<PaymentDto>.PaymentId @>
@@ -80,11 +66,7 @@ module Commands =
                     values(
                         @" + idName + ",
                         @" + createDateName + ")"
-            let parameters =
-                DynamicParameters()
-                    .AddParam(idName, dto.PaymentId)
-                    .AddParam(createDateName, dto.CreateDate, DbType.DateTime2)
-            new CommandDefinition(queryText, parameters, cancellationToken = token, transaction = tran)
+            new CommandDefinition(queryText, dto, cancellationToken = token, transaction = tran)
 
     open System
     open Mapping

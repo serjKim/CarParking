@@ -1,23 +1,20 @@
 namespace CarParking.WebApi
 
-open System
-open System.Linq
-open Microsoft.AspNetCore.Hosting
-open Microsoft.Extensions.Configuration
-open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.DependencyInjection
-open Microsoft.AspNetCore.Builder
-open Giraffe
-open CarParking.DataLayer.DataContext
-open RouteHandlers
-open System.Data.SqlClient
-open System.Data
-open Newtonsoft.Json
-open Giraffe.Serialization
-open Configuration
-open Newtonsoft.Json.Serialization
-
 module Program =
+    open System
+    open System.Linq
+    open Microsoft.AspNetCore.Hosting
+    open Microsoft.Extensions.Configuration
+    open Microsoft.Extensions.Hosting
+    open Microsoft.Extensions.DependencyInjection
+    open Microsoft.AspNetCore.Builder
+    open Giraffe
+    open CarParking.DataLayer.DataContext
+    open RouteHandlers
+    open System.Data.SqlClient
+    open System.Data
+    open Configuration
+
     let inline private ( <>> ) f g = g f
     let inline private ( ^ ) f x = f x
 
@@ -53,13 +50,8 @@ module Program =
            .UseGiraffe webApp |> ignore
 
     let configureServices (host: WebHostBuilderContext) (services : IServiceCollection) =
-        let jsonSettings =
-            JsonSerializerSettings
-                (DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                 ContractResolver = new DefaultContractResolver(NamingStrategy = new CamelCaseNamingStrategy()))
         services
-            .AddGiraffe()
-            .AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(jsonSettings)) |> ignore
+            .AddGiraffe() |> ignore
 
         let connStr = host.Configuration.GetConnectionString("CarParking")
         services
@@ -80,8 +72,6 @@ module Program =
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(fun webBuilder -> 
                 webBuilder
-                    .UseKestrel()
-                    .UseConfiguration(configuration)
                     .Configure(configureApp)
                     .ConfigureServices(configureServices) |> ignore)
             .Build()
