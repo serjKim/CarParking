@@ -89,7 +89,7 @@ module Commands =
     open System
     open Mapping
     open DataContext
-    open FSharp.Control.Tasks.V2
+    open FSharp.Control.Tasks.V2.ContextInsensitive
     open Dapper
 
     let insertStartedFree (cpdc, token) parking =

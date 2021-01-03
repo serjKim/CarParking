@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Utils.fs" />
@@ -12,10 +12,14 @@
     <Compile Include="Commands.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.78" />
+    <PackageReference Include="TaskBuilder.fs" Version="2.1" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="1.2.6" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
     <ProjectReference Include="..\CarParking.DataLayer.Dto\CarParking.DataLayer.Dto.fsproj" />
     <ProjectReference Include="..\CarParking.Error\CarParking.Error.fsproj" />
     <ProjectReference Include="..\CarParking.Utils\CarParking.Utils.fsproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

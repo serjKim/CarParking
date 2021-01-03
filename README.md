@@ -26,9 +26,8 @@ Property-based integration testing
 ![workflow](docs/workflow.png "Workflow")
 
 ## Requirements
-- .NET Core >= 3.1
+- .NET Core >= 5.0
 - Docker >= 19
-- (Optional) Paket: You can get all dependencies using `dotnet restore` without having Paket, since there is the `.paket/Paket.Restore.targets` file
 - (Optional) Node >= 12.14, npm >= 6.13: Required if there is a desire to build UI
 
 ## Getting Started
@@ -40,7 +39,7 @@ docker-compose up database
 2. Build the Web api
 ```cmd
 cd CarParking.WebApi
-dotnet run ASPNETCORE_ENVIRONMENT=Development
+dotnet run
 ```
 3. Web api is ready for work. That's enough to be able to use Postman or other client to play with the api. `postman_calls.json` - a collection of api calls intended to be imported to Postman.
 
@@ -54,7 +53,7 @@ npm run build
 5. Run the Web server
 ```cmd
 cd CarParking.WebUI
-dotnet run ASPNETCORE_ENVIRONMENT=Development
+dotnet run
 ```
 6. Open https://localhost:5051/
 7. Enjoy

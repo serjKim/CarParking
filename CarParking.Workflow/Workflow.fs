@@ -1,16 +1,16 @@
 ﻿namespace CarParking.Workflow
 
-open System
-open FSharp.Control.Tasks.V2.ContextInsensitive
-open CarParking.Utils
-open CarParking.Error
-open CarParking.Core
-open CarParking.Core.Parking
-open CarParking.DataLayer.Queries
-open CarParking.DataLayer
-open FsToolkit.ErrorHandling
-
 module Parking =
+    open System
+    open FSharp.Control.Tasks.V2.ContextInsensitive
+    open CarParking.Utils
+    open CarParking.Error
+    open CarParking.Core
+    open CarParking.Core.Parking
+    open CarParking.DataLayer.Queries
+    open CarParking.DataLayer
+    open FsToolkit.ErrorHandling
+
     let createNewParking dctx arrivalDate =
         task {
             let parking = 
@@ -29,13 +29,12 @@ module Parking =
         }
 
     let getParking dctx parkingId =
-        taskResult {
-            let! parking = queryParkingById dctx parkingId
-            match parking with
+        task {
+            match! queryParkingById dctx parkingId with
             | Ok prk ->
-                return! Ok prk
+                return Ok prk
             | Error _ ->
-                return! Error <| EntityNotFound "Parking not found"
+                return Error <| EntityNotFound "Parking not found"
         }
 
     let patchParking dctx freeLimit parkingId status completeDate =
@@ -48,7 +47,7 @@ module Parking =
                 | StartedFree prk ->
                     match Transitions.toCompletedFree freeLimit completeDate prk with
                     | Ok completedFree ->
-                        do! Commands.saveCompletedFree dctx completedFree
+                        let! _ = Commands.saveCompletedFree dctx completedFree
                         return! CompletedFree completedFree |> Ok
                     | Error err ->
                         return! Error err
@@ -66,7 +65,7 @@ module Parking =
                       CreateDate = completeDate }
                 match Transitions.toCompletedFirst freeLimit payment prk with
                 | Ok firstPrk ->
-                    do! Commands.saveCompletedFirst dctx firstPrk
+                    let! _ = Commands.saveCompletedFirst dctx firstPrk
                     return! firstPrk.PaidInterval
                             |> PaidInterval.getPayment
                             |> Ok

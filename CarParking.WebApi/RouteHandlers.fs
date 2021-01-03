@@ -1,22 +1,22 @@
 ﻿namespace CarParking.WebApi
 
-open Microsoft.AspNetCore.Http
-open Giraffe
-open FSharp.Control.Tasks.V2.ContextInsensitive
-open CarParking.Error
-open CarParking.Workflow.Parking
-open CarParking.DataLayer.DataContext
-open CarParking.DataLayer.Queries
-open Responses
-open Requests
-open System
-open Microsoft.Extensions.Options
-open Configuration
-open CarParking.Core
-open FsToolkit.ErrorHandling
-open System.Threading.Tasks
-
 module RouteHandlers =
+    open Microsoft.AspNetCore.Http
+    open Giraffe
+    open FSharp.Control.Tasks.V2.ContextInsensitive
+    open CarParking.Error
+    open CarParking.Workflow.Parking
+    open CarParking.DataLayer.DataContext
+    open CarParking.DataLayer.Queries
+    open Responses
+    open Requests
+    open System
+    open Microsoft.Extensions.Options
+    open Configuration
+    open CarParking.Core
+    open FsToolkit.ErrorHandling
+    open System.Threading.Tasks
+
     let ok obj = Successful.ok (json obj)
 
     let toResponse okResult = function

@@ -1,14 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Script.fsx" />
     <Compile Include="Domain.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="1.2.6" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CarParking.Error\CarParking.Error.fsproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

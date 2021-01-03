@@ -1,10 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Workflow.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="1.2.6" />
+    <PackageReference Include="TaskBuilder.fs" Version="2.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CarParking.Core\CarParking.Core.fsproj" />
@@ -12,5 +16,4 @@
     <ProjectReference Include="..\CarParking.Error\CarParking.Error.fsproj" />
     <ProjectReference Include="..\CarParking.Utils\CarParking.Utils.fsproj" />
   </ItemGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
