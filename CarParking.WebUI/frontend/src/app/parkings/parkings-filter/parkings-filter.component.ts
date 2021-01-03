@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Self } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injectable, Self } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { merge, Observable } from 'rxjs';
 import { map, mergeMap, publishReplay, refCount, takeUntil, tap } from 'rxjs/operators';
@@ -30,17 +30,10 @@ type ButtonStyles = {
     readonly [key in TransitionName]: ButtonStyle;
 };
 
-@Component({
-    selector: 'parkings-filter',
-    templateUrl: './parkings-filter.component.html',
-    styleUrls: ['./parkings-filter.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        NgDestroyer,
-    ],
-})
-export class ParkingsFilterComponent {
+@Injectable()
+export class ParkingFilterInternal {
     public readonly transitionButtons$: Observable<readonly TransitionButton[]>;
+
     private readonly buttonStyles: ButtonStyles = {
         'StartedFree': { icon: 'check_circle', className: 'started' },
         'CompletedFree': { icon: 'check_circle', className: 'completed' },
@@ -116,4 +109,22 @@ export class ParkingsFilterComponent {
             }
         };
     }
+}
+
+@Component({
+    selector: 'parkings-filter',
+    templateUrl: './parkings-filter.component.html',
+    styleUrls: ['./parkings-filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        NgDestroyer,
+        ParkingFilterInternal,
+    ],
+})
+export class ParkingsFilterComponent {
+    public readonly transitionButtons$ = this.parkingFilterInternal.transitionButtons$;
+
+    constructor(
+        @Self() private readonly parkingFilterInternal: ParkingFilterInternal,
+    ) { }
 }
