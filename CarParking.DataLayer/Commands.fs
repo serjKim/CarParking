@@ -59,7 +59,7 @@ module Commands =
                         @{nameof prop<PaymentDto>.CreateDate})"
             new CommandDefinition(queryText, dto, cancellationToken = token, transaction = tran)
 
-    open System
+    open System.Runtime.ExceptionServices
     open Mapping
     open DataContext
     open FSharp.Control.Tasks.V2.ContextInsensitive
@@ -102,6 +102,6 @@ module Commands =
             with 
             | _ as ex -> 
                 tran.Rollback()
-                raise(new Exception(ex.Message, ex))
+                ExceptionDispatchInfo.Capture(ex).Throw()
                 return false
         }
