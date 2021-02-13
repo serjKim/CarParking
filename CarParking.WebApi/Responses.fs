@@ -24,7 +24,7 @@ module Responses =
           CompleteDate: Nullable<DateTimeOffset>
           Payment: PaymentResponse }
         static member FromParking(x: Parking) = 
-            let parkingType = ClientConstants.Parking.ofParking x
+            let parkingType = Parking.toConstant x
             match x with
             | StartedFree prk ->
                 { Id           = ParkingId.toGuid prk.Id
@@ -59,7 +59,7 @@ module Responses =
           ToStatus: string }
         static member FromTransition (transition: Transition) =
             { Name = transition.Name
-              FromTariff = transition.FromTariff.MapOrDefault Tariff.toString
-              FromStatus = transition.FromStatus.MapOrDefault ParkingStatus.toString
-              ToTariff = transition.ToTariff |> Tariff.toString
-              ToStatus = transition.ToStatus |> ParkingStatus.toString }
+              FromTariff = transition.FromTariff.MapOrDefault Tariff.toConstant
+              FromStatus = transition.FromStatus.MapOrDefault ParkingStatus.toConstant
+              ToTariff = transition.ToTariff |> Tariff.toConstant
+              ToStatus = transition.ToStatus |> ParkingStatus.toConstant }

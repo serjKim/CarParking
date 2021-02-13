@@ -69,7 +69,7 @@ module ParkingStatus =
         elif parseStatus CompletedName then Ok Completed
         else Error <| BadInput (sprintf "Couldn't parse %s status" str)
 
-    let toString = function 
+    let toConstant = function 
         | Started -> StartedName
         | Completed -> CompletedName
 
@@ -106,7 +106,7 @@ module Tariff =
         elif parseTariff FirstName then Ok First
         else Error <| BadInput (sprintf "Couldn't parse %s tariff" str)
 
-    let toString = function 
+    let toConstant = function 
         | Free -> FreeName
         | First -> FirstName
 
@@ -157,6 +157,21 @@ module Parking =
         match interval with
         | FirstTariff freeLimit t -> t
         | _ -> Free
+
+
+    [<Literal>]
+    let StartedFreeName = "StartedFree"
+
+    [<Literal>]
+    let CompletedFreeName = "CompletedFree"
+
+    [<Literal>]
+    let CompletedFirstName = "CompletedFirst"
+
+    let toConstant = function 
+        | StartedFree _ -> StartedFreeName
+        | CompletedFree _ -> CompletedFreeName
+        | CompletedFirst _ -> CompletedFirstName
 
     [<RequireQualifiedAccess>]
     module Transitions =

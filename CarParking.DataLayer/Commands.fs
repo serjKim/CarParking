@@ -4,6 +4,7 @@ module Commands =
     [<RequireQualifiedAccess>]
     module private CommandDefinitions =
         open CarParking.Utils.NameOf
+        open CarParking.Core
         open Dto
         open System.Data
         open Dapper
@@ -21,7 +22,7 @@ module Commands =
                     @{nameof prop<StartedFreeParkingDto>.ArrivalDate},
                     ToTariff
                 from dbo.Transition
-                where Name = '{DbConstants.Transitions.StartedFree}'"
+                where Name = '{Parking.StartedFreeName}'"
             new CommandDefinition (queryText, dto, cancellationToken = token)
 
         let saveCompletedFree (dto: CompletedFreeParkingDto) token = 
@@ -32,7 +33,7 @@ module Commands =
                         p.CompleteDate = @{nameof prop<CompletedFreeParkingDto>.CompleteDate}
                 from dbo.Parking p
                 inner join dbo.Transition t
-                    on t.Name = '{DbConstants.Transitions.CompletedFree}'
+                    on t.Name = '{Parking.CompletedFreeName}'
                 where p.ParkingID = @{nameof prop<CompletedFreeParkingDto>.Id}"
             new CommandDefinition(queryText, dto, cancellationToken = token)
 
@@ -45,7 +46,7 @@ module Commands =
                             p.PaymentID = @{nameof prop<CompletedFirstParkingDto>.PaymentId}
                     from dbo.Parking p
                     inner join dbo.Transition t
-                        on t.Name = '{DbConstants.Transitions.CompletedFirst}'
+                        on t.Name = '{Parking.CompletedFirstName}'
                     where ParkingID = @{nameof prop<CompletedFirstParkingDto>.Id}"
             new CommandDefinition(queryText, dto, transaction = tran, cancellationToken = token);
 
