@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { merge, Observable } from 'rxjs';
 import { map, mergeMap, publishReplay, refCount, takeUntil, tap } from 'rxjs/operators';
 import { NgDestroyer } from '../../util';
-import { TransitionName } from '../models/transition';
+import { TransitionName } from '../models';
 import { ParkingsStorage } from '../parkings.storage';
 import { TransitionsApi } from '../transitions.api';
 import { ParkingsFilter } from './parking-filter';

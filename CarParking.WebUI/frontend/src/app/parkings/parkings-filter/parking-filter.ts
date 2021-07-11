@@ -1,4 +1,4 @@
-import { TransitionName } from '../models/transition';
+import { TransitionName } from '../models';
 
 export class ParkingsFilter {
     constructor(public readonly transitionNames: ReadonlySet<TransitionName>) {

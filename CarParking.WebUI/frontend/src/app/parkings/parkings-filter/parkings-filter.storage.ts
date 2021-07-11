@@ -3,8 +3,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ParkingType } from '../models';
-import { TRANSITION_NAMES, TransitionName } from '../models/transition';
+import { ParkingType, TRANSITION_NAMES, TransitionName } from '../models';
 import { ParkingsFilter } from './parking-filter';
 
 export interface ParkingsFilterQueryParams extends Params {

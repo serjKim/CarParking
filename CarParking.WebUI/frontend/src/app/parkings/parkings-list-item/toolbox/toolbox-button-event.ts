@@ -1,4 +1,4 @@
-import { CompletionResultType } from '../../models/completion';
+import { CompletionResultType } from '../../models';
 
 export const enum ToolboxButtonEventType {
     Completion,

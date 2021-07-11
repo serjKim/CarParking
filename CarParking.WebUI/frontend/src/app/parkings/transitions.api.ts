@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { deserializeArray } from 'santee-dcts';
 import { AppSettings } from '../app-settings';
-import { TransitionDto } from './dtos/transition-dto';
-import { Transition } from './models/transition';
+import { TransitionDto } from './dtos';
+import { Transition } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class TransitionsApi {

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, publishLast, refCount, switchMap } from 'rxjs/operators';
-import { Parking, StartedFree } from './models';
-import { CompletionResult, CompletionResultType } from './models/completion';
+import { CompletionResult, CompletionResultType, Parking, StartedFree } from './models';
 import { ParkingsFilter } from './parkings-filter/parking-filter';
 import { ParkingsFilterStorage } from './parkings-filter/parkings-filter.storage';
 import { ParkingsApi } from './parkings.api';
