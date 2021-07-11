@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { assertUnhandledType } from 'src/app/util';
+import { errorUnhandledType } from 'src/app/util';
 import { CompletionResultType, Parking, ParkingType } from '../../models';
 import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
 
@@ -33,7 +33,7 @@ export class ToolboxComponent implements OnInit {
                 }
                 break;
             default:
-                assertUnhandledType(e.eventType);
+                throw errorUnhandledType(e.eventType);
         }
     }
 
@@ -51,7 +51,7 @@ export class ToolboxComponent implements OnInit {
                 this.selectedButton = ToolboxButton.Pay;
                 break;
             default:
-                assertUnhandledType(this.parking);
+                throw errorUnhandledType(this.parking);
         }
     }
 }

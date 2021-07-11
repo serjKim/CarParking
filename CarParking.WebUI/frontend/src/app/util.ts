@@ -1,8 +1,9 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 
-export const assertUnhandledType = (type: never) => {
-    throw new Error(`Unhandled type: ${type}`);
+export const errorUnhandledType = (obj: never) => {
+    console.error('Unhandled type source: ', obj);
+    return new Error('Unhandled type.');
 };
 
 @Injectable()

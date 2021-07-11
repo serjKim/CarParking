@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input, OnInit } from '@angular/core';
-import { assertUnhandledType } from '../../util';
+import { errorUnhandledType } from '../../util';
 import { CompletedFirst, CompletedFree, Parking, ParkingType, StartedFree } from '../models';
 
 enum InfoType {
@@ -43,7 +43,7 @@ export class ParkingsListItemComponent implements OnInit {
                 this.canSwitchInfo = true;
                 break;
             default:
-                assertUnhandledType(this.parking);
+                throw errorUnhandledType(this.parking);
         }
     }
 
