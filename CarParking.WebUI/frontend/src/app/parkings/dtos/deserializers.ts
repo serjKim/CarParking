@@ -1,5 +1,5 @@
 import { deserialize } from 'santee-dcts';
-import { CompletedFirst, CompletedFree, Parking, ParkingType, Payment, StartedFree } from '../models/parking';
+import { CompletedFirst, CompletedFree, Parking, ParkingType, Payment, StartedFree } from '../models';
 import { CompletedFirstDto, CompletedFreeDto, ParkingDto, StartedFreeDto } from './parking-dto';
 
 export const deserializeParking = (obj: object | null): Parking => {

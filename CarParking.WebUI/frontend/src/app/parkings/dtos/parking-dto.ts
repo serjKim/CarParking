@@ -1,5 +1,5 @@
 import { dataMember, required } from 'santee-dcts';
-import { ParkingType } from '../models/parking';
+import { ParkingType } from '../models';
 
 export const deserializeDate = (str: string) => {
     const date = new Date(str);

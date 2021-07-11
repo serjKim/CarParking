@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { StartedFree } from '../../../models/parking';
+import { StartedFree } from '../../../models';
 
 @Component({
     selector: 'started-info',

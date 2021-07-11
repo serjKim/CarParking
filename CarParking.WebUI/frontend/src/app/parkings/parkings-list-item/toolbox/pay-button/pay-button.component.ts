@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Parking, ParkingType } from '../../../models/parking';
+import { Parking, ParkingType } from '../../../models';
 import { ParkingsStorage } from '../../../parkings.storage';
 
 @Component({

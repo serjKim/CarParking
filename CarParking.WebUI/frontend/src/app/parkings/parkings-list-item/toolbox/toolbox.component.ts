@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { assertUnhandledType } from 'src/app/util';
-import { CompletionResultType } from '../../models/completion';
-import { Parking, ParkingType } from '../../models/parking';
+import { CompletionResultType, Parking, ParkingType } from '../../models';
 import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
 
 enum ToolboxButton {

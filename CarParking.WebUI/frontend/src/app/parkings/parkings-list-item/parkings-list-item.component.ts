@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input, OnInit } from '@angular/core';
 import { assertUnhandledType } from '../../util';
-import { Parking, ParkingType } from '../models/parking';
+import { CompletedFirst, CompletedFree, Parking, ParkingType, StartedFree } from '../models';
 
 enum InfoType {
     Started,
@@ -45,5 +45,14 @@ export class ParkingsListItemComponent implements OnInit {
             default:
                 assertUnhandledType(this.parking);
         }
+    }
+
+    public isStartedInfo(prk: Parking): prk is StartedFree {
+        return this.selectedInfo === InfoType.Started && prk.type === ParkingType.StartedFree;
+    }
+
+    public isCompletedInfo(prk: Parking): prk is CompletedFirst | CompletedFree {
+        return this.selectedInfo === InfoType.Completed
+            && (prk.type === ParkingType.CompletedFirst || prk.type === ParkingType.CompletedFree);
     }
 }

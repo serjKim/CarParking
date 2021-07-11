@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CompletedFirst, CompletedFree } from '../../../models/parking';
+import { CompletedFirst, CompletedFree } from '../../../models';
 
 @Component({
     selector: 'complete-info',

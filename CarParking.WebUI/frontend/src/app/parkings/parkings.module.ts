@@ -11,6 +11,7 @@ import { CompleteButtonComponent } from './parkings-list-item/toolbox/complete-b
 import { PayButtonComponent } from './parkings-list-item/toolbox/pay-button/pay-button.component';
 import { ToolboxComponent } from './parkings-list-item/toolbox/toolbox.component';
 import { ParkingsListComponent } from './parkings-list/parkings-list.component';
+import { ParkingsRoutingModule } from './parkings-routing.module';
 import { ParkingsApi } from './parkings.api';
 import { ParkingsStorage } from './parkings.storage';
 import { ParkingsComponent } from './parkings/parkings.component';
@@ -28,13 +29,11 @@ import { TransitionsApi } from './transitions.api';
         CompleteButtonComponent,
         ParkingsComponent,
     ],
-    exports: [
-        ParkingsComponent,
-    ],
     imports: [
         CommonModule,
         HttpClientModule,
         ReactiveFormsModule,
+        ParkingsRoutingModule,
     ],
     providers: [
         ParkingsApi,
