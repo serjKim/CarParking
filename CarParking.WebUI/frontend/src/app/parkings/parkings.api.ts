@@ -15,7 +15,7 @@ interface TransitionErrorResponse {
     readonly errorType: TransitionErrorType;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ParkingsApi {
     constructor(
         private readonly httpClient: HttpClient,

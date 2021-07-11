@@ -7,7 +7,7 @@ import { AppSettings } from '../app-settings';
 import { TransitionDto } from './dtos/transition-dto';
 import { Transition } from './models/transition';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TransitionsApi {
     constructor(
         private readonly httpClient: HttpClient,

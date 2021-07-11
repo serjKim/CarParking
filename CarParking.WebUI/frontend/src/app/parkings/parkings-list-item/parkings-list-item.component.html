@@ -1,5 +1,7 @@
 <div class="content" [class.disabled]="!canSwitchInfo" >
-    <started-info *ngIf="isStartedInfo(parking)" [parking]="parking"></started-info>
-    <complete-info *ngIf="isCompletedInfo(parking)" [parking]="parking"></complete-info>
-    <toolbox [parking]="parking"></toolbox>
+    <ng-container [ngSwitch]="selectedInfo">
+        <started-info *ngSwitchCase="intoType.Started" [info]="infosByType[intoType.Started]"></started-info>
+        <complete-info *ngSwitchCase="intoType.Completed" [info]="infosByType[intoType.Completed]"></complete-info>
+    </ng-container>
+    <toolbox [parking]="currentParking"></toolbox>
 </div>

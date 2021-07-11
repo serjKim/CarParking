@@ -1,10 +1,16 @@
-import { ChangeDetectionStrategy, Component, HostListener, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angular/core';
 import { errorUnhandledType } from '../../util';
-import { CompletedFirst, CompletedFree, Parking, ParkingType, StartedFree } from '../models';
+import { Parking, ParkingType } from '../models';
+import { CompletedInfo, StartedInfo } from './item-info';
 
 enum InfoType {
     Started,
     Completed,
+}
+
+interface InfoByType {
+    [InfoType.Started]?: StartedInfo;
+    [InfoType.Completed]?: CompletedInfo;
 }
 
 @Component({
@@ -13,13 +19,36 @@ enum InfoType {
     styleUrls: ['./parkings-list-item.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ParkingsListItemComponent implements OnInit {
+export class ParkingsListItemComponent {
     public readonly intoType = InfoType;
+    public readonly infosByType: InfoByType = {};
     public selectedInfo = InfoType.Started;
     public canSwitchInfo = false;
+    public currentParking: Parking | null = null;
 
     @Input()
-    public parking!: Parking;
+    public set parking(prk: Parking | null) {
+        if (prk == null) {
+            throw new Error('Parking is null but expected an instance.');
+        }
+
+        this.currentParking = prk;
+        this.infosByType[InfoType.Started] = prk;
+
+        switch (prk.type) {
+            case ParkingType.StartedFree:
+                this.selectedInfo = InfoType.Started;
+                break;
+            case ParkingType.CompletedFirst:
+            case ParkingType.CompletedFree:
+                this.selectedInfo = InfoType.Completed;
+                this.canSwitchInfo = true;
+                this.infosByType[InfoType.Completed] = prk;
+                break;
+            default:
+                throw errorUnhandledType(prk);
+        }
+    }
 
     @HostListener('click')
     public onSwitchInfo() {
@@ -30,29 +59,5 @@ export class ParkingsListItemComponent implements OnInit {
         this.selectedInfo = this.selectedInfo === InfoType.Started
             ? InfoType.Completed
             : InfoType.Started;
-    }
-
-    public ngOnInit() {
-        switch (this.parking.type) {
-            case ParkingType.StartedFree:
-                this.selectedInfo = InfoType.Started;
-                break;
-            case ParkingType.CompletedFirst:
-            case ParkingType.CompletedFree:
-                this.selectedInfo = InfoType.Completed;
-                this.canSwitchInfo = true;
-                break;
-            default:
-                throw errorUnhandledType(this.parking);
-        }
-    }
-
-    public isStartedInfo(prk: Parking): prk is StartedFree {
-        return this.selectedInfo === InfoType.Started && prk.type === ParkingType.StartedFree;
-    }
-
-    public isCompletedInfo(prk: Parking): prk is CompletedFirst | CompletedFree {
-        return this.selectedInfo === InfoType.Completed
-            && (prk.type === ParkingType.CompletedFirst || prk.type === ParkingType.CompletedFree);
     }
 }

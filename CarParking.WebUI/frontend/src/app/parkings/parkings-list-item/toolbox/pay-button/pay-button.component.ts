@@ -10,10 +10,10 @@ import { ParkingsStorage } from '../../../parkings.storage';
 })
 export class PayButtonComponent {
     @Input()
-    public parking!: Parking;
+    public parking: Parking | null = null;
 
     @Input()
-    public disabled!: boolean;
+    public disabled = false;
 
     constructor(
         private readonly parkingsStorage: ParkingsStorage,
@@ -26,7 +26,7 @@ export class PayButtonComponent {
             return;
         }
 
-        if (this.parking.type === ParkingType.StartedFree) {
+        if (this.parking && this.parking.type === ParkingType.StartedFree) {
             await this.parkingsStorage.payParking(this.parking);
         }
     }

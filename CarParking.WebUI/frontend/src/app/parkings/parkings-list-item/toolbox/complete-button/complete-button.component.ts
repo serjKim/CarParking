@@ -11,10 +11,10 @@ import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event
 })
 export class CompleteButtonComponent {
     @Input()
-    public parking!: Parking;
+    public parking: Parking | null = null;
 
     @Input()
-    public disabled!: boolean;
+    public disabled = false;
 
     @Output()
     public complete = new EventEmitter<ToolboxButtonEvent>();
@@ -30,7 +30,7 @@ export class CompleteButtonComponent {
             return;
         }
 
-        if (this.parking.type === ParkingType.StartedFree) {
+        if (this.parking && this.parking.type === ParkingType.StartedFree) {
             const result = await this.parkingsStorage.completeParking(this.parking);
             this.complete.emit(new CompleteButtonEvent(result.type));
         }

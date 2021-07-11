@@ -11,7 +11,7 @@ export interface ParkingsFilterQueryParams extends Params {
     readonly transitions?: string | null;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ParkingsFilterStorage {
 
     public get filter(): Observable<ParkingsFilter> {

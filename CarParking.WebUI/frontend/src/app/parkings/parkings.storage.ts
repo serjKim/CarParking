@@ -9,21 +9,20 @@ import { ParkingsApi } from './parkings.api';
 
 type Parkings$ = Observable<readonly Parking[]>;
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ParkingsStorage {
+    public readonly all: Observable<readonly Parking[]>;
     private readonly parkings$ = new BehaviorSubject<Parkings$>(of([]));
-
-    public get all(): Parkings$ {
-        return this.parkings$.pipe(
-            switchMap(x => x),
-            map(this.sortParkings),
-        );
-    }
 
     constructor(
         private readonly parkingsApi: ParkingsApi,
         private readonly parkingsFilterStorage: ParkingsFilterStorage,
-    ) { }
+    ) {
+        this.all = this.parkings$.pipe(
+            switchMap(x => x),
+            map(this.sortParkings),
+        );
+    }
 
     public loadStorage(filter$: Observable<ParkingsFilter>) {
         const loadedParkings$ = filter$

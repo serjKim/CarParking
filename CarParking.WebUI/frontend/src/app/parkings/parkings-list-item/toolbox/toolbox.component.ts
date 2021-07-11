@@ -16,7 +16,7 @@ enum ToolboxButton {
 })
 export class ToolboxComponent implements OnInit {
     @Input()
-    public parking!: Parking;
+    public parking: Parking | null = null;
 
     public readonly toolboxButtonType = ToolboxButton;
     public selectedButton = ToolboxButton.Complete;
@@ -38,7 +38,11 @@ export class ToolboxComponent implements OnInit {
     }
 
     public ngOnInit() {
-        switch (this.parking.type) {
+        if (this.parking == null) {
+            throw new Error('Expected an instance.');
+        }
+
+        switch (this.parking?.type) {
             case ParkingType.StartedFree:
                 this.canComplete = true;
                 this.canPay = true;

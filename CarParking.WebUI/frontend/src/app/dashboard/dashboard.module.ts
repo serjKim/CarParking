@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { ParkingsModule } from '../parkings/parkings.module';
 import { CreateParkingButtonComponent } from './create-parking-button/create-parking-button.component';
 import { DashboardComponent } from './dashboard.component';
 
@@ -14,7 +13,6 @@ import { DashboardComponent } from './dashboard.component';
     ],
     imports: [
         RouterModule,
-        ParkingsModule,
     ],
 })
 export class DashboardModule { }
