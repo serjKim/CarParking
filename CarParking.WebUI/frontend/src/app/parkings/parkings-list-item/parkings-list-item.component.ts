@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angular/core';
-import { errorUnhandledType } from '../../util';
+import { errorUnhandledType, notNullOrFail } from '../../util';
 import { Parking, ParkingType } from '../models';
 import { CompletedInfo, StartedInfo } from './item-info';
 
@@ -27,11 +27,8 @@ export class ParkingsListItemComponent {
     public currentParking: Parking | null = null;
 
     @Input()
-    public set parking(prk: Parking | null) {
-        if (prk == null) {
-            throw new Error('Parking is null but expected an instance.');
-        }
-
+    public set parking(val: Parking | null) {
+        const prk = notNullOrFail(val);
         this.currentParking = prk;
         this.infosByType[InfoType.Started] = prk;
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { errorUnhandledType } from 'src/app/util';
+import { errorUnhandledType, notNullOrFail } from '../../../util';
 import { CompletionResultType, Parking, ParkingType } from '../../models';
 import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
 
@@ -38,11 +38,9 @@ export class ToolboxComponent implements OnInit {
     }
 
     public ngOnInit() {
-        if (this.parking == null) {
-            throw new Error('Expected an instance.');
-        }
+        const parking = notNullOrFail(this.parking);
 
-        switch (this.parking?.type) {
+        switch (parking.type) {
             case ParkingType.StartedFree:
                 this.canComplete = true;
                 this.canPay = true;
@@ -55,7 +53,7 @@ export class ToolboxComponent implements OnInit {
                 this.selectedButton = ToolboxButton.Pay;
                 break;
             default:
-                throw errorUnhandledType(this.parking);
+                throw errorUnhandledType(parking);
         }
     }
 }
