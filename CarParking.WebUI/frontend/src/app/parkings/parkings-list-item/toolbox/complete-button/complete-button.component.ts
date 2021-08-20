@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ParkingsStorage } from 'src/app/parkings/parkings.storage';
+import { notNullOrFail } from '../../../../util';
 import { Parking, ParkingType } from '../../../models';
 import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event';
 
@@ -11,13 +12,21 @@ import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event
 })
 export class CompleteButtonComponent {
     @Input()
-    public parking: Parking | null = null;
+    public set parking(val: Parking) {
+        this.currentParking = val;
+    }
+
+    public get parking(): Parking {
+        return notNullOrFail(this.currentParking);
+    }
 
     @Input()
     public disabled = false;
 
     @Output()
     public complete = new EventEmitter<ToolboxButtonEvent>();
+
+    private currentParking: Parking | null = null;
 
     constructor(
         private readonly parkingsStorage: ParkingsStorage,
@@ -30,7 +39,7 @@ export class CompleteButtonComponent {
             return;
         }
 
-        if (this.parking && this.parking.type === ParkingType.StartedFree) {
+        if (this.parking.type === ParkingType.StartedFree) {
             const result = await this.parkingsStorage.completeParking(this.parking);
             this.complete.emit(new CompleteButtonEvent(result.type));
         }

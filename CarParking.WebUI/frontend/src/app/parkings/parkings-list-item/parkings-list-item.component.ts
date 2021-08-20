@@ -24,11 +24,10 @@ export class ParkingsListItemComponent {
     public readonly infosByType: InfoByType = {};
     public selectedInfo = InfoType.Started;
     public canSwitchInfo = false;
-    public currentParking: Parking | null = null;
+    private currentParking: Parking | null = null;
 
     @Input()
-    public set parking(val: Parking | null) {
-        const prk = notNullOrFail(val);
+    public set parking(prk: Parking) {
         this.currentParking = prk;
         this.infosByType[InfoType.Started] = prk;
 
@@ -45,6 +44,10 @@ export class ParkingsListItemComponent {
             default:
                 throw errorUnhandledType(prk);
         }
+    }
+
+    public get parking(): Parking {
+        return notNullOrFail(this.currentParking);
     }
 
     @HostListener('click')

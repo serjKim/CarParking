@@ -16,12 +16,20 @@ enum ToolboxButton {
 })
 export class ToolboxComponent implements OnInit {
     @Input()
-    public parking: Parking | null = null;
+    public set parking(val: Parking) {
+        this.currentParking = val;
+    }
+
+    public get parking(): Parking {
+        return notNullOrFail(this.currentParking);
+    }
 
     public readonly toolboxButtonType = ToolboxButton;
     public selectedButton = ToolboxButton.Complete;
     public canComplete = false;
     public canPay = false;
+
+    private currentParking: Parking | null = null;
 
     constructor() { }
 
@@ -38,9 +46,7 @@ export class ToolboxComponent implements OnInit {
     }
 
     public ngOnInit() {
-        const parking = notNullOrFail(this.parking);
-
-        switch (parking.type) {
+        switch (this.parking.type) {
             case ParkingType.StartedFree:
                 this.canComplete = true;
                 this.canPay = true;
@@ -53,7 +59,7 @@ export class ToolboxComponent implements OnInit {
                 this.selectedButton = ToolboxButton.Pay;
                 break;
             default:
-                throw errorUnhandledType(parking);
+                throw errorUnhandledType(this.parking);
         }
     }
 }

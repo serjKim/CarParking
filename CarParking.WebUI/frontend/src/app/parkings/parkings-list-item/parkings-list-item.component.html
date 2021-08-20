@@ -3,5 +3,5 @@
         <started-info *ngSwitchCase="intoType.Started" [info]="infosByType[intoType.Started]"></started-info>
         <complete-info *ngSwitchCase="intoType.Completed" [info]="infosByType[intoType.Completed]"></complete-info>
     </ng-container>
-    <toolbox [parking]="currentParking"></toolbox>
+    <toolbox [parking]="parking"></toolbox>
 </div>
