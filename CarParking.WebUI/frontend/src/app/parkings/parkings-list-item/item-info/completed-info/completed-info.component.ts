@@ -9,5 +9,5 @@ import { CompletedInfo } from './completed-info';
 })
 export class CompletedInfoComponent {
     @Input()
-    public info: CompletedInfo | undefined | null = null;
+    public info: Optional<CompletedInfo> = null;
 }

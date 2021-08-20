@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail } from '../../../../util';
+import { notNullOrFail } from '../../../../extensions';
 import { Parking, ParkingType } from '../../../models';
 import { ParkingsStorage } from '../../../parkings.storage';
 

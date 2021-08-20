@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ParkingsStorage } from 'src/app/parkings/parkings.storage';
-import { notNullOrFail } from '../../../../util';
+import { notNullOrFail } from '../../../../extensions';
 import { Parking, ParkingType } from '../../../models';
 import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event';
 

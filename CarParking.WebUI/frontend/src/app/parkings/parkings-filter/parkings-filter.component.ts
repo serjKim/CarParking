@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Injectable, Self } from '@angular/c
 import { FormControl } from '@angular/forms';
 import { merge, Observable } from 'rxjs';
 import { map, mergeMap, publishReplay, refCount, takeUntil, tap } from 'rxjs/operators';
-import { NgDestroyer } from '../../util';
+import { NgDestroyer } from '../../extensions';
 import { TransitionName } from '../models';
 import { ParkingsStorage } from '../parkings.storage';
 import { TransitionsApi } from '../transitions.api';

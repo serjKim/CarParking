@@ -1,5 +1,5 @@
 import { deserialize } from 'santee-dcts';
-import { errorUnhandledType } from '../../util';
+import { errorUnhandledType } from '../../extensions';
 import { CompletedFirst, CompletedFree, Parking, ParkingType, Payment, StartedFree } from '../models';
 import { CompletedFirstDto, CompletedFreeDto, ParkingDto, StartedFreeDto } from './parking-dto';
 

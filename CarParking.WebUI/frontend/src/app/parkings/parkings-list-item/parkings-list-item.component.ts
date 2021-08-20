@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angular/core';
-import { errorUnhandledType, notNullOrFail } from '../../util';
+import { errorUnhandledType, notNullOrFail } from '../../extensions';
 import { Parking, ParkingType } from '../models';
 import { CompletedInfo, StartedInfo } from './item-info';
 

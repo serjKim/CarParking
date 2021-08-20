@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { errorUnhandledType, notNullOrFail } from '../../../util';
+import { errorUnhandledType, notNullOrFail } from '../../../extensions';
 import { CompletionResultType, Parking, ParkingType } from '../../models';
 import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
 

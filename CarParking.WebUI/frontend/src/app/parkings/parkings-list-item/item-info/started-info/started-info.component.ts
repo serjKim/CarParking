@@ -9,5 +9,5 @@ import { StartedInfo } from './started-info';
 })
 export class StartedInfoComponent {
     @Input()
-    public info: StartedInfo | undefined | null = null;
+    public info: Optional<StartedInfo> = null;
 }
