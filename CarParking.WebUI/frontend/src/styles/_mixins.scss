@@ -1,0 +1,3 @@
+@mixin transition() {
+    transition: box-shadow .2s ease, color .2s ease;
+}
