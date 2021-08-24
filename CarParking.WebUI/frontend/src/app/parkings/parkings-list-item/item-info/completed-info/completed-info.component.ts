@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CompletedInfo } from './completed-info';
+import { notNullOrFail } from '../../../../extensions';
+import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../models';
 
 @Component({
     selector: 'complete-info',
@@ -8,6 +9,16 @@ import { CompletedInfo } from './completed-info';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CompletedInfoComponent {
+    private currentParking: CompletedFirst | CompletedFree | null = null;
+
     @Input()
-    public info: Optional<CompletedInfo> = null;
+    public set parking(prk: Parking) {
+        if (prk.type !== ParkingType.CompletedFirst && prk.type !== ParkingType.CompletedFree) {
+            throw new Error('Expected completed.');
+        }
+    }
+
+    public get info(): CompletedFirst | CompletedFree {
+        return notNullOrFail(this.currentParking);
+    }
 }
