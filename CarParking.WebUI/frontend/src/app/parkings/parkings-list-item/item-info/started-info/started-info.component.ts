@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail, NotNullProperty } from '../../../../extensions';
-import { Parking, ParkingType, StartedFree } from '../../../models';
+import { notNullOrFail } from '../../../../extensions';
+import { Parking } from '../../../models';
 
 @Component({
     selector: 'started-info',
@@ -9,18 +9,14 @@ import { Parking, ParkingType, StartedFree } from '../../../models';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StartedInfoComponent {
-    private currentParking: StartedFree | null = null;
-
     @Input()
-    @NotNullProperty()
     public set parking(prk: Parking) {
-        if (prk.type !== ParkingType.StartedFree) {
-            throw new Error('Expected StartedFree.');
-        }
         this.currentParking = prk;
     }
 
-    public get info(): StartedFree {
+    public get parking(): Parking {
         return notNullOrFail(this.currentParking);
     }
+
+    private currentParking: Parking | null = null;
 }

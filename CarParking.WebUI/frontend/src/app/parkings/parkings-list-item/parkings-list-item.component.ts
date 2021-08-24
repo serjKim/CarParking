@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angular/core';
-import { NotNullProperty } from '../../extensions';
+import { notNullOrFail } from '../../extensions';
 import { Parking } from '../models';
 import { createSelectedInfo, InfoType, SelectedInfo } from './selected-info';
 
@@ -14,10 +14,16 @@ export class ParkingsListItemComponent {
     public selectedInfo = SelectedInfo.started();
 
     @Input()
-    @NotNullProperty()
     public set parking(prk: Parking) {
         this.selectedInfo = createSelectedInfo(prk.type);
+        this.currentParking = prk;
     }
+
+    public get parking(): Parking {
+        return notNullOrFail(this.currentParking);
+    }
+
+    private currentParking: Parking | null = null;
 
     @HostListener('click')
     public onSwitchInfo() {

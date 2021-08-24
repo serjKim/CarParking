@@ -12,7 +12,7 @@ export class ToolboxButtonComponent {
     public click = new EventEmitter<void>();
 
     @Input()
-    public disabled = false;
+    public disabled: boolean | null = false;
 
     @Input()
     public buttonType = ToolboxButtonType.Complete;

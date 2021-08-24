@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { CompletionResultType, Parking, ParkingType } from '../../models';
 import { ParkingsStorage } from '../../parkings.storage';
 
@@ -13,13 +14,13 @@ const BUTTON_STATE = Symbol('Button mutable state.');
 
 export class ToolboxButton {
     public [BUTTON_STATE] = {
-        disabled: false,
-        displayed: false,
+        disabled: new BehaviorSubject(false),
+        displayed: new BehaviorSubject(false),
     };
-    public get disabled(): boolean {
+    public get disabled(): Observable<boolean> {
         return this[BUTTON_STATE].disabled;
     }
-    public get displayed(): boolean {
+    public get displayed(): Observable<boolean> {
         return this[BUTTON_STATE].displayed;
     }
     constructor(
@@ -35,7 +36,7 @@ export class Toolbox {
 
     public displayPayButton() {
         for (const button of this.buttons) {
-            button[BUTTON_STATE].displayed = button.type === ToolboxButtonType.Pay;
+            button[BUTTON_STATE].displayed.next(button.type === ToolboxButtonType.Pay);
         }
     }
 }
@@ -46,18 +47,19 @@ type ToolboxButtonSettings = { [key in ParkingType]: (completeButton: ToolboxBut
 export class ToolboxFactory {
     private readonly settingsByType: ToolboxButtonSettings = {
         [ParkingType.StartedFree]: (completeButton: ToolboxButton, payButton: ToolboxButton) => {
-            completeButton[BUTTON_STATE].displayed = true;
-            payButton[BUTTON_STATE].displayed = false;
+            completeButton[BUTTON_STATE].displayed.next(true);
+            completeButton[BUTTON_STATE].disabled.next(false);
+            payButton[BUTTON_STATE].displayed.next(false);
         },
         [ParkingType.CompletedFree]: (completeButton: ToolboxButton, payButton: ToolboxButton) => {
-            completeButton[BUTTON_STATE].displayed = true;
-            completeButton[BUTTON_STATE].disabled = true;
-            payButton[BUTTON_STATE].displayed = false;
+            completeButton[BUTTON_STATE].displayed.next(true);
+            completeButton[BUTTON_STATE].disabled.next(true);
+            payButton[BUTTON_STATE].displayed.next(false);
         },
         [ParkingType.CompletedFirst]: (completeButton: ToolboxButton, payButton: ToolboxButton) => {
-            completeButton[BUTTON_STATE].displayed = false;
-            payButton[BUTTON_STATE].displayed = true;
-            payButton[BUTTON_STATE].disabled = false;
+            completeButton[BUTTON_STATE].displayed.next(false);
+            payButton[BUTTON_STATE].displayed.next(true);
+            payButton[BUTTON_STATE].disabled.next(true);
         },
     };
 

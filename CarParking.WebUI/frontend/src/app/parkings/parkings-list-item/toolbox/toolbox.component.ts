@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, Self } from '@angular/core';
-import { NotNullProperty } from '../../../extensions';
+import { notNullOrFail } from '../../../extensions';
 import { Parking } from '../../models';
 import { Toolbox, ToolBoxClick, ToolboxFactory } from './toolbox';
 
@@ -14,12 +14,18 @@ import { Toolbox, ToolBoxClick, ToolboxFactory } from './toolbox';
 })
 export class ToolboxComponent {
     @Input()
-    @NotNullProperty()
     public set parking(prk: Parking) {
         this.toolbox = this.toolboxFactory.createToolbox(prk.type);
+        this.currentParking = prk;
+    }
+
+    public get parking(): Parking {
+        return notNullOrFail(this.currentParking);
     }
 
     public toolbox: Toolbox | null = null;
+
+    private currentParking: Parking | null = null;
 
     constructor(
         @Self() private readonly toolboxFactory: ToolboxFactory,

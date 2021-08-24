@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail, NotNullProperty } from '../../../../extensions';
+import { notNullOrFail } from '../../../../extensions';
 import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../models';
 
 @Component({
@@ -9,17 +9,20 @@ import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../mo
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CompletedInfoComponent {
-    private currentParking: CompletedFirst | CompletedFree | null = null;
-
     @Input()
-    @NotNullProperty()
     public set parking(prk: Parking) {
-        if (prk.type !== ParkingType.CompletedFirst && prk.type !== ParkingType.CompletedFree) {
-            throw new Error('Expected completed.');
-        }
+        this.currentParking = prk;
     }
 
-    public get info(): CompletedFirst | CompletedFree {
+    public get parking(): Parking {
         return notNullOrFail(this.currentParking);
+    }
+
+    private currentParking: Parking | null = null;
+
+    public get info(): CompletedFirst | CompletedFree | null {
+        return this.parking.type === ParkingType.CompletedFirst || this.parking.type === ParkingType.CompletedFree
+            ? this.parking
+            : null;
     }
 }

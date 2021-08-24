@@ -1,9 +1,9 @@
 <div class="toolbox" *ngIf="!!toolbox">
     <ng-container *ngFor="let button of toolbox.buttons">
         <toolbox-button
-            *ngIf="button.displayed"
+            *ngIf="button.displayed | async"
             [buttonType]="button.type"
-            [disabled]="button.disabled"
+            [disabled]="button.disabled | async"
             (click)="onToolButtonClick(button.onClick)">
         </toolbox-button>
     </ng-container>
