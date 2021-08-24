@@ -1,4 +1,3 @@
-import { dataMember, required, typedArray } from 'santee-dcts';
 import { ParkingStatus, Tariff } from './parking';
 
 type TransitionNames = [
