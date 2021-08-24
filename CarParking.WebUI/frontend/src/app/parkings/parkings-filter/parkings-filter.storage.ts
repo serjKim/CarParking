@@ -1,72 +1,112 @@
-import { HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { ParkingType, TRANSITION_NAMES, TransitionName } from '../models';
+import { Injectable, Self } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { merge, Observable } from 'rxjs';
+import { map, mergeMap, publishReplay, refCount, takeUntil, tap } from 'rxjs/operators';
+import { NgDestroyer } from '../../extensions';
+import { TransitionName } from '../models';
+import { ParkingsStorage } from '../parkings.storage';
+import { TransitionsApi } from '../transitions.api';
 import { ParkingsFilter } from './parking-filter';
+import { ParkingsFilterRouter } from './parkings-filter-router';
 
-export interface ParkingsFilterQueryParams extends Params {
-    readonly transitions?: string | null;
+export class TransitionButton {
+    public get buttonId(): string {
+        return `${this.transitionName}-status-button`;
+    }
+
+    constructor(
+        public readonly transitionName: TransitionName,
+        public readonly control: FormControl,
+        public readonly style: ButtonStyle,
+    ) { }
 }
 
-@Injectable({ providedIn: 'root' })
-export class ParkingsFilterStorage {
+interface ButtonStyle {
+    readonly icon: string;
+    readonly className: string;
+}
 
-    public get filter(): Observable<ParkingsFilter> {
-        return this.filter$;
+type ButtonStyles = {
+    readonly [key in TransitionName]: ButtonStyle;
+};
+
+@Injectable()
+export class ParkingFilterStorage {
+    public readonly transitionButtons$: Observable<readonly TransitionButton[]>;
+
+    private readonly buttonStyles: ButtonStyles = {
+        'StartedFree': { icon: 'check_circle', className: 'started' },
+        'CompletedFree': { icon: 'check_circle', className: 'completed' },
+        'CompletedFirst': { icon: 'attach_money', className: 'payed' },
+    };
+
+    constructor(
+        @Self() private readonly destroyer$: NgDestroyer,
+        private readonly parkingsStorage: ParkingsStorage,
+        private readonly parkingsFilterRouter: ParkingsFilterRouter,
+        transitionApi: TransitionsApi,
+    ) {
+        this.transitionButtons$ = transitionApi.getTransitions().pipe(
+            map(transitions => {
+                return transitions.map(transition =>
+                    new TransitionButton(
+                        transition.name,
+                        new FormControl(false),
+                        this.buttonStyles[transition.name]));
+            }),
+            publishReplay(1),
+            refCount(),
+        );
+
+        this.applyNewFilterOnButtonClicks();
+        this.loadStorage();
     }
-    private readonly filter$: Observable<ParkingsFilter>;
 
-    constructor(activatedRoute: ActivatedRoute, private readonly router: Router) {
-        this.filter$ = activatedRoute.queryParams
-            .pipe(
-                map(params => this.deserializeFilter(params)),
-            );
-    }
+    private applyNewFilterOnButtonClicks() {
+        const buttonValues$ = this.transitionButtons$.pipe(
+            map(transitionButtons => transitionButtons.map<Observable<void>>(btn => btn.control.valueChanges)),
+        );
 
-    public applyFilter(filter: ParkingsFilter) {
-        this.router.navigate([], {
-            queryParams: this.serializeFilter(filter),
+        buttonValues$.pipe(
+            mergeMap(buttonValues => {
+                return merge(...buttonValues).pipe(
+                    mergeMap(() => this.transitionButtons$),
+                    mergeMap(transitionButtons => {
+                        const transitionNames = transitionButtons
+                            .filter(x => !!x.control.value)
+                            .map(x => x.transitionName);
+
+                        return this.parkingsFilterRouter.filter.pipe(
+                            map(currentFilter => currentFilter.setTransitionNames(new Set(transitionNames))),
+                        );
+                    }),
+                );
+            }),
+            takeUntil(this.destroyer$),
+        ).subscribe(filter => {
+            this.parkingsFilterRouter.applyFilter(filter);
         });
     }
 
-    public toHttpParams(filter: ParkingsFilter): HttpParams {
-        const httpParams = new HttpParams();
-        const queryParams = this.serializeFilter(filter);
+    private loadStorage() {
+        const filter$ = this.transitionButtons$.pipe(
+            mergeMap(transitionButtons => {
+                return this.parkingsFilterRouter.filter
+                    .pipe(
+                        tap(this.setButtonValues(transitionButtons)),
+                    );
+            }),
+        );
 
-        if (!!queryParams.transitions) {
-            return new HttpParams({ fromObject: queryParams });
-        }
-
-        return httpParams;
+        this.parkingsStorage.loadStorage(filter$);
     }
 
-    private serializeFilter(filter: ParkingsFilter): ParkingsFilterQueryParams {
-        return {
-            transitions: filter.transitionNames.size > 0
-                ? this.serializeTransitionNames(filter.transitionNames)
-                : null,
+    private setButtonValues(transitionButtons: readonly TransitionButton[]) {
+        return (filter: ParkingsFilter) => {
+            for (const button of transitionButtons) {
+                const selected = filter.transitionNames.has(button.transitionName);
+                button.control.setValue(selected);
+            }
         };
-    }
-
-    private deserializeFilter(params: Params): ParkingsFilter {
-        const keys = this.deserializeTransitionNames(params);
-        return new ParkingsFilter(keys);
-    }
-
-    private deserializeTransitionNames = (params: Params): ReadonlySet<TransitionName> => {
-        const transitions: string | null | undefined = (params as ParkingsFilterQueryParams).transitions;
-        const transitionNames = transitions?.split(',').filter(this.isTransitionName) ?? [];
-
-        return new Set(transitionNames);
-    }
-
-    private isTransitionName = (raw: string): raw is TransitionName => {
-        return TRANSITION_NAMES.has(raw as keyof typeof ParkingType);
-    }
-
-    private serializeTransitionNames(names: ReadonlySet<TransitionName>): string {
-        return Array.from(names).join(',');
     }
 }

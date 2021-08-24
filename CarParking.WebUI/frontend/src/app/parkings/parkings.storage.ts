@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, publishLast, refCount, switchMap } from 'rxjs/operators';
 import { CompletionResult, CompletionResultType, Parking, StartedFree } from './models';
 import { ParkingsFilter } from './parkings-filter/parking-filter';
-import { ParkingsFilterStorage } from './parkings-filter/parkings-filter.storage';
+import { ParkingsFilterRouter } from './parkings-filter/parkings-filter-router';
 import { ParkingsApi } from './parkings.api';
 
 type Parkings$ = Observable<readonly Parking[]>;
@@ -15,7 +15,7 @@ export class ParkingsStorage {
 
     constructor(
         private readonly parkingsApi: ParkingsApi,
-        private readonly parkingsFilterStorage: ParkingsFilterStorage,
+        private readonly parkingsFilterStorage: ParkingsFilterRouter,
     ) {
         this.all = this.parkings$.pipe(
             switchMap(x => x),
