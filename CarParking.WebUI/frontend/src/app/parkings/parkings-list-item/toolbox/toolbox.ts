@@ -13,7 +13,7 @@ export type ToolBoxClick = (parking: Parking, toolbox: Toolbox) => Promise<void>
 const BUTTON_STATE = Symbol('Button mutable state.');
 
 export class ToolboxButton {
-    public [BUTTON_STATE] = {
+    public readonly [BUTTON_STATE] = {
         disabled: new BehaviorSubject(false),
         displayed: new BehaviorSubject(false),
     };
