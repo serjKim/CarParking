@@ -9,9 +9,19 @@ export enum ToolboxButtonType {
 
 export type ToolBoxClick = (parking: Parking, toolbox: Toolbox) => Promise<void>;
 
+const BUTTON_STATE = Symbol('Button mutable state.');
+
 export class ToolboxButton {
-    public disabled = false;
-    public displayed = false;
+    public [BUTTON_STATE] = {
+        disabled: false,
+        displayed: false,
+    };
+    public get disabled(): boolean {
+        return this[BUTTON_STATE].disabled;
+    }
+    public get displayed(): boolean {
+        return this[BUTTON_STATE].displayed;
+    }
     constructor(
         public readonly type: ToolboxButtonType,
         public readonly onClick: ToolBoxClick,
@@ -25,7 +35,7 @@ export class Toolbox {
 
     public displayPayButton() {
         for (const button of this.buttons) {
-            button.displayed = button.type === ToolboxButtonType.Pay;
+            button[BUTTON_STATE].displayed = button.type === ToolboxButtonType.Pay;
         }
     }
 }
@@ -36,18 +46,18 @@ type ToolboxButtonSettings = { [key in ParkingType]: (completeButton: ToolboxBut
 export class ToolboxFactory {
     private readonly settingsByType: ToolboxButtonSettings = {
         [ParkingType.StartedFree]: (completeButton: ToolboxButton, payButton: ToolboxButton) => {
-            completeButton.displayed = true;
-            payButton.displayed = false;
+            completeButton[BUTTON_STATE].displayed = true;
+            payButton[BUTTON_STATE].displayed = false;
         },
         [ParkingType.CompletedFree]: (completeButton: ToolboxButton, payButton: ToolboxButton) => {
-            completeButton.displayed = true;
-            completeButton.disabled = true;
-            payButton.displayed = false;
+            completeButton[BUTTON_STATE].displayed = true;
+            completeButton[BUTTON_STATE].disabled = true;
+            payButton[BUTTON_STATE].displayed = false;
         },
         [ParkingType.CompletedFirst]: (completeButton: ToolboxButton, payButton: ToolboxButton) => {
-            completeButton.displayed = false;
-            payButton.displayed = true;
-            payButton.disabled = false;
+            completeButton[BUTTON_STATE].displayed = false;
+            payButton[BUTTON_STATE].displayed = true;
+            payButton[BUTTON_STATE].disabled = false;
         },
     };
 
