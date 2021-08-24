@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail } from '../../../../extensions';
+import { notNullOrFail, NotNullProperty } from '../../../../extensions';
 import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../models';
 
 @Component({
@@ -12,6 +12,7 @@ export class CompletedInfoComponent {
     private currentParking: CompletedFirst | CompletedFree | null = null;
 
     @Input()
+    @NotNullProperty()
     public set parking(prk: Parking) {
         if (prk.type !== ParkingType.CompletedFirst && prk.type !== ParkingType.CompletedFree) {
             throw new Error('Expected completed.');

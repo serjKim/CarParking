@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ParkingsStorage } from 'src/app/parkings/parkings.storage';
-import { notNullOrFail } from '../../../../extensions';
 import { Parking, ParkingType } from '../../../models';
 import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event';
 
@@ -12,21 +11,13 @@ import { CompleteButtonEvent, ToolboxButtonEvent } from '../toolbox-button-event
 })
 export class CompleteButtonComponent {
     @Input()
-    public set parking(val: Parking) {
-        this.currentParking = val;
-    }
-
-    public get parking(): Parking {
-        return notNullOrFail(this.currentParking);
-    }
+    public set parking(_: Parking) {}
 
     @Input()
     public disabled = false;
 
     @Output()
     public complete = new EventEmitter<ToolboxButtonEvent>();
-
-    private currentParking: Parking | null = null;
 
     constructor(
         private readonly parkingsStorage: ParkingsStorage,

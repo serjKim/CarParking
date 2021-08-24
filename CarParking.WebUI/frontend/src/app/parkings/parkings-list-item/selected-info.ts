@@ -28,8 +28,16 @@ export class SelectedInfo {
     }
 }
 
-export const selectedInfoByType: { [key in ParkingType]: () => SelectedInfo } = {
+const selectedInfoByType: { [key in ParkingType]: () => SelectedInfo } = {
     [ParkingType.StartedFree]: () => SelectedInfo.started(),
     [ParkingType.CompletedFree]: () => SelectedInfo.completed(),
     [ParkingType.CompletedFirst]: () => SelectedInfo.completed(),
+};
+
+export const createSelectedInfo = (prkType: ParkingType) => {
+    const factory = selectedInfoByType[prkType];
+    if (!factory) {
+        throw new Error(`Unexpected ${prkType} parking type.`);
+    }
+    return factory();
 };

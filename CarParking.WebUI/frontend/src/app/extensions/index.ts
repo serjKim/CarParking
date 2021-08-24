@@ -1,2 +1,3 @@
-export * from './error-handing';
+export * from './error-handling';
 export * from './ng-destroyer';
+export * from './not-null-property';

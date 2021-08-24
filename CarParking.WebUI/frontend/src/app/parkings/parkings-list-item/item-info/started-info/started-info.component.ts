@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail } from '../../../../extensions';
+import { notNullOrFail, NotNullProperty } from '../../../../extensions';
 import { Parking, ParkingType, StartedFree } from '../../../models';
 
 @Component({
@@ -12,6 +12,7 @@ export class StartedInfoComponent {
     private currentParking: StartedFree | null = null;
 
     @Input()
+    @NotNullProperty()
     public set parking(prk: Parking) {
         if (prk.type !== ParkingType.StartedFree) {
             throw new Error('Expected StartedFree.');

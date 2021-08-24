@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { errorUnhandledType, notNullOrFail } from '../../../extensions';
+import { errorUnhandledType, NotNullProperty } from '../../../extensions';
 import { CompletionResultType, Parking, ParkingType } from '../../models';
 import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
 
@@ -16,20 +16,13 @@ enum ToolboxButton {
 })
 export class ToolboxComponent implements OnInit {
     @Input()
-    public set parking(val: Parking) {
-        this.currentParking = val;
-    }
-
-    public get parking(): Parking {
-        return notNullOrFail(this.currentParking);
-    }
+    @NotNullProperty()
+    public set parking(_: Parking) {}
 
     public readonly toolboxButtonType = ToolboxButton;
     public selectedButton = ToolboxButton.Complete;
     public canComplete = false;
     public canPay = false;
-
-    private currentParking: Parking | null = null;
 
     constructor() { }
 
