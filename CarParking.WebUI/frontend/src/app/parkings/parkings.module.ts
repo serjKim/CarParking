@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ParkingsFilterComponent } from './parkings-filter/parkings-filter.component';
+import { ParkingsFilterModule } from './parkings-filter';
 import { CompletedInfoComponent } from './parkings-list-item/item-info/completed-info/completed-info.component';
 import { StartedInfoComponent } from './parkings-list-item/item-info/started-info/started-info.component';
 import { ParkingsListItemComponent } from './parkings-list-item/parkings-list-item.component';
@@ -16,7 +16,6 @@ import { ParkingsComponent } from './parkings/parkings.component';
         ParkingsListItemComponent,
         StartedInfoComponent,
         CompletedInfoComponent,
-        ParkingsFilterComponent,
         ParkingsComponent,
     ],
     imports: [
@@ -24,6 +23,7 @@ import { ParkingsComponent } from './parkings/parkings.component';
         ReactiveFormsModule,
         ParkingsRoutingModule,
         ToolboxModule,
+        ParkingsFilterModule,
     ],
 })
 export class ParkingsModule { }
