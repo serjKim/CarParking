@@ -1,16 +1,8 @@
-import { ParkingStatus, Tariff } from './parking';
+import { ParkingStatus, ParkingType, Tariff } from './parking';
 
-type TransitionNames = [
-    'StartedFree',
-    'CompletedFree',
-    'CompletedFirst',
-];
-
-export type TransitionName = TransitionNames extends Array<infer T> ? T : never;
-
-const transitionNamesArray: TransitionNames = ['StartedFree', 'CompletedFree', 'CompletedFirst'];
-
-export const TRANSITION_NAMES = new Set(transitionNamesArray);
+export type TransitionName = keyof (typeof ParkingType);
+const keys = Object.keys(ParkingType) as TransitionName[];
+export const TRANSITION_NAMES = new Set(keys);
 
 export class Transition {
     constructor(
