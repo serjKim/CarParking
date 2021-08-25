@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail } from '../../../../extensions';
+import { NotNullProperty } from '../../../../extensions';
 import { Parking } from '../../../models';
 
 @Component({
@@ -10,13 +10,6 @@ import { Parking } from '../../../models';
 })
 export class StartedInfoComponent {
     @Input()
-    public set parking(prk: Parking) {
-        this.currentParking = prk;
-    }
-
-    public get parking(): Parking {
-        return notNullOrFail(this.currentParking);
-    }
-
-    private currentParking: Parking | null = null;
+    @NotNullProperty()
+    public set parking(_: Parking) {}
 }

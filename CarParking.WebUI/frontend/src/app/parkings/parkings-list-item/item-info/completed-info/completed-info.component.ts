@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { notNullOrFail } from '../../../../extensions';
+import { NotNullProperty } from '../../../../extensions';
 import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../models';
 
 @Component({
@@ -10,15 +10,8 @@ import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../mo
 })
 export class CompletedInfoComponent {
     @Input()
-    public set parking(prk: Parking) {
-        this.currentParking = prk;
-    }
-
-    public get parking(): Parking {
-        return notNullOrFail(this.currentParking);
-    }
-
-    private currentParking: Parking | null = null;
+    @NotNullProperty()
+    public set parking(_: Parking) {}
 
     public get info(): CompletedFirst | CompletedFree | null {
         return this.parking.type === ParkingType.CompletedFirst || this.parking.type === ParkingType.CompletedFree
