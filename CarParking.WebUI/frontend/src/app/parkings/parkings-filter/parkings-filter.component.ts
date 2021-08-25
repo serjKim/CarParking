@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Self } from '@angular/core';
 import { NgDestroyer } from '../../extensions';
-import { ParkingFilterStorage } from './parkings-filter.storage';
+import { TransitionButtonsStorage } from './transition-buttons.storage';
 
 @Component({
     selector: 'parkings-filter',
@@ -9,13 +9,13 @@ import { ParkingFilterStorage } from './parkings-filter.storage';
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         NgDestroyer,
-        ParkingFilterStorage,
+        TransitionButtonsStorage,
     ],
 })
 export class ParkingsFilterComponent {
-    public readonly transitionButtons$ = this.parkingsFilterStorage.transitionButtons$;
+    public readonly transitionButtons$ = this.transitionButtonsStorage.transitionButtons$;
 
     constructor(
-        @Self() private readonly parkingsFilterStorage: ParkingFilterStorage,
+        @Self() private readonly transitionButtonsStorage: TransitionButtonsStorage,
     ) { }
 }

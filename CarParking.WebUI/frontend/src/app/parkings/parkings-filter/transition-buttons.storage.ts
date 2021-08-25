@@ -3,35 +3,14 @@ import { FormControl } from '@angular/forms';
 import { merge, Observable } from 'rxjs';
 import { map, mergeMap, publishReplay, refCount, takeUntil, tap } from 'rxjs/operators';
 import { NgDestroyer } from '../../extensions';
-import { TransitionName } from '../models';
 import { ParkingsStorage } from '../parkings.storage';
 import { TransitionsApi } from '../transitions.api';
 import { ParkingsFilter } from './parking-filter';
 import { ParkingsFilterRouter } from './parkings-filter-router';
-
-export class TransitionButton {
-    public get buttonId(): string {
-        return `${this.transitionName}-status-button`;
-    }
-
-    constructor(
-        public readonly transitionName: TransitionName,
-        public readonly control: FormControl,
-        public readonly style: ButtonStyle,
-    ) { }
-}
-
-interface ButtonStyle {
-    readonly icon: string;
-    readonly className: string;
-}
-
-type ButtonStyles = {
-    readonly [key in TransitionName]: ButtonStyle;
-};
+import { ButtonStyles, TransitionButton } from './transition-button';
 
 @Injectable()
-export class ParkingFilterStorage {
+export class TransitionButtonsStorage {
     public readonly transitionButtons$: Observable<readonly TransitionButton[]>;
 
     private readonly buttonStyles: ButtonStyles = {
