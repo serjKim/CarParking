@@ -1,13 +1,10 @@
-<div class="toolbox" [ngSwitch]="selectedButton">
-    <complete-button
-        *ngSwitchCase="toolboxButtonType.Complete"
-        [parking]="parking"
-        [disabled]="!canComplete"
-        (complete)="onComplete($event)">
-    </complete-button>
-    <pay-button
-        *ngSwitchCase="toolboxButtonType.Pay"
-        [parking]="parking"
-        [disabled]="!canPay">
-    </pay-button>
+<div class="toolbox" *ngIf="!!toolbox">
+    <ng-container *ngFor="let button of toolbox.buttons">
+        <toolbox-button
+            *ngIf="button.displayed | async"
+            [buttonType]="button.type"
+            [disabled]="button.disabled | async"
+            (click)="onToolButtonClick(button.onClick)">
+        </toolbox-button>
+    </ng-container>
 </div>

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ParkingsComponent } from './parkings/parkings/parkings.component';
 
 const routes: Routes = [
     {
@@ -10,7 +9,7 @@ const routes: Routes = [
         children: [
             {
                 path: 'parkings',
-                component: ParkingsComponent,
+                loadChildren: () => import('./parkings').then((m) => m.ParkingsModule),
             },
             {
                 path: '',

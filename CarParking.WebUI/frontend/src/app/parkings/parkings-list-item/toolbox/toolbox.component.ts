@@ -1,58 +1,33 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { assertUnhandledType } from 'src/app/util';
-import { CompletionResultType } from '../../models/completion';
-import { Parking, ParkingType } from '../../models/parking';
-import { ToolboxButtonEvent, ToolboxButtonEventType } from './toolbox-button-event';
-
-enum ToolboxButton {
-    Complete,
-    Pay,
-}
+import { ChangeDetectionStrategy, Component, Input, Self } from '@angular/core';
+import { NotNullProperty } from '../../../extensions';
+import { Parking } from '../../models';
+import { Toolbox, ToolBoxClick, ToolboxFactory } from './toolbox';
 
 @Component({
     selector: 'toolbox',
     templateUrl: './toolbox.component.html',
     styleUrls: ['./toolbox.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        ToolboxFactory,
+    ],
 })
-export class ToolboxComponent implements OnInit {
+export class ToolboxComponent {
     @Input()
-    public parking!: Parking;
-
-    public readonly toolboxButtonType = ToolboxButton;
-    public selectedButton = ToolboxButton.Complete;
-    public canComplete = false;
-    public canPay = false;
-
-    constructor() { }
-
-    public async onComplete(e: ToolboxButtonEvent) {
-        switch (e.eventType) {
-            case ToolboxButtonEventType.Completion:
-                if (e.completionResult === CompletionResultType.FreeExpired) {
-                    this.selectedButton = ToolboxButton.Pay;
-                }
-                break;
-            default:
-                assertUnhandledType(e.eventType);
-        }
+    @NotNullProperty()
+    public set parking(prk: Parking) {
+        this.toolbox = this.toolboxFactory.createToolbox(prk.type);
     }
 
-    public ngOnInit() {
-        switch (this.parking.type) {
-            case ParkingType.StartedFree:
-                this.canComplete = true;
-                this.canPay = true;
-                break;
-            case ParkingType.CompletedFree:
-                this.canComplete = false;
-                break;
-            case ParkingType.CompletedFirst:
-                this.canPay = false;
-                this.selectedButton = ToolboxButton.Pay;
-                break;
-            default:
-                assertUnhandledType(this.parking);
+    public toolbox: Toolbox | null = null;
+
+    constructor(
+        @Self() private readonly toolboxFactory: ToolboxFactory,
+    ) {}
+
+    public onToolButtonClick(handler: ToolBoxClick) {
+        if (this.toolbox != null) {
+            handler(this.parking, this.toolbox);
         }
     }
 }

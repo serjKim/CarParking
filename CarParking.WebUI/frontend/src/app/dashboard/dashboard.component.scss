@@ -1,7 +1,6 @@
-@import '../../common.scss';
+@use 'variables' as *;
 
 :host {
-    background-color: #eee;
     display: block;
     padding: $dashboard-margin;
 }

@@ -1,0 +1,5 @@
+<i  class="material-icons toolbox-button"
+    [class.disabled]="disabled"
+    (click)="onClick($event)"
+    [ngClass]="stylesByType[buttonType].className"
+>{{ stylesByType[buttonType].iconName }}</i>

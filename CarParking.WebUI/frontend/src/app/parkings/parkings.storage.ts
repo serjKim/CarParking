@@ -1,29 +1,27 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, publishLast, refCount, switchMap } from 'rxjs/operators';
-import { CompletionResult, CompletionResultType } from './models/completion';
-import { Parking, StartedFree } from './models/parking';
+import { CompletionResult, CompletionResultType, Parking, StartedFree } from './models';
 import { ParkingsFilter } from './parkings-filter/parking-filter';
-import { ParkingsFilterStorage } from './parkings-filter/parkings-filter.storage';
+import { ParkingsFilterRouter } from './parkings-filter/parkings-filter-router';
 import { ParkingsApi } from './parkings.api';
 
 type Parkings$ = Observable<readonly Parking[]>;
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ParkingsStorage {
+    public readonly all: Observable<readonly Parking[]>;
     private readonly parkings$ = new BehaviorSubject<Parkings$>(of([]));
 
-    public get all(): Parkings$ {
-        return this.parkings$.pipe(
+    constructor(
+        private readonly parkingsApi: ParkingsApi,
+        private readonly parkingsFilterStorage: ParkingsFilterRouter,
+    ) {
+        this.all = this.parkings$.pipe(
             switchMap(x => x),
             map(this.sortParkings),
         );
     }
-
-    constructor(
-        private readonly parkingsApi: ParkingsApi,
-        private readonly parkingsFilterStorage: ParkingsFilterStorage,
-    ) { }
 
     public loadStorage(filter$: Observable<ParkingsFilter>) {
         const loadedParkings$ = filter$

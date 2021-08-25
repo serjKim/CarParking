@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { CompletedFirst, CompletedFree } from '../../../models/parking';
+import { NotNullProperty } from '../../../../extensions';
+import { CompletedFirst, CompletedFree, Parking, ParkingType } from '../../../models';
 
 @Component({
     selector: 'complete-info',
@@ -9,5 +10,12 @@ import { CompletedFirst, CompletedFree } from '../../../models/parking';
 })
 export class CompletedInfoComponent {
     @Input()
-    public parking!: CompletedFree | CompletedFirst;
+    @NotNullProperty()
+    public set parking(_: Parking) {}
+
+    public get info(): CompletedFirst | CompletedFree | null {
+        return this.parking.type === ParkingType.CompletedFirst || this.parking.type === ParkingType.CompletedFree
+            ? this.parking
+            : null;
+    }
 }

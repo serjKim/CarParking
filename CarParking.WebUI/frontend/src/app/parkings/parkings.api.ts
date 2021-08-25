@@ -3,9 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppSettings } from '../app-settings';
-import { deserializeParking, deserializeParkings } from './dtos/deserializers';
-import { CompletionResult, CompletionResultType } from './models/completion';
-import { Parking, StartedFree } from './models/parking';
+import { deserializeParking, deserializeParkings } from './dtos';
+import { CompletionResult, CompletionResultType, Parking, StartedFree } from './models';
 
 const enum TransitionErrorType {
     FreeExpired = 'FreeExpired',
@@ -15,7 +14,7 @@ interface TransitionErrorResponse {
     readonly errorType: TransitionErrorType;
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ParkingsApi {
     constructor(
         private readonly httpClient: HttpClient,

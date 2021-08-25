@@ -1,5 +1,6 @@
 import { deserialize } from 'santee-dcts';
-import { CompletedFirst, CompletedFree, Parking, ParkingType, Payment, StartedFree } from '../models/parking';
+import { errorUnhandledType } from '../../extensions';
+import { CompletedFirst, CompletedFree, Parking, ParkingType, Payment, StartedFree } from '../models';
 import { CompletedFirstDto, CompletedFreeDto, ParkingDto, StartedFreeDto } from './parking-dto';
 
 export const deserializeParking = (obj: object | null): Parking => {
@@ -25,7 +26,7 @@ export const deserializeParking = (obj: object | null): Parking => {
             return new CompletedFirst(dto.id, dto.arrivalDate, dto.completeDate, payment);
         }
         default:
-            throw new Error(`Unknown parking dto: ${raw}`);
+            throw errorUnhandledType(raw);
     }
 };
 

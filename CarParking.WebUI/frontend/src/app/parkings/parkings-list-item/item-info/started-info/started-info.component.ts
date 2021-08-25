@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { StartedFree } from '../../../models/parking';
+import { NotNullProperty } from '../../../../extensions';
+import { Parking } from '../../../models';
 
 @Component({
     selector: 'started-info',
@@ -9,5 +10,6 @@ import { StartedFree } from '../../../models/parking';
 })
 export class StartedInfoComponent {
     @Input()
-    public parking!: StartedFree;
+    @NotNullProperty()
+    public set parking(_: Parking) {}
 }

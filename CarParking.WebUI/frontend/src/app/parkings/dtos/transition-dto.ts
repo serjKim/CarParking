@@ -1,6 +1,5 @@
 import { dataMember, required } from 'santee-dcts';
-import { ParkingStatus, Tariff } from '../models/parking';
-import { TransitionName } from '../models/transition';
+import { ParkingStatus, Tariff, TransitionName } from '../models';
 
 export class TransitionDto {
     @dataMember()
