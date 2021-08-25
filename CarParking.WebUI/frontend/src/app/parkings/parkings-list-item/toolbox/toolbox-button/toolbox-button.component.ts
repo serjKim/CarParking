@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ToolboxButtonType } from '../toolbox';
 
+type StylesByType = {
+    [key in ToolboxButtonType]: {
+        readonly iconName: string;
+        readonly className: string;
+    };
+};
+
 @Component({
     selector: 'toolbox-button',
     templateUrl: './toolbox-button.component.html',
@@ -17,7 +24,7 @@ export class ToolboxButtonComponent {
     @Input()
     public buttonType = ToolboxButtonType.Complete;
 
-    public readonly stylesByType: { [key in ToolboxButtonType]: { readonly iconName: string, readonly className: string } } = {
+    public readonly stylesByType: StylesByType = {
         [ToolboxButtonType.Complete]: { iconName: 'check_circle', className: 'complete' },
         [ToolboxButtonType.Pay]: { iconName: 'attach_money', className: 'pay' },
     };
