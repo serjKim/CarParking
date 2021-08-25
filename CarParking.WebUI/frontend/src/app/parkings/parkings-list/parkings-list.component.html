@@ -1,3 +1,3 @@
-<ng-container *ngFor="let parking of parkings$ | async">
+<ng-container *ngFor="let parking of parkings$ | async; trackBy:trackById">
     <parkings-list-item [parking]="parking"></parkings-list-item>
 </ng-container>
