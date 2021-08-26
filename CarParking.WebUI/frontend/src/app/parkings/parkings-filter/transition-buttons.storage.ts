@@ -11,7 +11,7 @@ import { ButtonStyles, TransitionButton } from './transition-button';
 
 @Injectable()
 export class TransitionButtonsStorage {
-    public readonly transitionButtons$: Observable<readonly TransitionButton[]>;
+    public readonly transitionButtons: Observable<readonly TransitionButton[]>;
 
     private readonly buttonStyles: ButtonStyles = {
         'StartedFree': { icon: 'check_circle', className: 'started' },
@@ -25,7 +25,7 @@ export class TransitionButtonsStorage {
         private readonly parkingsFilterRouter: ParkingsFilterRouter,
         transitionApi: TransitionsApi,
     ) {
-        this.transitionButtons$ = transitionApi.getTransitions().pipe(
+        this.transitionButtons = transitionApi.getTransitions().pipe(
             map(transitions => {
                 return transitions.map(transition =>
                     new TransitionButton(
@@ -42,14 +42,14 @@ export class TransitionButtonsStorage {
     }
 
     private applyNewFilterOnButtonClicks() {
-        const buttonValues$ = this.transitionButtons$.pipe(
+        const buttonValues$ = this.transitionButtons.pipe(
             map(transitionButtons => transitionButtons.map<Observable<void>>(btn => btn.control.valueChanges)),
         );
 
         buttonValues$.pipe(
             mergeMap(buttonValues => {
                 return merge(...buttonValues).pipe(
-                    mergeMap(() => this.transitionButtons$),
+                    mergeMap(() => this.transitionButtons),
                     mergeMap(transitionButtons => {
                         const transitionNames = transitionButtons
                             .filter(x => !!x.control.value)
@@ -68,7 +68,7 @@ export class TransitionButtonsStorage {
     }
 
     private loadStorage() {
-        const filter$ = this.transitionButtons$.pipe(
+        const filter$ = this.transitionButtons.pipe(
             mergeMap(transitionButtons => {
                 return this.parkingsFilterRouter.filter
                     .pipe(

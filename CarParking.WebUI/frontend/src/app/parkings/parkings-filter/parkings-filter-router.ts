@@ -12,18 +12,14 @@ export interface ParkingsFilterQueryParams extends Params {
 
 @Injectable({ providedIn: 'root' })
 export class ParkingsFilterRouter {
-
-    public get filter(): Observable<ParkingsFilter> {
-        return this.filter$;
-    }
-    private readonly filter$: Observable<ParkingsFilter>;
+    public readonly filter: Observable<ParkingsFilter>;
 
     constructor(
         activatedRoute: ActivatedRoute,
         private readonly router: Router,
         private readonly filterSerializer: ParkingsFilterSerializer,
     ) {
-        this.filter$ = activatedRoute.queryParams
+        this.filter = activatedRoute.queryParams
             .pipe(
                 map(params => this.filterSerializer.deserializeFilter(params)),
             );
