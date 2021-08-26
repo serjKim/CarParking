@@ -13,7 +13,7 @@ import { TransitionButtonsStorage } from './transition-buttons.storage';
     ],
 })
 export class ParkingsFilterComponent {
-    public readonly transitionButtons$ = this.transitionButtonsStorage.transitionButtons$;
+    public readonly transitionButtons$ = this.transitionButtonsStorage.transitionButtons;
 
     constructor(
         @Self() private readonly transitionButtonsStorage: TransitionButtonsStorage,
