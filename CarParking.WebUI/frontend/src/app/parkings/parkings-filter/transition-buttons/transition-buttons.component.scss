@@ -1,0 +1,60 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.statuses {
+    display: flex;
+    user-select: none;
+
+    .type-button-label {
+        position: relative;
+
+        .checkbox {
+            display: none;
+        }
+
+        .selector-icon {
+            position: absolute;
+            height: 4px;
+            width: 4px;
+            display: none;
+            background-color: #aba6b3;
+            border-radius: 5px;
+            top: -8px;
+            left: 5px;
+        }
+
+        input[type=checkbox]:checked + .selector-icon {
+            display: block;
+        }
+
+        .type-button {
+            $button-size: 15px;
+
+            font-size: $button-size;
+            border-radius: $button-size;
+            cursor: pointer;
+            @include transition();
+            margin-right: 3px;
+
+            @mixin type-button($color-button) {
+                color: $color-button;
+
+                &:hover {
+                    color: darken($color: $color-button, $amount: $hover-amount);
+                }
+            }
+
+            &.started {
+                @include type-button($complete-color);
+            }
+
+            &.completed {
+                @include type-button($completed-color);
+            }
+
+            &.payed {
+                @include type-button($payed-color);
+            }
+        }
+    }
+}

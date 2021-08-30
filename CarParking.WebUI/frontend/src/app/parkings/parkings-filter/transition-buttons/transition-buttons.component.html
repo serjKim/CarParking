@@ -1,0 +1,10 @@
+<div class="statuses">
+    <label class="type-button-label" *ngFor="let transitionButton of transitionButtons$ | async" [for]="transitionButton.buttonId">
+        <input class="checkbox"
+               type="checkbox"
+               [id]="transitionButton.buttonId"
+               [formControl]="transitionButton.control" >
+        <div class="selector-icon"></div>
+        <i class="material-icons type-button" [ngClass]="transitionButton.style.className">{{ transitionButton.style.icon }}</i>
+    </label>
+</div>

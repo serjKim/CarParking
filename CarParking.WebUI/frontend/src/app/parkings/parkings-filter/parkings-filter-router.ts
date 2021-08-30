@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ParkingsFilter } from './parking-filter';
+import { ParkingsFilter } from './parkings-filter';
 import { ParkingsFilterSerializer } from './parkings-filter-serializer';
 
 export interface ParkingsFilterQueryParams extends Params {

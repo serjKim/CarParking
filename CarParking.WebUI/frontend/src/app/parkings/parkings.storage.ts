@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, publishLast, refCount, switchMap } from 'rxjs/operators';
 import { CompletionResult, CompletionResultType, Parking, StartedFree } from './models';
-import { ParkingsFilter } from './parkings-filter/parking-filter';
+import { ParkingsFilter } from './parkings-filter';
 import { ParkingsFilterRouter } from './parkings-filter/parkings-filter-router';
 import { ParkingsApi } from './parkings.api';
 
@@ -21,23 +21,7 @@ export class ParkingsStorage {
             switchMap(x => x),
             map(this.sortParkings),
         );
-    }
-
-    public loadStorage(filter$: Observable<ParkingsFilter>) {
-        const loadedParkings$ = filter$
-            .pipe(
-                switchMap(filter => {
-                    const httpParams = this.parkingsFilterStorage.toHttpParams(filter);
-
-                    return this.parkingsApi.getAll(httpParams)
-                        .pipe(
-                            publishLast(),
-                            refCount(),
-                        );
-                }),
-            );
-
-        this.parkings$.next(loadedParkings$);
+        this.reloadStorage();
     }
 
     public async create(): Promise<void> {
@@ -67,5 +51,22 @@ export class ParkingsStorage {
     private reloadStorage() {
         const filter$ = this.parkingsFilterStorage.filter;
         this.loadStorage(filter$);
+    }
+
+    private loadStorage(filter$: Observable<ParkingsFilter>) {
+        const loadedParkings$ = filter$
+            .pipe(
+                switchMap(filter => {
+                    const httpParams = this.parkingsFilterStorage.toHttpParams(filter);
+
+                    return this.parkingsApi.getAll(httpParams)
+                        .pipe(
+                            publishLast(),
+                            refCount(),
+                        );
+                }),
+            );
+
+        this.parkings$.next(loadedParkings$);
     }
 }
