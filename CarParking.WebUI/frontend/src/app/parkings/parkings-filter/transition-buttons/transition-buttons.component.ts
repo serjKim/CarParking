@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input, Output, Self } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { filter, switchMap } from 'rxjs/operators';
-import { NgDestroyer, NotNullProperty } from '../../../extensions';
 import { TransitionButton } from './transition-button';
 import { TransitionButtonsStorage } from './transition-buttons.storage';
 
@@ -10,15 +9,10 @@ import { TransitionButtonsStorage } from './transition-buttons.storage';
     templateUrl: './transition-buttons.component.html',
     styleUrls: ['./transition-buttons.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [
-        NgDestroyer,
-        TransitionButtonsStorage,
-    ],
 })
 export class TransitionButtonsComponent<RMap> {
     @Input()
-    @NotNullProperty()
-    public set selectedButtonsArgsMap(_: (buttons: readonly TransitionButton[]) => Observable<RMap>) {}
+    public selectedButtonsArgsMap: ((buttons: readonly TransitionButton[]) => Observable<RMap>) | null = null;
 
     @Output()
     public selectedButtons = this.transitionButtonsStorage.selectedButtons.pipe(
@@ -34,6 +28,6 @@ export class TransitionButtonsComponent<RMap> {
     public readonly transitionButtons$ = this.transitionButtonsStorage.buttons;
 
     constructor(
-        @Self() private readonly transitionButtonsStorage: TransitionButtonsStorage,
+        private readonly transitionButtonsStorage: TransitionButtonsStorage,
     ) { }
 }

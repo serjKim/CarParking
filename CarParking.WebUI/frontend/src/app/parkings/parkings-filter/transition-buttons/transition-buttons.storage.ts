@@ -1,14 +1,11 @@
-import { Injectable, Self } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, merge, Observable } from 'rxjs';
-import { map, mergeMap, publishReplay, refCount, takeUntil } from 'rxjs/operators';
-import { NgDestroyer } from '../../../extensions';
+import { merge, Observable } from 'rxjs';
+import { map, mergeMap, publishReplay, refCount } from 'rxjs/operators';
 import { TransitionsApi } from '../../transitions.api';
-import { ParkingsFilter } from '../parkings-filter';
-import { ParkingsFilterRouter } from '../parkings-filter-router';
 import { ButtonStyles, TransitionButton } from './transition-button';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TransitionButtonsStorage {
     public readonly buttons: Observable<readonly TransitionButton[]>;
     public readonly selectedButtons: Observable<readonly TransitionButton[]>;
@@ -20,13 +17,10 @@ export class TransitionButtonsStorage {
     };
 
     constructor(
-        @Self() private readonly destroyer$: NgDestroyer,
-        private readonly parkingsFilterRouter: ParkingsFilterRouter,
         private readonly transitionApi: TransitionsApi,
     ) {
         this.buttons = this.getButtons$();
         this.selectedButtons = this.getSelectedButtons$();
-        this.syncWithFilter();
     }
 
     private getButtons$() {
@@ -60,21 +54,5 @@ export class TransitionButtonsStorage {
                 );
             }),
         );
-    }
-
-    private syncWithFilter() {
-        combineLatest([
-            this.parkingsFilterRouter.filter,
-            this.buttons,
-        ]).pipe(
-            takeUntil(this.destroyer$),
-        ).subscribe(this.setButtonValues);
-    }
-
-    private setButtonValues = ([filter, transitionButtons]: [ParkingsFilter, readonly TransitionButton[]]) => {
-        for (const button of transitionButtons) {
-            const selected = filter.transitionNames.has(button.transitionName);
-            button.control.setValue(selected);
-        }
     }
 }
