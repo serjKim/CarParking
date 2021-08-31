@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Self } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { ParkingsFilter } from './parkings-filter';
 import { ParkingsFilterRouter } from './parkings-filter-router';
+import { SyncButtonsWithFilter } from './sync-buttons-with-filter';
 import { TransitionButton } from './transition-buttons';
 
 @Component({
@@ -9,11 +10,17 @@ import { TransitionButton } from './transition-buttons';
     templateUrl: './parkings-filter.component.html',
     styleUrls: ['./parkings-filter.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        SyncButtonsWithFilter,
+    ],
 })
 export class ParkingsFilterComponent {
     constructor(
         private readonly parkingsFilterRouter: ParkingsFilterRouter,
-    ) {}
+        @Self() syncButtonsWithFilter: SyncButtonsWithFilter,
+    ) {
+        syncButtonsWithFilter.register();
+    }
 
     public getUpdatedFilter = (buttons: readonly TransitionButton[]) => {
         const transitionNames = buttons.map(x => x.transitionName);

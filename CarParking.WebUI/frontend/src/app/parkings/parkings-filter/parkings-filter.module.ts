@@ -1,17 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import { ParkingsFilterComponent } from './parkings-filter.component';
-import { TransitionButtonsComponent } from './transition-buttons';
+import { TransitionButtonsModule } from './transition-buttons';
 
 @NgModule({
     imports: [
         CommonModule,
-        ReactiveFormsModule,
+        TransitionButtonsModule,
     ],
     declarations: [
         ParkingsFilterComponent,
-        TransitionButtonsComponent,
     ],
     exports: [
         ParkingsFilterComponent,
