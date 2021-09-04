@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppSettings } from '../app-settings';
-import { deserializeParking, deserializeParkings } from './dtos';
+import { deserializeParking, deserializeParkings, ParkingRaw } from './dtos';
 import { CompletionResult, CompletionResultType, Parking, StartedFree } from './models';
 
 const enum TransitionErrorType {
@@ -22,13 +22,13 @@ export class ParkingsApi {
     ) { }
 
     public getAll(queryParams: HttpParams): Observable<readonly Parking[]> {
-        return this.httpClient.get<object[]>(`${this.settings.apiUrl}/parkings`, { params: queryParams }).pipe(
+        return this.httpClient.get<ParkingRaw[]>(`${this.settings.apiUrl}/parkings`, { params: queryParams }).pipe(
             map(obj => deserializeParkings(obj)),
         );
     }
 
     public create(): Promise<Parking> {
-        return this.httpClient.post<object>(`${this.settings.apiUrl}/parkings`, null).pipe(
+        return this.httpClient.post<ParkingRaw>(`${this.settings.apiUrl}/parkings`, null).pipe(
             map(obj => deserializeParking(obj)),
         ).toPromise();
     }
